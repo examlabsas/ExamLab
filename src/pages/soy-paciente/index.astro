@@ -1,0 +1,321 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import CalculadoraAyuno from '@/components/CalculadoraAyuno.astro';
+import FranjaLogos from '@/components/FranjaLogos.astro';
+import convenios from '@/data/convenios.json';
+import { examenes } from '@/lib/examenes';
+import { whatsappLink } from '@/lib/whatsapp';
+import { breadcrumbSchema } from '@/lib/schema';
+import type { IconName } from '@/lib/iconos';
+
+const accesos: {
+  icono: IconName;
+  titulo: string;
+  descripcion: string;
+  cta: string;
+  href: string;
+}[] = [
+  {
+    icono: 'calendario',
+    titulo: 'Pedir cita',
+    descripcion: 'Reserve su turno por WhatsApp y evite tiempos de espera.',
+    cta: 'Agendar',
+    href: '/soy-paciente/pedir-cita',
+  },
+  {
+    icono: 'documento',
+    titulo: 'Resultados',
+    descripcion: 'Guía de acceso al sistema Avalab para descargar su informe.',
+    cta: 'Ver guía',
+    href: '/soy-paciente/resultados',
+  },
+  {
+    icono: 'pin',
+    titulo: 'Puntos de atención',
+    descripcion: 'Direcciones, mapas y horarios de nuestras sedes.',
+    cta: 'Ver sedes',
+    href: '/sedes',
+  },
+  {
+    icono: 'escudo',
+    titulo: 'Guía para pacientes',
+    descripcion: 'Cómo prepararse para que su examen salga bien a la primera.',
+    cta: 'Leer guía',
+    href: '#guia',
+  },
+  {
+    icono: 'alerta',
+    titulo: 'Preguntas frecuentes',
+    descripcion: 'Ayunas, tiempos de entrega, convenios y formas de pago.',
+    cta: 'Ver respuestas',
+    href: '#preguntas-frecuentes',
+  },
+  {
+    icono: 'usuarios',
+    titulo: 'Califica tu experiencia',
+    descripcion: 'Cuéntenos cómo le atendimos y ayúdenos a mejorar.',
+    cta: 'Dejar reseña',
+    href: '/soy-paciente/califica-tu-experiencia',
+  },
+];
+
+const pasos: { icono: IconName; titulo: string; texto: string }[] = [
+  {
+    icono: 'calendario',
+    titulo: 'Agende su cita',
+    texto:
+      'Escríbanos por WhatsApp con el examen que necesita. También puede acudir sin cita en horario de atención.',
+  },
+  {
+    icono: 'documento',
+    titulo: 'Revise la preparación',
+    texto:
+      'Busque su examen en el catálogo: ahí encontrará las condiciones del paciente y si necesita ayuno.',
+  },
+  {
+    icono: 'gota',
+    titulo: 'Toma de muestra',
+    texto:
+      'Lleve su cédula y la orden médica. El procedimiento toma pocos minutos y lo realiza personal certificado.',
+  },
+  {
+    icono: 'monitor',
+    titulo: 'Descargue su resultado',
+    texto:
+      'Reciba el aviso y descargue su informe en Avalab con su cédula y el código de orden.',
+  },
+];
+
+const preguntas = [
+  {
+    pregunta: '¿Necesito cita previa?',
+    respuesta:
+      'No es obligatoria para exámenes de rutina: puede acudir en horario de atención. Sí la recomendamos para chequeos completos, pruebas especiales y toma de muestra a domicilio.',
+  },
+  {
+    pregunta: '¿Cuántas horas de ayuno debo hacer?',
+    respuesta:
+      'Depende del examen. La mayoría de pruebas de química clínica requieren entre 8 y 12 horas. Cada ficha del catálogo lo indica en “Condiciones del paciente”; si su médico le dio una indicación distinta, siga la de su médico.',
+  },
+  {
+    pregunta: '¿En cuánto tiempo tengo mis resultados?',
+    respuesta:
+      'La mayoría de exámenes de rutina se entregan el mismo día. Los cultivos y pruebas especializadas pueden tomar de 48 a 72 horas. El tiempo exacto aparece en la ficha de cada examen.',
+  },
+  {
+    pregunta: '¿Puedo tomar mis medicamentos antes del examen?',
+    respuesta:
+      'En general sí, salvo indicación contraria de su médico. Avísenos qué medicación toma al momento de la toma de muestra, porque algunos fármacos influyen en ciertos resultados.',
+  },
+  {
+    pregunta: '¿Qué documentos debo llevar?',
+    respuesta:
+      'Su cédula de identidad y la orden médica si la tiene. Para menores de edad, la cédula del representante. Si viene por convenio o seguro, traiga también su credencial.',
+  },
+  {
+    pregunta: '¿Trabajan con seguros y medicina prepagada?',
+    respuesta:
+      'Sí, atendemos pacientes de las principales aseguradoras y empresas de medicina prepagada del país. Antes de acudir, escríbanos por WhatsApp para confirmar la cobertura de su plan.',
+  },
+  {
+    pregunta: '¿Qué formas de pago aceptan?',
+    respuesta:
+      'Efectivo, tarjeta de débito, tarjeta de crédito y transferencia bancaria. El pago se realiza al momento de la toma de muestra, salvo que usted venga por convenio institucional.',
+  },
+  {
+    pregunta: '¿Atienden a niños?',
+    respuesta:
+      'Sí. Contamos con personal con experiencia en toma de muestra pediátrica y con volúmenes reducidos. Recomendamos agendar cita para reducir el tiempo de espera.',
+  },
+];
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Soy paciente', href: '/soy-paciente' },
+  ]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: preguntas.map((item) => ({
+      '@type': 'Question',
+      name: item.pregunta,
+      acceptedAnswer: { '@type': 'Answer', text: item.respuesta },
+    })),
+  },
+];
+---
+
+<BaseLayout
+  titulo="Soy paciente"
+  descripcion="Pedir cita, acceder a sus resultados, puntos de atención, guía de preparación y preguntas frecuentes de ExamLab."
+  whatsapp="paciente"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Para usted y su familia"
+    titulo="Su examen, paso a paso y sin complicaciones"
+    descripcion="Todo lo que necesita saber antes, durante y después de su visita al laboratorio."
+    migas={[
+      { nombre: 'Inicio', href: '/' },
+      { nombre: 'Soy paciente', href: '/soy-paciente' },
+    ]}
+  >
+    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Button href="/soy-paciente/pedir-cita" icon="calendario">Pedir cita</Button>
+      <Button href="/soy-paciente/resultados" variant="sobreOscuro" icon="documento">
+        Ver mis resultados
+      </Button>
+    </div>
+  </PageHero>
+
+  <!-- Accesos -->
+  <section class="bg-white py-section">
+    <div class="container-page grid grid-cols-1 gap-4.5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        accesos.map((acceso) => (
+          <ServiceCard
+            icono={acceso.icono}
+            titulo={acceso.titulo}
+            descripcion={acceso.descripcion}
+            cta={acceso.cta}
+            href={acceso.href}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Proceso -->
+  <section class="bg-surface py-section">
+    <div class="container-page">
+      <SectionHeading eyebrow="Cómo es el proceso" titulo="De la cita al resultado" />
+      <ol class="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          pasos.map((paso, i) => (
+            <li class="rounded-3xl border border-line bg-white p-6">
+              <div class="flex items-center justify-between">
+                <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+                  <Icon name={paso.icono} size={23} />
+                </span>
+                <span class="font-display text-[28px] leading-none font-bold text-line-strong">
+                  0{i + 1}
+                </span>
+              </div>
+              <h3 class="mt-4 text-[17px] font-bold text-brand">{paso.titulo}</h3>
+              <p class="mt-2 text-[14px] leading-relaxed text-neutral">{paso.texto}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Calculadora de ayuno -->
+  <section id="ayuno" class="scroll-mt-24 bg-white py-section">
+    <div class="container-page">
+      <SectionHeading
+        eyebrow="Preparación"
+        titulo="Calcule su hora de ayuno"
+        descripcion="La duda más frecuente del laboratorio, resuelta con una hora exacta en vez de un rango."
+      />
+      <div class="mt-9 max-w-[720px]">
+        <CalculadoraAyuno examenes={examenes} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Guía para pacientes -->
+  <section id="guia" class="scroll-mt-24 bg-surface py-section">
+    <div class="container-page grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+      <div>
+        <SectionHeading
+          eyebrow="Guía para pacientes"
+          titulo="Recomendaciones que evitan repetir la toma"
+        />
+        <ul class="mt-7 flex flex-col gap-4">
+          {
+            [
+              'Respete las horas de ayuno indicadas para su examen.',
+              'Tome agua: la hidratación facilita la punción venosa.',
+              'Evite ejercicio intenso y alcohol el día previo.',
+              'Si suele marearse con las agujas, avísele al personal antes de sentarse.',
+              'Para muestras de orina, solicite el frasco estéril con anticipación.',
+              'Llegue con 10 minutos de anticipación si tiene cita agendada.',
+            ].map((item) => (
+              <li class="flex items-start gap-3 rounded-2xl bg-surface p-4 text-[14.5px] leading-relaxed text-neutral">
+                <Icon name="check" size={19} strokeWidth={2.2} class="mt-0.5 text-accent" />
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="lg:pt-16">
+        <div class="rounded-3xl bg-brand p-7 lg:p-9">
+          <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-accent-light">
+            <Icon name="alerta" size={24} />
+          </span>
+          <h2 class="mt-5 text-h3 font-bold text-white">
+            Sus resultados los interpreta su médico
+          </h2>
+          <p class="mt-3 text-[15px] leading-relaxed text-white/75">
+            Un valor fuera del rango de referencia no significa por sí solo una enfermedad, y un
+            valor normal no descarta todas las condiciones. Lleve siempre su informe a la consulta:
+            el laboratorio entrega datos, el diagnóstico lo hace su médico tratante.
+          </p>
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Button href={whatsappLink('paciente')} icon="whatsapp-marca" size="sm">Tengo una duda</Button>
+            <Button href="/catalogo" variant="sobreOscuro" size="sm">Ver condiciones</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Convenios -->
+  <section id="convenios" class="scroll-mt-24 bg-white py-section">
+    <div class="container-page">
+      <SectionHeading
+        eyebrow="Seguros y medicina prepagada"
+        titulo="¿Su plan tiene convenio con nosotros?"
+        descripcion="Atendemos a pacientes de las principales aseguradoras del país. Confirme la cobertura antes de acudir y traiga su credencial."
+        ctaLabel="Confirmar mi cobertura"
+        ctaHref={whatsappLink('convenios')}
+      />
+      <div class="mt-9 rounded-2xl border border-line bg-white px-6 py-8">
+        <FranjaLogos logos={convenios} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Preguntas frecuentes -->
+  <section id="preguntas-frecuentes" class="scroll-mt-24 bg-surface py-section">
+    <div class="container-page">
+      <SectionHeading eyebrow="Preguntas frecuentes" titulo="Las dudas más comunes" />
+      <div class="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {
+          preguntas.map((item) => (
+            <details class="group rounded-3xl border border-line bg-white p-6 open:border-accent">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[16.5px] font-bold text-brand">
+                {item.pregunta}
+                <Icon
+                  name="mas"
+                  size={20}
+                  class="flex-none text-accent transition-transform duration-200 group-open:rotate-45"
+                />
+              </summary>
+              <p class="mt-3.5 text-[14.5px] leading-relaxed text-neutral">{item.respuesta}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

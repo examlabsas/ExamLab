@@ -1,0 +1,103 @@
+---
+/**
+ * Texto base de términos y condiciones.
+ * IMPORTANTE: revisar con la asesoría legal de ExamLab antes de publicar.
+ */
+import LegalLayout from '@/layouts/LegalLayout.astro';
+import { site } from '@/lib/site';
+---
+
+<LegalLayout
+  titulo="Términos y condiciones"
+  descripcion="Condiciones de uso del sitio web y de los servicios de laboratorio de ExamLab."
+  actualizado="2026-07-01"
+  ruta="/terminos"
+>
+  <p>
+    Estos términos regulan el uso del sitio web de {site.razonSocial} y la contratación de sus
+    servicios de laboratorio clínico. Al utilizar el sitio o solicitar un examen, usted acepta lo
+    aquí descrito.
+  </p>
+
+  <h2>1. Naturaleza de la información publicada</h2>
+  <p>
+    El contenido de este sitio, incluidos los artículos de la sección de noticias y las fichas del
+    catálogo de exámenes, tiene finalidad informativa. <strong
+      >No sustituye la consulta, el diagnóstico ni el tratamiento de un profesional de la salud.</strong
+    > No utilice esta información para autodiagnosticarse ni para modificar un tratamiento indicado por
+    su médico.
+  </p>
+
+  <h2>2. Catálogo, precios y disponibilidad</h2>
+  <ul>
+    <li>Los precios publicados son referenciales y están expresados en dólares de los Estados Unidos.</li>
+    <li>Pueden variar según convenios institucionales, promociones vigentes y actualizaciones de tarifario.</li>
+    <li>
+      El catálogo muestra una selección de nuestra cartera; la disponibilidad de pruebas
+      especializadas se confirma al momento de agendar.
+    </li>
+    <li>Los tiempos de entrega son estimados y pueden extenderse en pruebas derivadas o repetidas por control de calidad.</li>
+  </ul>
+
+  <h2>3. Agendamiento y toma de muestra</h2>
+  <p>
+    El agendamiento por WhatsApp o teléfono queda confirmado cuando nuestro personal responde con el
+    día y la hora asignados. Es responsabilidad del paciente cumplir las condiciones de preparación
+    indicadas para cada examen; el incumplimiento puede obligar a repetir la toma de muestra, con el
+    costo que ello implique.
+  </p>
+  <p>
+    Para la toma de muestra a domicilio se requiere confirmación previa y aplica un valor adicional
+    por desplazamiento, informado antes de la visita.
+  </p>
+
+  <h2>4. Entrega de resultados</h2>
+  <p>
+    Los resultados se entregan a través del portal en línea, mediante el número de cédula y el
+    código de orden, o de forma impresa en la sede donde se tomó la muestra. La entrega a terceros
+    requiere autorización escrita del paciente, salvo el caso del profesional de la salud que
+    solicitó el examen y de los representantes legales de menores de edad.
+  </p>
+
+  <h2>5. Pagos y facturación</h2>
+  <p>
+    El pago se realiza al momento de la toma de muestra, salvo convenio institucional vigente.
+    Emitimos comprobante electrónico con los datos que el paciente proporcione. Las devoluciones
+    proceden únicamente cuando el examen no llegó a procesarse por causa atribuible al laboratorio.
+  </p>
+
+  <h2>6. Uso del sitio web</h2>
+  <p>
+    El usuario se compromete a utilizar el sitio conforme a la ley y a no realizar acciones que
+    afecten su funcionamiento o seguridad. Las marcas, textos, imágenes y demás elementos del sitio
+    son propiedad de {site.razonSocial} o se utilizan con autorización, y no pueden reproducirse sin
+    consentimiento previo.
+  </p>
+
+  <h2>7. Enlaces y servicios de terceros</h2>
+  <p>
+    El sitio enlaza al portal de resultados y a servicios de mensajería de terceros. El uso de esos
+    servicios se rige por sus propios términos y políticas de privacidad, sobre los cuales no
+    ejercemos control.
+  </p>
+
+  <h2>8. Responsabilidad</h2>
+  <p>
+    {site.razonSocial} responde por la calidad técnica del análisis realizado y por el cumplimiento
+    de sus procedimientos de control de calidad. No responde por decisiones clínicas tomadas a
+    partir de la información publicada en este sitio, ni por perjuicios derivados del incumplimiento
+    de las indicaciones de preparación por parte del paciente.
+  </p>
+
+  <h2>9. Ley aplicable</h2>
+  <p>
+    Estos términos se rigen por la legislación de la República del Ecuador. Cualquier controversia
+    se someterá a los jueces competentes de la ciudad de {site.ciudad}.
+  </p>
+
+  <h2>10. Contacto</h2>
+  <p>
+    Para consultas sobre estos términos escriba a <a href={`mailto:${site.email}`}>{site.email}</a> o
+    llame al {site.telefono}.
+  </p>
+</LegalLayout>

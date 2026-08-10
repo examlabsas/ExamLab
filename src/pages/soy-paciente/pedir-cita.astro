@@ -1,0 +1,179 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { site, sedes } from '@/lib/site';
+import { whatsappLink, whatsappSede } from '@/lib/whatsapp';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Soy paciente', href: '/soy-paciente' },
+    { nombre: 'Pedir cita', href: '/soy-paciente/pedir-cita' },
+  ]),
+];
+
+const pasos = [
+  {
+    titulo: 'Escríbanos por WhatsApp',
+    texto:
+      'Toque el botón y se abrirá el chat con un mensaje ya escrito. Solo tiene que enviarlo.',
+  },
+  {
+    titulo: 'Indique qué examen necesita',
+    texto:
+      'Si tiene la orden médica, puede enviarnos una foto. Si no sabe cuál es, le orientamos.',
+  },
+  {
+    titulo: 'Elija sede, día y hora',
+    texto: 'Le confirmamos disponibilidad y le indicamos la preparación que debe seguir.',
+  },
+  {
+    titulo: 'Reciba su confirmación',
+    texto:
+      'Le enviamos el resumen de su cita con la dirección y las condiciones de preparación.',
+  },
+];
+---
+
+<BaseLayout
+  titulo="Pedir cita"
+  descripcion="Agende su toma de muestra en ExamLab por WhatsApp: elija sede, día y hora, y reciba las indicaciones de preparación."
+  whatsapp="cita"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Pedir cita"
+    titulo="Agende su examen por WhatsApp"
+    descripcion="Sin formularios ni llamadas en espera. Nos escribe, elegimos juntos el horario y le enviamos las indicaciones de preparación."
+    migas={[
+      { nombre: 'Inicio', href: '/' },
+      { nombre: 'Soy paciente', href: '/soy-paciente' },
+      { nombre: 'Pedir cita', href: '/soy-paciente/pedir-cita' },
+    ]}
+  >
+    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Button href={whatsappLink('cita')} icon="whatsapp-marca">Agendar por WhatsApp</Button>
+      <Button href={`tel:${site.telefonoE164}`} variant="sobreOscuro" icon="telefono">
+        Llamar al {site.telefono}
+      </Button>
+    </div>
+  </PageHero>
+
+  <!-- Pasos -->
+  <section class="bg-white py-section">
+    <div class="container-page">
+      <SectionHeading eyebrow="Cómo agendar" titulo="Cuatro pasos por WhatsApp" />
+      <ol class="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          pasos.map((paso, i) => (
+            <li class="rounded-3xl bg-surface p-6">
+              <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-[17px] font-bold text-white">
+                {i + 1}
+              </span>
+              <h3 class="mt-4 text-[17px] font-bold text-brand">{paso.titulo}</h3>
+              <p class="mt-2 text-[14px] leading-relaxed text-neutral">{paso.texto}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Elegir sede o domicilio -->
+  <section class="bg-surface py-section">
+    <div class="container-page">
+      <SectionHeading
+        eyebrow="Dónde quiere atenderse"
+        titulo="Elija la sede o pida la toma a domicilio"
+        descripcion="Cada botón abre el chat con el mensaje ya preparado para esa opción."
+      />
+      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {
+          sedes.map((sede) => (
+            <div class="flex flex-col gap-3 rounded-3xl bg-white p-6 shadow-card">
+              <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+                <Icon name="pin" size={23} />
+              </span>
+              <h3 class="text-[17px] font-bold text-brand">{sede.nombre}</h3>
+              <p class="text-[13.8px] leading-relaxed text-neutral">
+                {sede.direccion}
+                <br />
+                {sede.ciudad}, {sede.provincia}
+              </p>
+              <div class="mt-auto pt-3">
+                <Button href={whatsappSede(sede.nombre)} icon="whatsapp-marca" size="sm" full>
+                  Agendar aquí
+                </Button>
+              </div>
+            </div>
+          ))
+        }
+        <div class="flex flex-col gap-3 rounded-3xl bg-brand p-6">
+          <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-accent-light">
+            <Icon name="casa" size={23} />
+          </span>
+          <h3 class="text-[17px] font-bold text-white">Toma a domicilio</h3>
+          <p class="text-[13.8px] leading-relaxed text-white/75">
+            Un profesional acude a su casa u oficina. Se agenda hasta las 17:00 del día anterior y
+            tiene un valor adicional por desplazamiento.
+          </p>
+          <div class="mt-auto pt-3">
+            <Button href={whatsappLink('domicilio')} variant="blanco" icon="whatsapp-marca" size="sm" full>
+              Solicitar visita
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Antes de su cita -->
+  <section class="bg-white py-section">
+    <div class="container-page grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-12">
+      <div>
+        <h2 class="text-h2 font-bold text-brand">Antes de su cita</h2>
+        <ul class="mt-6 flex flex-col gap-3.5">
+          {
+            [
+              'Revise en el catálogo si su examen requiere ayuno y cuántas horas.',
+              'Tenga a mano su cédula y la orden médica si la tiene.',
+              'Si viene por convenio o seguro, confírmenos su plan antes de acudir.',
+              'Llegue 10 minutos antes de la hora acordada.',
+              'Si necesita cancelar o reprogramar, avísenos por el mismo chat.',
+            ].map((item) => (
+              <li class="flex items-start gap-3 text-[15px] leading-relaxed text-neutral">
+                <Icon name="check" size={19} strokeWidth={2.2} class="mt-0.5 text-accent" />
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <aside class="rounded-3xl bg-surface p-6 lg:p-7">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-alert-soft text-alert-dark">
+          <Icon name="mas" size={21} />
+        </span>
+        <h2 class="mt-4 text-[18px] font-bold text-brand">¿Es un examen urgente?</h2>
+        <p class="mt-2.5 text-[14px] leading-relaxed text-neutral">
+          Procesamos con prioridad los exámenes con indicación de urgencia y entregamos el mismo
+          día. Llame directamente para coordinar.
+        </p>
+        <Button
+          href={`tel:${site.emergenciasE164}`}
+          variant="brand"
+          size="sm"
+          icon="telefono"
+          full
+          class="mt-4"
+        >
+          {site.emergencias}
+        </Button>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

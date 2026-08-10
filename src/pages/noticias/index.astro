@@ -1,0 +1,140 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import NewsCard from '@/components/NewsCard.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import { getCollection } from 'astro:content';
+import { breadcrumbSchema } from '@/lib/schema';
+import { whatsappLink } from '@/lib/whatsapp';
+import { formatoFecha } from '@/lib/fechas';
+import { site } from '@/lib/site';
+
+const notas = (await getCollection('noticias', ({ data }) => !data.borrador)).sort(
+  (a, b) => b.data.fecha.getTime() - a.data.fecha.getTime(),
+);
+
+const [destacada, ...resto] = notas;
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Noticias', href: '/noticias' },
+  ]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: `Noticias y salud · ${site.nombre}`,
+    url: new URL('/noticias', site.url).toString(),
+    inLanguage: 'es-EC',
+    publisher: { '@id': new URL('/#organizacion', site.url).toString() },
+  },
+];
+---
+
+<BaseLayout
+  titulo="Noticias y salud"
+  descripcion="Artículos de prevención, preparación de exámenes y novedades del laboratorio, escritos por el equipo de ExamLab."
+  whatsapp="noticias"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Noticias y salud"
+    titulo="Información útil para su cuidado"
+    descripcion="Guías de preparación, recomendaciones de prevención y novedades del laboratorio."
+    migas={[
+      { nombre: 'Inicio', href: '/' },
+      { nombre: 'Noticias', href: '/noticias' },
+    ]}
+  />
+
+  {
+    destacada && (
+      <section class="bg-white py-10 lg:py-14">
+        <div class="container-page">
+          <a
+            href={`/noticias/${destacada.id}`}
+            class="group grid grid-cols-1 gap-6 overflow-hidden rounded-[28px] border border-line bg-white transition-all duration-200 hover:border-accent hover:shadow-card-hover lg:grid-cols-2 lg:gap-0"
+          >
+            {destacada.data.imagen ? (
+              <img
+                src={destacada.data.imagen}
+                alt={destacada.data.imagenAlt ?? ''}
+                width="1024"
+                height="768"
+                loading="lazy"
+                decoding="async"
+                class="h-56 w-full object-cover lg:h-full"
+              />
+            ) : (
+              <span class="flex h-56 items-center justify-center bg-[repeating-linear-gradient(45deg,#F0F1F3_0_9px,#E4E6E9_9px_18px)] lg:h-full">
+                <span class="rounded-md bg-white/85 px-2.5 py-1.5 font-mono text-[11.5px] text-[#9A9B9E]">
+                  imagen destacada · 16:9
+                </span>
+              </span>
+            )}
+            <div class="p-6 lg:p-10">
+              <span class="flex flex-wrap items-center gap-2.5 text-xs font-bold text-accent-dark">
+                <span class="rounded-lg bg-accent-soft px-2.5 py-1.5 uppercase">
+                  {destacada.data.categoria}
+                </span>
+                <span class="text-[#9A9B9E]">{formatoFecha(destacada.data.fecha)}</span>
+              </span>
+              <h2 class="mt-4 text-h3 font-bold text-brand">{destacada.data.titulo}</h2>
+              <p class="mt-3 text-[15px] leading-relaxed text-neutral">
+                {destacada.data.descripcion}
+              </p>
+              <span class="mt-5 flex items-center gap-2 text-[14px] font-bold text-accent">
+                Leer artículo
+                <Icon
+                  name="flecha"
+                  size={16}
+                  strokeWidth={2.4}
+                  class="transition-transform duration-200 group-hover:translate-x-1"
+                />
+              </span>
+            </div>
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="bg-surface py-section">
+    <div class="container-page">
+      <h2 class="text-h2 font-bold text-brand">Todos los artículos</h2>
+
+      {
+        resto.length > 0 ? (
+          <div class="mt-8 grid grid-cols-1 gap-5.5 md:grid-cols-2 lg:grid-cols-3">
+            {resto.map((nota, i) => (
+              <NewsCard
+                slug={nota.id}
+                titulo={nota.data.titulo}
+                descripcion={nota.data.descripcion}
+                categoria={nota.data.categoria}
+                fecha={nota.data.fecha}
+                imagen={nota.data.imagen}
+                indice={i + 1}
+              />
+            ))}
+          </div>
+        ) : (
+          <p class="mt-6 text-base text-neutral">Muy pronto publicaremos más contenidos.</p>
+        )
+      }
+
+      <div class="mt-10 flex flex-col gap-4 rounded-3xl bg-brand p-7 sm:flex-row sm:items-center sm:justify-between lg:p-9">
+        <div>
+          <h2 class="text-h3 font-bold text-white">¿Tiene una duda sobre su examen?</h2>
+          <p class="mt-2 max-w-[520px] text-[15px] leading-relaxed text-white/75">
+            Nuestro equipo responde consultas sobre preparación, tiempos de entrega y disponibilidad.
+          </p>
+        </div>
+        <Button href={whatsappLink('noticias')} icon="whatsapp-marca" class="shrink-0">
+          Escribirnos
+        </Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,186 @@
+[
+  {
+    "codigo": "AUT-001",
+    "slug": "ac-anti-endomisio-ema-igg",
+    "nombre": "AC. ANTI ENDOMISIO (EMA) IgG",
+    "especialidad": "Autoinmunidad",
+    "sinonimos": [
+      "EMA",
+      "Anticuerpos anti-endomisio",
+      "Endomisio IgG"
+    ],
+    "utilidad": "La determinación de anticuerpos anti-transglutaminasa tisular (tTG) es una herramienta serológica de primera línea para el diagnóstico de la enfermedad celíaca, en conjunto con la evaluación clínica y, cuando está indicada, la biopsia de intestino delgado. La transglutaminasa tisular es el principal antígeno reconocido por los anticuerpos anti-endomisio (EMA), lo que permite una detección más sensible, específica y confiable de esta enfermedad.",
+    "condicionesClinicas": "AYUNO 8-12 horas.",
+    "tiempoEntrega": "2-3 días laborables",
+    "tipoMuestra": "Suero 1mL",
+    "tecnica": "REMISIÓN",
+    "ficha": null,
+    "tecnico": {
+      "equipo": "Inmunofluorescencia indirecta sobre esófago de mono",
+      "volumenMinimo": "1 mL de suero",
+      "conservacion": "2 a 8 °C hasta 7 días · congelado −20 °C hasta 3 meses",
+      "transporte": "Refrigerado 2 a 8 °C",
+      "diasProceso": "Martes y jueves",
+      "loinc": "31017-6",
+      "unidades": "Título (1:5, 1:10, 1:20…)",
+      "criteriosRechazo": [
+        "Suero hemolizado o lipémico",
+        "Volumen menor a 0,5 mL",
+        "Muestra sin refrigerar por más de 24 horas"
+      ]
+    }
+  },
+  {
+    "codigo": "HEM-001",
+    "slug": "biometria-hematica-completa",
+    "nombre": "BIOMETRÍA HEMÁTICA COMPLETA",
+    "especialidad": "Hematología",
+    "sinonimos": [
+      "Hemograma",
+      "BHC",
+      "CBC"
+    ],
+    "utilidad": "Evalúa las tres series celulares de la sangre: eritrocitaria, leucocitaria y plaquetaria. Permite detectar anemias y clasificarlas según los índices eritrocitarios, orientar el diagnóstico de procesos infecciosos e inflamatorios mediante la fórmula leucocitaria, y valorar alteraciones de la hemostasia primaria a través del recuento plaquetario. Es el examen de rutina más solicitado en el control prequirúrgico y en el seguimiento de tratamientos que afectan la médula ósea.",
+    "condicionesClinicas": "No requiere ayuno. Puede tomar agua con normalidad. Informe si recibe corticoides o quimioterapia.",
+    "tiempoEntrega": "El mismo día, 4-6 horas",
+    "tipoMuestra": "Sangre total con EDTA 3mL",
+    "tecnica": "CITOMETRÍA DE FLUJO AUTOMATIZADA",
+    "ficha": null,
+    "tecnico": {
+      "equipo": "Analizador hematológico de 5 poblaciones",
+      "volumenMinimo": "3 mL de sangre total (1 mL en pediatría)",
+      "conservacion": "2 a 8 °C hasta 24 horas",
+      "transporte": "Refrigerado 2 a 8 °C, en posición vertical",
+      "diasProceso": "Lunes a sábado, dos corridas diarias",
+      "loinc": "58410-2",
+      "unidades": "10³/µL, g/dL y % según parámetro",
+      "criteriosRechazo": [
+        "Muestra coagulada o con microcoágulos",
+        "Volumen insuficiente respecto del anticoagulante",
+        "Tubo sin identificación",
+        "Más de 24 horas desde la toma"
+      ]
+    }
+  },
+  {
+    "codigo": "QUI-014",
+    "slug": "perfil-lipidico",
+    "nombre": "PERFIL LIPÍDICO",
+    "especialidad": "Química clínica",
+    "sinonimos": [
+      "Perfil de lípidos",
+      "Colesterol y triglicéridos"
+    ],
+    "utilidad": "Cuantifica colesterol total, colesterol HDL, colesterol LDL calculado, VLDL y triglicéridos. Constituye la base de la estimación del riesgo cardiovascular y del seguimiento del tratamiento hipolipemiante. Está indicado en el control anual del adulto desde los 20 años, y con mayor frecuencia en pacientes con hipertensión, diabetes, sobrepeso o antecedentes familiares de enfermedad coronaria precoz.",
+    "condicionesClinicas": "AYUNO 12 horas. Evitar alcohol durante las 72 horas previas. No realizar ejercicio intenso el día anterior. Mantener la dieta habitual las dos semanas previas.",
+    "tiempoEntrega": "El mismo día, 6 horas",
+    "tipoMuestra": "Suero 1mL",
+    "tecnica": "ESPECTROFOTOMETRÍA ENZIMÁTICA COLORIMÉTRICA",
+    "ficha": null,
+    "tecnico": {
+      "equipo": "Analizador de química clínica",
+      "volumenMinimo": "1 mL de suero",
+      "conservacion": "2 a 8 °C hasta 7 días · congelado −20 °C hasta 3 meses",
+      "transporte": "Suero ya separado, refrigerado",
+      "diasProceso": "Lunes a sábado, corrida de la mañana",
+      "loinc": "57698-3",
+      "unidades": "mg/dL",
+      "criteriosRechazo": [
+        "Suero lipémico por incumplimiento del ayuno",
+        "Hemólisis moderada o intensa",
+        "Muestra no separada dentro de las 2 horas"
+      ]
+    }
+  },
+  {
+    "codigo": "HOR-003",
+    "slug": "tsh-ultrasensible",
+    "nombre": "TSH ULTRASENSIBLE",
+    "especialidad": "Hormonas y marcadores",
+    "sinonimos": [
+      "Tirotropina",
+      "Hormona estimulante de la tiroides"
+    ],
+    "utilidad": "Prueba de primera línea para el estudio de la función tiroidea. Valores elevados orientan a hipotiroidismo primario y valores suprimidos a hipertiroidismo, en ambos casos con confirmación mediante T4 libre. Está indicada en el estudio de astenia, cambios de peso, caída de cabello y alteraciones del ciclo menstrual, en el control del tratamiento con levotiroxina y en el tamizaje durante el embarazo.",
+    "condicionesClinicas": "No requiere ayuno estricto. Se recomienda toma matutina. Si toma levotiroxina, realizar la toma antes de la dosis del día. Informe si recibió medios de contraste yodados en el último mes.",
+    "tiempoEntrega": "24 horas",
+    "tipoMuestra": "Suero 0.5mL",
+    "tecnica": "QUIMIOLUMINISCENCIA (CLIA)",
+    "ficha": null,
+    "tecnico": {
+      "equipo": "Analizador de inmunoensayo por quimioluminiscencia",
+      "volumenMinimo": "0,5 mL de suero",
+      "conservacion": "2 a 8 °C hasta 5 días · congelado −20 °C hasta 6 meses",
+      "transporte": "Refrigerado, evitando congelado y descongelado repetido",
+      "diasProceso": "Lunes a viernes",
+      "loinc": "3016-3",
+      "unidades": "µUI/mL",
+      "criteriosRechazo": [
+        "Muestra hemolizada",
+        "Suero con fibrina en suspensión",
+        "Más de dos ciclos de congelado"
+      ]
+    }
+  },
+  {
+    "codigo": "MIC-007",
+    "slug": "urocultivo-antibiograma",
+    "nombre": "UROCULTIVO + ANTIBIOGRAMA",
+    "especialidad": "Microbiología",
+    "sinonimos": [
+      "Cultivo de orina",
+      "Urocultivo"
+    ],
+    "utilidad": "Aísla e identifica el microorganismo responsable de la infección de vías urinarias y determina su perfil de sensibilidad antimicrobiana. El antibiograma se informa con lectura interpretada según los puntos de corte vigentes del CLSI, lo que permite orientar el tratamiento dirigido y evitar el uso empírico de antibióticos de amplio espectro. Indicado en infección urinaria sintomática, cuadros a repetición, control postratamiento y tamizaje de bacteriuria asintomática en el embarazo.",
+    "condicionesClinicas": "Primera orina de la mañana, chorro medio, previa higiene genital con agua y jabón. Recolectar en frasco estéril solicitado en el laboratorio. No debe estar recibiendo antibióticos; de ser así, esperar 5 días desde la última dosis. Entregar antes de 2 horas o mantener refrigerada.",
+    "tiempoEntrega": "48-72 horas",
+    "tipoMuestra": "Orina de chorro medio 5mL en frasco estéril",
+    "tecnica": "CULTIVO EN MEDIOS SELECTIVOS Y DIFUSIÓN EN DISCO",
+    "ficha": null,
+    "tecnico": {
+      "equipo": "Siembra en medios selectivos y antibiograma por difusión",
+      "volumenMinimo": "5 mL de orina",
+      "conservacion": "2 a 8 °C hasta 24 horas · ambiente máximo 2 horas",
+      "transporte": "Refrigerado en frasco estéril sellado",
+      "diasProceso": "Lunes a sábado, siembra el mismo día",
+      "loinc": "630-4",
+      "unidades": "UFC/mL e interpretación S/I/R según CLSI",
+      "criteriosRechazo": [
+        "Envase no estéril o sin sellar",
+        "Más de 24 horas desde la recolección",
+        "Bolsa recolectora en adultos",
+        "Antibioticoterapia activa sin nota en la orden"
+      ]
+    }
+  },
+  {
+    "codigo": "PAQ-001",
+    "slug": "chequeo-preventivo-adulto",
+    "nombre": "CHEQUEO PREVENTIVO ADULTO",
+    "especialidad": "Perfiles y chequeos",
+    "sinonimos": [
+      "Perfil anual",
+      "Chequeo básico"
+    ],
+    "utilidad": "Paquete de tamizaje para el control anual del adulto sano. Reúne biometría hemática completa, glucosa en ayunas, perfil lipídico, urea y creatinina, transaminasas y bilirrubinas, y elemental y microscópico de orina. Permite la detección temprana de diabetes, dislipidemia, enfermedad renal crónica y hepatopatía en etapas asintomáticas, con una sola toma de muestra y a valor preferencial.",
+    "condicionesClinicas": "AYUNO 12 horas; solo puede tomar agua. Traer muestra de orina de la primera micción o recolectarla en la sede. Evitar alcohol y ejercicio intenso el día previo. Puede tomar su medicación habitual salvo indicación médica contraria.",
+    "tiempoEntrega": "24 horas",
+    "tipoMuestra": "Sangre total, suero y orina",
+    "tecnica": "PERFIL MULTIPARAMÉTRICO AUTOMATIZADO",
+    "ficha": null,
+    "tecnico": {
+      "equipo": "Perfil multiparamétrico: hematología, química y uroanálisis",
+      "volumenMinimo": "5 mL de sangre total, 1 mL de suero y 10 mL de orina",
+      "conservacion": "Según el componente; consultar cada prueba",
+      "transporte": "Refrigerado, contenedores separados",
+      "diasProceso": "Lunes a sábado",
+      "loinc": "—",
+      "unidades": "Ver informe consolidado",
+      "criteriosRechazo": [
+        "Falta de alguno de los contenedores",
+        "Incumplimiento del ayuno de 12 horas",
+        "Orina sin refrigerar por más de 2 horas"
+      ]
+    }
+  }
+]

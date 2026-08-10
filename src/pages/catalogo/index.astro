@@ -1,0 +1,52 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import CatalogoBuscador from '@/components/CatalogoBuscador.astro';
+import { examenes } from '@/lib/examenes';
+import { breadcrumbSchema } from '@/lib/schema';
+import { whatsappLink } from '@/lib/whatsapp';
+import { site } from '@/lib/site';
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Catálogo de exámenes', href: '/catalogo' },
+  ]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Catálogo de exámenes de ExamLab',
+    numberOfItems: examenes.length,
+    itemListElement: examenes.map((examen, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: examen.nombre,
+      url: new URL(`/catalogo/${examen.slug}`, site.url).toString(),
+    })),
+  },
+];
+---
+
+<BaseLayout
+  titulo="Catálogo de exámenes"
+  descripcion="Busque cualquier examen por código, nombre o especialidad y consulte tipo de muestra, tiempo de entrega y condiciones del estudio y del paciente."
+  whatsapp="catalogo"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Catálogo de exámenes"
+    titulo="Busque por código, nombre o especialidad"
+    descripcion="Herramienta de consulta para pacientes y profesionales de la salud. Cada examen indica su especialidad, tipo de muestra, tiempo de entrega y las condiciones del estudio y del paciente."
+    migas={[
+      { nombre: 'Inicio', href: '/' },
+      { nombre: 'Catálogo de exámenes', href: '/catalogo' },
+    ]}
+  />
+
+  <CatalogoBuscador
+    lista={examenes}
+    basePath="/catalogo"
+    whatsappHref={whatsappLink('catalogo')}
+    aviso="Las condiciones indicadas aplican al procedimiento estándar del laboratorio. Si su médico le entregó indicaciones distintas, siga las de su médico. Para conocer valores y convenios vigentes, escríbanos por WhatsApp antes de acudir a la toma de muestra."
+  />
+</BaseLayout>

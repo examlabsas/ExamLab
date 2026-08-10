@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell(cd D:\\\\WorkSpace\\\\ExamLab; \\(Get-Content node_modules\\\\@astrojs\\\\vercel\\\\package.json | ConvertFrom-Json\\).exports | ConvertTo-Json -Depth 4)",
+      "mcp__plugin_desktop-commander_desktop-commander__read_file",
+      "WebFetch(domain:www.synlab.ec)",
+      "PowerShell(cd D:\\\\WorkSpace\\\\ExamLab; try { $r = Invoke-WebRequest -Uri \"http://localhost:4321/images/logo.png\" -UseBasicParsing -TimeoutSec 15; \"status=$\\($r.StatusCode\\) type=$\\($r.Headers['Content-Type']\\) bytes=$\\($r.RawContentLength\\)\" } catch { \"ERROR: $\\($_.Exception.Message\\)\" })",
+      "Bash(python -)",
+      "WebFetch(domain:www.zoho.com)",
+      "WebSearch",
+      "WebFetch(domain:www.microsoft.com)",
+      "WebFetch(domain:www.ecuahosting.com)",
+      "WebFetch(domain:www.framer.com)",
+      "PowerShell(cd D:\\\\WorkSpace\\\\ExamLab; try { $r = Invoke-WebRequest -Uri \"http://localhost:4321/prueba-framer\" -UseBasicParsing -TimeoutSec 20; \"status=$\\($r.StatusCode\\)  bytes=$\\($r.RawContentLength\\)\"; if \\($r.Content -match 'astro-island'\\) { \"contiene astro-island: si\" } else { \"contiene astro-island: NO\" } } catch { \"ERROR: $\\($_.Exception.Message\\)\" })",
+      "Bash(awk '{printf \"  %s  \\(%s bytes\\)\\\\n\", $9, $5}')",
+      "Bash(node -e ' *)",
+      "Bash(npx astro *)",
+      "Bash(sed -i \"s|import { examenes, getRelacionados } from '@/lib/examenes';|import { examenes, getRelacionados, resumenCorto } from '@/lib/examenes';|\" \"src/pages/catalogo/[slug].astro\")",
+      "Bash(sed -i \"s|import { examenesLaboratorios, getRelacionados } from '@/lib/examenes';|import { examenesLaboratorios, getRelacionados, resumenCorto } from '@/lib/examenes';|\" \"src/pages/laboratorios-asociados/catalogo/[slug].astro\")"
+    ]
+  }
+}

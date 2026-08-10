@@ -1,0 +1,37 @@
+[
+  {
+    "nombre": "Hematología",
+    "icono": "gota",
+    "descripcion": "Biometría hemática, coagulación, grupo sanguíneo y estudios de anemia con analizadores automatizados.",
+    "conteo": "128 exámenes",
+    "enPortada": true
+  },
+  {
+    "nombre": "Química clínica",
+    "icono": "tubo",
+    "descripcion": "Glucosa, perfil lipídico, función renal y hepática, electrolitos y marcadores metabólicos.",
+    "conteo": "96 exámenes",
+    "enPortada": true
+  },
+  {
+    "nombre": "Microbiología",
+    "icono": "microbio",
+    "descripcion": "Cultivos, antibiogramas y estudios de infecciones con lectura profesional.",
+    "conteo": "64 exámenes",
+    "enPortada": true
+  },
+  {
+    "nombre": "Hormonas y marcadores",
+    "icono": "escudo",
+    "descripcion": "Función tiroidea, hormonas reproductivas, marcadores tumorales y autoinmunidad.",
+    "conteo": "73 exámenes",
+    "enPortada": true
+  },
+  {
+    "nombre": "Perfiles y chequeos",
+    "icono": "maletin",
+    "descripcion": "Paquetes preventivos por etapa de vida, con una sola toma de muestra.",
+    "conteo": "9 paquetes",
+    "enPortada": false
+  }
+]

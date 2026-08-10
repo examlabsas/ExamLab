@@ -1,0 +1,32 @@
+---
+/**
+ * Icono SVG inline del set de marca. Se pinta con `currentColor`,
+ * así que el color se controla con utilidades `text-*`.
+ */
+import { iconos, iconosRellenos, type IconName } from '@/lib/iconos';
+
+interface Props {
+  name: IconName;
+  size?: number | string;
+  strokeWidth?: number;
+  class?: string;
+}
+
+const { name, size = 20, strokeWidth = 2, class: className } = Astro.props;
+const relleno = iconosRellenos.has(name);
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill={relleno ? 'currentColor' : 'none'}
+  stroke={relleno ? undefined : 'currentColor'}
+  stroke-width={relleno ? undefined : strokeWidth}
+  stroke-linecap={relleno ? undefined : 'round'}
+  stroke-linejoin={relleno ? undefined : 'round'}
+  aria-hidden="true"
+  focusable="false"
+  class:list={['shrink-0', className]}
+  set:html={iconos[name]}
+/>

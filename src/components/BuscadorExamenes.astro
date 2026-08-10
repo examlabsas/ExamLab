@@ -1,0 +1,73 @@
+---
+/**
+ * Buscador de exámenes que lleva directo al catálogo.
+ *
+ * Es un formulario GET normal: funciona sin JavaScript y aprovecha que las
+ * páginas de catálogo ya leen el parámetro `q` al cargar.
+ *
+ * `accion` permite apuntar al catálogo público o al de laboratorios asociados.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Ruta del catálogo al que se envía la búsqueda. */
+  accion?: string;
+  placeholder?: string;
+  /** Texto del botón. */
+  boton?: string;
+  /** `true` sobre fondo azul (cabeceras de página interna). */
+  oscuro?: boolean;
+  /** Identificador único del campo, por si hay dos buscadores en una página. */
+  id?: string;
+  class?: string;
+}
+
+const {
+  accion = '/catalogo',
+  placeholder = 'Busque su examen: biometría, TSH, urocultivo…',
+  boton = 'Buscar',
+  oscuro = false,
+  id = 'buscar-examenes',
+  class: className,
+} = Astro.props;
+---
+
+<form
+  action={accion}
+  method="get"
+  role="search"
+  class:list={[
+    'flex max-w-[540px] items-center gap-2 rounded-xl border p-1.5 transition-colors',
+    oscuro
+      ? 'border-white/25 bg-white/10 focus-within:border-white/60'
+      : 'border-line-strong bg-white focus-within:border-accent',
+    className,
+  ]}
+>
+  <label for={id} class="sr-only">Buscar un examen en el catálogo</label>
+  <Icon
+    name="lupa"
+    size={18}
+    class:list={['ml-2.5 flex-none', oscuro ? 'text-white/60' : 'text-neutral']}
+  />
+  <input
+    type="search"
+    id={id}
+    name="q"
+    autocomplete="off"
+    placeholder={placeholder}
+    class:list={[
+      'min-w-0 flex-1 bg-transparent py-2 text-[14px] focus:outline-none',
+      oscuro ? 'text-white placeholder:text-white/50' : 'text-black placeholder:text-neutral/70',
+    ]}
+  />
+  <button
+    type="submit"
+    class:list={[
+      'flex-none rounded-lg px-4 py-2 text-[13px] font-bold transition-colors',
+      oscuro ? 'bg-white text-brand hover:bg-accent-soft' : 'bg-brand text-white hover:bg-accent',
+    ]}
+  >
+    {boton}
+  </button>
+</form>

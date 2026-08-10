@@ -1,0 +1,378 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import EstadoApertura from './EstadoApertura.astro';
+import { site, sedes, navPrincipal } from '@/lib/site';
+import { whatsappLink } from '@/lib/whatsapp';
+
+const ruta = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const esActivo = (href: string) => {
+  const base = href.split('#')[0]!.replace(/\/+$/, '') || '/';
+  return base === '/' ? ruta === '/' : ruta === base || ruta.startsWith(`${base}/`);
+};
+---
+
+<header
+  id="cabecera"
+  class="cabecera sticky top-0 z-50 bg-white shadow-[0_1px_0_var(--color-line)]"
+>
+  <!-- Barra de utilidades (solo escritorio) -->
+  <div class="hidden bg-brand text-[12.5px] font-medium text-white/80 menu:block">
+    <div class="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5">
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <a
+          href={`tel:${site.telefonoE164}`}
+          class="flex items-center gap-2 text-white/80 transition-colors hover:text-white"
+        >
+          <Icon name="telefono" size={13} class="text-accent" />
+          {site.telefono}
+        </a>
+        <span class="flex items-center gap-2">
+          <Icon name="reloj" size={13} class="text-accent" />
+          <EstadoApertura horario={sedes[0]!.horarioSemanal} respaldo={site.horarioResumen} oscuro />
+        </span>
+      </div>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <a href="/sedes" class="flex items-center gap-2 text-white/80 transition-colors hover:text-white">
+          <Icon name="pin" size={13} class="text-accent" />
+          Ambato y Pelileo
+        </a>
+        <a
+          href="/soy-profesional"
+          class="text-white transition-colors hover:text-accent-light"
+        >
+          Portal profesional
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra principal -->
+  <div class="barra-principal container-page flex items-center gap-2.5 py-3.5 menu:gap-5">
+    <a href="/" class="flex-none" aria-label={`${site.nombre} · inicio`}>
+      <Logo box={54} bajada={false} />
+    </a>
+
+    <div class="flex-1"></div>
+
+    <!-- Navegación de escritorio -->
+    <nav class="hidden items-center gap-4 menu:flex" aria-label="Navegación principal">
+      {
+        navPrincipal.map((item) =>
+          item.hijos ? (
+            <div class="submenu relative">
+              <button
+                type="button"
+                class:list={[
+                  'flex items-center gap-1.5 py-2 text-sm transition-colors hover:text-accent',
+                  esActivo(item.href) ? 'font-semibold text-brand' : 'font-medium text-black',
+                ]}
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
+                {item.label}
+                <Icon name="flecha" size={13} strokeWidth={2.4} class="submenu-icono rotate-90 text-accent transition-transform duration-200" />
+              </button>
+              <div
+                class="submenu-panel invisible absolute top-full left-1/2 z-10 w-[320px] -translate-x-1/2 pt-3 opacity-0 transition-all duration-150"
+              >
+                <ul class="overflow-hidden rounded-xl border border-line bg-white p-2 shadow-lg">
+                  {item.hijos!.map((hijo) => (
+                    <li>
+                      <a
+                        href={hijo.href}
+                        class="block rounded-lg px-4 py-2.5 transition-colors hover:bg-brand-soft/50"
+                      >
+                        <span class="block text-sm font-bold text-brand">{hijo.label}</span>
+                        {hijo.descripcion && (
+                          <span class="mt-0.5 block text-xs leading-snug text-neutral">
+                            {hijo.descripcion}
+                          </span>
+                        )}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <a
+              href={item.href}
+              aria-current={esActivo(item.href) ? 'page' : undefined}
+              class:list={[
+                'py-2 text-sm transition-colors hover:text-accent',
+                esActivo(item.href) ? 'font-semibold text-brand' : 'font-medium text-black',
+              ]}
+            >
+              {item.label}
+            </a>
+          ),
+        )
+      }
+      <a
+        href="/soy-paciente/resultados"
+        class="ml-2 flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-accent-dark"
+      >
+        <Icon name="documento" size={16} />
+        Resultados
+      </a>
+    </nav>
+
+    <!-- Acciones móviles -->
+    <div class="flex items-center gap-2.5 menu:hidden">
+      <a
+        href="/soy-paciente/resultados"
+        class="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[13px] font-bold text-white"
+      >
+        <Icon name="documento" size={15} />
+        <span class="hidden sm:inline">Resultados</span>
+      </a>
+      <button
+        type="button"
+        id="btn-menu"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-line-strong bg-white text-brand"
+      >
+        <Icon name="menu" size={20} strokeWidth={2.2} />
+      </button>
+    </div>
+  </div>
+
+  <!-- Menú móvil -->
+  <nav
+    id="menu-movil"
+    hidden
+    aria-label="Navegación móvil"
+    class="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-line bg-white px-6 pt-2.5 pb-6 menu:hidden"
+  >
+    <div class="flex flex-col">
+      {
+        navPrincipal.map((item, i) =>
+          item.hijos ? (
+            <details class="group border-b border-line" open={esActivo(item.href)}>
+              <summary
+                class:list={[
+                  'flex cursor-pointer list-none items-center justify-between py-3.5 text-base',
+                  esActivo(item.href) ? 'font-semibold text-brand' : 'font-medium text-black',
+                ]}
+              >
+                {item.label}
+                <Icon
+                  name="mas"
+                  size={18}
+                  class="text-accent transition-transform duration-200 group-open:rotate-45"
+                />
+              </summary>
+              <ul class="pb-2">
+                {item.hijos!.map((hijo) => (
+                  <li>
+                    <a
+                      href={hijo.href}
+                      class="block py-2.5 pl-3 text-[15px] font-medium text-neutral transition-colors hover:text-accent"
+                    >
+                      {hijo.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : (
+            <a
+              href={item.href}
+              aria-current={esActivo(item.href) ? 'page' : undefined}
+              class:list={[
+                'py-3.5 text-base',
+                i < navPrincipal.length - 1 && 'border-b border-line',
+                esActivo(item.href) ? 'font-semibold text-brand' : 'font-medium text-black',
+              ]}
+            >
+              {item.label}
+            </a>
+          ),
+        )
+      }
+      <a
+        href={whatsappLink('cita')}
+        target="_blank"
+        rel="noopener"
+        class="mt-4 flex items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-4 text-center text-[15px] font-bold text-white"
+      >
+        <Icon name="whatsapp-marca" size={17} />
+        Agendar cita por WhatsApp
+      </a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  /* La apertura la controla el script: solo un submenú abierto a la vez. */
+  .submenu[data-abierto='true'] .submenu-panel {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .submenu[data-abierto='true'] .submenu-icono {
+    transform: rotate(-90deg);
+  }
+</style>
+
+<script>
+  // Con las transiciones de página, este módulo se ejecuta una sola vez y la
+  // cabecera se reemplaza en cada navegación: por eso los listeners de
+  // elementos se vuelven a montar en `astro:page-load`, y los de `document`
+  // se registran una sola vez y buscan los elementos al dispararse.
+
+  const submenus = () => Array.from(document.querySelectorAll<HTMLElement>('.submenu'));
+
+  const cerrarSubmenus = (excepto?: HTMLElement) => {
+    for (const grupo of submenus()) {
+      if (grupo === excepto) continue;
+      grupo.dataset.abierto = 'false';
+      grupo.querySelector('button')?.setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  const abrirSubmenu = (grupo: HTMLElement) => {
+    cerrarSubmenus(grupo);
+    grupo.dataset.abierto = 'true';
+    grupo.querySelector('button')?.setAttribute('aria-expanded', 'true');
+  };
+
+  const cerrarMenuMovil = () => {
+    const boton = document.getElementById('btn-menu');
+    const menu = document.getElementById('menu-movil');
+    if (!boton || !menu) return;
+    menu.hidden = true;
+    boton.setAttribute('aria-expanded', 'false');
+    boton.setAttribute('aria-label', 'Abrir menú');
+  };
+
+  const initCabecera = () => {
+    const cabecera = document.getElementById('cabecera');
+    // `astro:page-load` también se dispara en la carga inicial: sin esta
+    // guarda los listeners se montaban dos veces y el clic abría y cerraba
+    // el menú en el mismo gesto.
+    if (!cabecera || cabecera.dataset.iniciada === 'true') return;
+    cabecera.dataset.iniciada = 'true';
+
+    // ── Menú móvil ──────────────────────────────────────────────────
+    const boton = document.getElementById('btn-menu');
+    const menu = document.getElementById('menu-movil');
+
+    if (boton && menu) {
+      boton.addEventListener('click', () => {
+        if (menu.hidden) {
+          menu.hidden = false;
+          boton.setAttribute('aria-expanded', 'true');
+          boton.setAttribute('aria-label', 'Cerrar menú');
+        } else {
+          cerrarMenuMovil();
+        }
+      });
+
+      menu.addEventListener('click', (evento) => {
+        if ((evento.target as HTMLElement).closest('a')) cerrarMenuMovil();
+      });
+    }
+
+    // ── Submenús de escritorio: solo uno abierto a la vez ────────────
+    for (const grupo of submenus()) {
+      const disparador = grupo.querySelector('button');
+      if (!disparador) continue;
+
+      grupo.dataset.abierto = 'false';
+
+      grupo.addEventListener('pointerenter', (evento) => {
+        if (evento.pointerType === 'touch') return;
+        abrirSubmenu(grupo);
+      });
+      grupo.addEventListener('pointerleave', (evento) => {
+        if (evento.pointerType === 'touch') return;
+        cerrarSubmenus();
+      });
+
+      disparador.addEventListener('click', (evento) => {
+        evento.preventDefault();
+        grupo.dataset.abierto === 'true' ? cerrarSubmenus() : abrirSubmenu(grupo);
+      });
+
+      grupo.addEventListener('focusin', () => abrirSubmenu(grupo));
+      grupo.addEventListener('focusout', (evento) => {
+        if (!grupo.contains(evento.relatedTarget as Node)) cerrarSubmenus();
+      });
+    }
+
+    // ── Sombra de la cabecera al hacer scroll ────────────────────────
+    marcarScroll();
+  };
+
+  // ── Listeners globales: se registran una sola vez ──────────────────
+
+  /*
+    Umbrales con histéresis: la sombra aparece al pasar los 80px y no
+    desaparece hasta bajar de 40px. Con un único umbral, cualquier
+    micromovimiento alrededor de ese punto encendía y apagaba la sombra
+    varias veces por segundo.
+  */
+  const ENTRA = 80;
+  const SALE = 40;
+
+  const marcarScroll = () => {
+    const cabecera = document.getElementById('cabecera');
+    if (!cabecera) return;
+
+    const y = window.scrollY;
+    const activa = cabecera.dataset.scroll === 'true';
+    if (!activa && y > ENTRA) cabecera.dataset.scroll = 'true';
+    else if (activa && y < SALE) cabecera.dataset.scroll = 'false';
+  };
+
+  let pendiente = false;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(() => {
+        marcarScroll();
+        pendiente = false;
+      });
+    },
+    { passive: true },
+  );
+
+  document.addEventListener('keydown', (evento) => {
+    if (evento.key !== 'Escape') return;
+
+    const abierto = submenus().find((g) => g.dataset.abierto === 'true');
+    if (abierto) {
+      cerrarSubmenus();
+      abierto.querySelector('button')?.focus();
+      return;
+    }
+
+    const menu = document.getElementById('menu-movil');
+    if (menu && !menu.hidden) {
+      cerrarMenuMovil();
+      document.getElementById('btn-menu')?.focus();
+    }
+  });
+
+  document.addEventListener('click', (evento) => {
+    if (!(evento.target as HTMLElement).closest('.submenu')) cerrarSubmenus();
+  });
+
+  // Debe coincidir con --breakpoint-menu de global.css.
+  window.matchMedia('(min-width: 75rem)').addEventListener('change', (evento) => {
+    if (evento.matches) cerrarMenuMovil();
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCabecera);
+  } else {
+    initCabecera();
+  }
+  document.addEventListener('astro:page-load', initCabecera);
+</script>

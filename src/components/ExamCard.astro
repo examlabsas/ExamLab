@@ -1,0 +1,94 @@
+---
+import Icon from './Icon.astro';
+import {
+  indiceBusqueda,
+  interpretarAyuno,
+  esRemision,
+  resumenCorto,
+  type Examen,
+} from '@/lib/examenes';
+
+interface Props {
+  examen: Examen;
+  /** Ruta base del catálogo al que pertenece la tarjeta. */
+  basePath?: string;
+  /** En modo laboratorio se muestran datos preanalíticos. */
+  tecnico?: boolean;
+}
+
+const { examen, basePath = '/catalogo', tecnico = false } = Astro.props;
+const ayuno = interpretarAyuno(examen);
+const remision = esRemision(examen);
+const ficha = examen.tecnico;
+---
+
+<article
+  class="group relative flex flex-col gap-3 rounded-3xl border border-line bg-white p-6 transition-all duration-200 hover:border-accent hover:shadow-[0_14px_30px_rgb(0_90_140/0.09)]"
+  data-examen
+  data-especialidad={examen.especialidad}
+  data-indice={indiceBusqueda(examen)}
+>
+  <div class="flex flex-wrap items-center gap-2">
+    <span
+      class="rounded-lg bg-accent-soft px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-dark uppercase"
+    >
+      {examen.especialidad}
+    </span>
+    <span class="font-mono text-[11.5px] font-semibold text-neutral">{examen.codigo}</span>
+    {
+      ayuno.requiere && (
+        <span class="rounded-lg bg-alert-soft px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-alert-dark uppercase">
+          Ayuno
+        </span>
+      )
+    }
+    {
+      tecnico && remision && (
+        <span class="rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-brand uppercase">
+          Remisión
+        </span>
+      )
+    }
+  </div>
+
+  <h3 class="text-[17px] leading-snug font-bold text-brand">
+    <a href={`${basePath}/${examen.slug}`} class="after:absolute after:inset-0">
+      {examen.nombre}
+    </a>
+  </h3>
+
+  <p class="text-[14px] leading-relaxed text-neutral">{resumenCorto(examen)}</p>
+
+  <dl class="mt-1 flex flex-col gap-2 text-[13px] text-neutral">
+    <div class="flex items-start gap-2">
+      <Icon name="gota" size={15} class="mt-0.5 text-accent" />
+      <dt class="sr-only">Tipo de muestra</dt>
+      <dd>{examen.tipoMuestra}</dd>
+    </div>
+    {
+      tecnico && ficha?.conservacion ? (
+        <div class="flex items-start gap-2">
+          <Icon name="nieve" size={15} class="mt-0.5 text-accent" />
+          <dt class="sr-only">Conservación</dt>
+          <dd>{ficha.conservacion}</dd>
+        </div>
+      ) : (
+        <div class="flex items-start gap-2">
+          <Icon name="reloj" size={15} class="mt-0.5 text-accent" />
+          <dt class="sr-only">Tiempo de entrega</dt>
+          <dd>{examen.tiempoEntrega}</dd>
+        </div>
+      )
+    }
+  </dl>
+
+  <span class="mt-auto flex items-center gap-1.5 pt-3 text-[13.5px] font-bold text-accent">
+    Ver detalle del examen
+    <Icon
+      name="flecha"
+      size={15}
+      strokeWidth={2.4}
+      class="transition-transform duration-200 group-hover:translate-x-1"
+    />
+  </span>
+</article>

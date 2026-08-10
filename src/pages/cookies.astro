@@ -1,0 +1,78 @@
+---
+/**
+ * Texto base de política de cookies.
+ * Debe actualizarse si se incorporan herramientas de analítica o remarketing.
+ */
+import LegalLayout from '@/layouts/LegalLayout.astro';
+import { site } from '@/lib/site';
+---
+
+<LegalLayout
+  titulo="Política de cookies"
+  descripcion="Qué cookies utiliza el sitio de ExamLab y cómo puede gestionarlas desde su navegador."
+  actualizado="2026-07-01"
+  ruta="/cookies"
+>
+  <p>
+    Las cookies son pequeños archivos que un sitio web guarda en su dispositivo para recordar
+    información entre visitas. Esta política explica cuáles utiliza el sitio de {site.razonSocial} y
+    cómo puede controlarlas.
+  </p>
+
+  <h2>1. Cookies que utilizamos</h2>
+  <p>
+    Este sitio es de contenido estático y <strong
+      >no utiliza cookies de publicidad, perfilado ni remarketing.</strong
+    > Únicamente pueden almacenarse:
+  </p>
+  <ul>
+    <li>
+      <strong>Cookies técnicas propias:</strong> necesarias para servir el sitio y recordar
+      preferencias básicas de visualización. No identifican al usuario.
+    </li>
+    <li>
+      <strong>Almacenamiento del portal de resultados:</strong> el portal, alojado en un dominio
+      distinto, utiliza cookies de sesión indispensables para mantener su acceso autenticado
+      mientras consulta sus informes.
+    </li>
+    <li>
+      <strong>Recursos de terceros:</strong> las tipografías se cargan desde Google Fonts, que
+      registra la solicitud de descarga del archivo. No se instalan cookies de seguimiento por este
+      medio.
+    </li>
+  </ul>
+
+  <h2>2. Si en el futuro incorporamos analítica</h2>
+  <p>
+    Si llegamos a utilizar herramientas de medición de audiencia, actualizaremos esta política y
+    solicitaremos su consentimiento previo mediante un aviso visible, con la posibilidad de
+    rechazarlas sin que ello afecte el uso del sitio.
+  </p>
+
+  <h2>3. Cómo gestionar las cookies</h2>
+  <p>
+    Puede bloquear o eliminar las cookies desde la configuración de su navegador. Tenga en cuenta
+    que bloquear las cookies técnicas del portal de resultados le impedirá iniciar sesión y
+    consultar sus informes.
+  </p>
+  <ul>
+    <li>Chrome: Configuración → Privacidad y seguridad → Cookies y otros datos de sitios.</li>
+    <li>Safari: Preferencias → Privacidad → Gestionar datos de sitios web.</li>
+    <li>Firefox: Ajustes → Privacidad &amp; Seguridad → Cookies y datos del sitio.</li>
+    <li>Edge: Configuración → Cookies y permisos del sitio.</li>
+  </ul>
+
+  <h2>4. Enlaces relacionados</h2>
+  <p>
+    Para conocer cómo tratamos sus datos personales y de salud, consulte nuestra <a
+      href="/privacidad">política de privacidad</a
+    >. Las condiciones de uso del sitio están en los <a href="/terminos">términos y condiciones</a>.
+  </p>
+
+  <h2>5. Contacto</h2>
+  <p>
+    Cualquier consulta sobre esta política puede dirigirla a <a href={`mailto:${site.email}`}
+      >{site.email}</a
+    >.
+  </p>
+</LegalLayout>

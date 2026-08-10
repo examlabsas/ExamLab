@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "chequeo-preventivo",
+    "nombre": "Chequeo preventivo",
+    "icono": "escudo",
+    "descripcion": "El control anual del adulto sano: hematología, glucosa, lípidos, función renal y hepática.",
+    "publico": "Adultos desde los 20 años"
+  },
+  {
+    "slug": "salud-de-la-mujer",
+    "nombre": "Salud de la mujer",
+    "icono": "usuario",
+    "descripcion": "Perfil hormonal, control de anemia y tamizajes recomendados por etapa de vida.",
+    "publico": "Mujeres en edad fértil y menopausia"
+  },
+  {
+    "slug": "salud-del-hombre",
+    "nombre": "Salud del hombre",
+    "icono": "usuario",
+    "descripcion": "Perfil prostático, testosterona, lípidos y riesgo cardiovascular.",
+    "publico": "Hombres desde los 40 años"
+  },
+  {
+    "slug": "nutricion-y-metabolismo",
+    "nombre": "Nutrición y metabolismo",
+    "icono": "tubo",
+    "descripcion": "Glucosa, insulina, hemoglobina glicosilada, vitaminas y micronutrientes.",
+    "publico": "Control de peso y diabetes"
+  },
+  {
+    "slug": "alergias",
+    "nombre": "Alergias",
+    "icono": "gota",
+    "descripcion": "Paneles de alérgenos alimentarios y respiratorios, IgE total y específica.",
+    "publico": "Niños y adultos con síntomas alérgicos"
+  },
+  {
+    "slug": "salud-infantil",
+    "nombre": "Salud infantil",
+    "icono": "usuarios",
+    "descripcion": "Control pediátrico con toma de muestra adaptada y volúmenes reducidos.",
+    "publico": "Niños y adolescentes"
+  }
+]

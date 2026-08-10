@@ -1,0 +1,62 @@
+---
+import Icon from './Icon.astro';
+import type { IconName } from '@/lib/iconos';
+
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary' | 'brand' | 'sobreOscuro' | 'blanco';
+  size?: 'md' | 'sm';
+  icon?: IconName;
+  iconoFinal?: IconName;
+  external?: boolean;
+  full?: boolean;
+  class?: string;
+  'aria-label'?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  iconoFinal,
+  external,
+  full = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 rounded-xl font-bold no-underline transition-all duration-200 active:scale-[0.99]';
+
+const variantes: Record<NonNullable<Props['variant']>, string> = {
+  primary: 'bg-accent text-white shadow-sm hover:bg-accent-dark hover:shadow-md',
+  secondary:
+    'bg-white text-brand border border-line-strong hover:border-brand hover:bg-brand-soft/30',
+  brand: 'bg-brand text-white shadow-sm hover:bg-brand-dark',
+  sobreOscuro:
+    'bg-white/10 text-white border border-white/30 hover:bg-white hover:text-brand',
+  blanco: 'bg-white text-brand shadow-sm hover:bg-brand-soft',
+};
+
+const tamanos: Record<NonNullable<Props['size']>, string> = {
+  md: 'px-6 py-3.5 text-sm',
+  sm: 'px-4 py-2.5 text-xs',
+};
+
+const esExterna = href.startsWith('http');
+---
+
+<a
+  href={href}
+  class:list={[base, variantes[variant], tamanos[size], full && 'w-full', className]}
+  target={external ?? esExterna ? '_blank' : undefined}
+  rel={external ?? esExterna ? 'noopener' : undefined}
+  {...rest}
+>
+  {/* El glifo de WhatsApp es de relleno: al mismo tamaño pesa más que los de
+      trazo, así que se dibuja un punto más pequeño para igualar el peso óptico. */}
+  {icon && <Icon name={icon} size={icon === 'whatsapp-marca' ? 17 : 19} />}
+  <slot />
+  {iconoFinal && <Icon name={iconoFinal} size={16} strokeWidth={2.4} />}
+</a>

@@ -1,0 +1,46 @@
+---
+/** Tarjeta de acceso rápido (fila bajo el hero). */
+import Icon from './Icon.astro';
+import type { IconName } from '@/lib/iconos';
+
+interface Props {
+  icono: IconName;
+  titulo: string;
+  descripcion: string;
+  cta: string;
+  href: string;
+  external?: boolean;
+}
+
+const { icono, titulo, descripcion, cta, href, external } = Astro.props;
+const esExterna = external ?? href.startsWith('http');
+---
+
+<a
+  href={href}
+  target={esExterna ? '_blank' : undefined}
+  rel={esExterna ? 'noopener' : undefined}
+  class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-line bg-white p-6 transition-all duration-200 hover:border-brand hover:shadow-md"
+>
+  <div class="absolute top-0 left-0 h-1 w-full bg-line-strong transition-colors duration-200 group-hover:bg-accent"></div>
+  
+  <div>
+    <div class="flex items-center justify-between">
+      <span class="inline-flex items-center justify-center text-brand transition-colors duration-200 group-hover:text-accent">
+        <Icon name={icono} size={24} strokeWidth={2} />
+      </span>
+    </div>
+    <span class="mt-4 block text-lg font-bold text-brand">{titulo}</span>
+    <span class="mt-2 block text-sm leading-relaxed text-neutral">{descripcion}</span>
+  </div>
+
+  <div class="mt-5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-brand uppercase transition-colors duration-200 group-hover:text-accent">
+    {cta}
+    <Icon
+      name="flecha"
+      size={14}
+      strokeWidth={2.4}
+      class="text-accent transition-transform duration-200 group-hover:translate-x-1"
+    />
+  </div>
+</a>

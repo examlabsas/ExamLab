@@ -1,0 +1,41 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ExamenFicha from '@/components/ExamenFicha.astro';
+import { examenesLaboratorios, getRelacionados, resumenCorto } from '@/lib/examenes';
+import { breadcrumbSchema } from '@/lib/schema';
+
+export function getStaticPaths() {
+  return examenesLaboratorios.map((examen) => ({
+    params: { slug: examen.slug },
+    props: { examen },
+  }));
+}
+
+const { examen } = Astro.props;
+const relacionados = getRelacionados(examen, examenesLaboratorios);
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Laboratorios asociados', href: '/laboratorios-asociados' },
+    { nombre: 'Catálogo laboratorios', href: '/laboratorios-asociados/catalogo' },
+    { nombre: examen.nombre, href: `/laboratorios-asociados/catalogo/${examen.slug}` },
+  ]),
+];
+---
+
+<BaseLayout
+  titulo={`${examen.nombre} · Catálogo laboratorios`}
+  descripcion={`${resumenCorto(examen)} Especialidad ${examen.especialidad}, muestra: ${examen.tipoMuestra}. Entrega en ${examen.tiempoEntrega.toLowerCase()}.`}
+  whatsapp="laboratorios"
+  noindex
+  schema={schema}
+>
+  <ExamenFicha
+    examen={examen}
+    relacionados={relacionados}
+    basePath="/laboratorios-asociados/catalogo"
+    catalogoLabel="Catálogo laboratorios"
+    tecnico
+  />
+</BaseLayout>

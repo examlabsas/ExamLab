@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://examlabsas.com/sitemap-index.xml

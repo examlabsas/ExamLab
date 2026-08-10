@@ -1,0 +1,114 @@
+---
+/**
+ * Texto base de política de privacidad.
+ * IMPORTANTE: debe ser revisado y aprobado por la asesoría legal de ExamLab
+ * antes de publicar, especialmente los plazos de conservación y el contacto
+ * del responsable de protección de datos.
+ */
+import LegalLayout from '@/layouts/LegalLayout.astro';
+import { site } from '@/lib/site';
+---
+
+<LegalLayout
+  titulo="Política de privacidad"
+  descripcion="Cómo ExamLab recolecta, usa y protege los datos personales y de salud de sus pacientes."
+  actualizado="2026-07-01"
+  ruta="/privacidad"
+>
+  <p>
+    En {site.razonSocial} tratamos datos personales y datos sensibles de salud. Esta política
+    explica qué información recolectamos, con qué finalidad, durante cuánto tiempo la conservamos y
+    qué derechos puede ejercer sobre ella, conforme a la Ley Orgánica de Protección de Datos
+    Personales del Ecuador.
+  </p>
+
+  <h2>1. Responsable del tratamiento</h2>
+  <p>
+    {site.razonSocial}, con domicilio en {site.ciudad}, {site.provincia}, {site.pais}. Para
+    consultas sobre el tratamiento de sus datos puede escribir a <a href={`mailto:${site.email}`}
+      >{site.email}</a
+    > o llamar al {site.telefono}.
+  </p>
+
+  <h2>2. Datos que tratamos</h2>
+  <ul>
+    <li><strong>Identificación:</strong> nombres, cédula o pasaporte, fecha de nacimiento, sexo.</li>
+    <li><strong>Contacto:</strong> teléfono, correo electrónico y dirección para toma a domicilio.</li>
+    <li>
+      <strong>Datos de salud:</strong> exámenes solicitados, resultados de laboratorio, historial de
+      órdenes y datos clínicos que su médico consigne en la orden.
+    </li>
+    <li>
+      <strong>Datos de facturación:</strong> los exigidos por el Servicio de Rentas Internas para la
+      emisión del comprobante.
+    </li>
+    <li>
+      <strong>Datos de navegación:</strong> los descritos en nuestra <a href="/cookies"
+        >política de cookies</a
+      >.
+    </li>
+  </ul>
+
+  <h2>3. Finalidades</h2>
+  <ul>
+    <li>Prestar el servicio de laboratorio clínico solicitado y emitir el informe de resultados.</li>
+    <li>Identificar de forma inequívoca la muestra y garantizar su trazabilidad.</li>
+    <li>Entregar los resultados al paciente y al profesional de la salud que los solicitó.</li>
+    <li>Cumplir obligaciones legales, tributarias y de vigilancia epidemiológica.</li>
+    <li>Gestionar convenios institucionales y facturación.</li>
+    <li>Responder consultas realizadas por WhatsApp, teléfono o correo electrónico.</li>
+  </ul>
+
+  <h2>4. Base legal</h2>
+  <p>
+    El tratamiento se sustenta en la ejecución del servicio solicitado, en el cumplimiento de
+    obligaciones legales del sector salud y, cuando corresponde, en su consentimiento expreso. Los
+    datos de salud se tratan bajo la reserva propia del secreto profesional.
+  </p>
+
+  <h2>5. Con quién compartimos su información</h2>
+  <p>
+    Sus resultados se entregan a usted y al profesional de la salud que solicitó el examen.
+    Adicionalmente podemos compartir información con: laboratorios de referencia cuando una prueba
+    requiere derivación, aseguradoras o empresas cuando usted acude por convenio y ha autorizado el
+    envío, y autoridades sanitarias cuando la normativa lo exige. No vendemos ni cedemos datos con
+    fines publicitarios.
+  </p>
+
+  <h2>6. Conservación</h2>
+  <p>
+    Los resultados y registros clínicos se conservan por el plazo que establece la normativa
+    sanitaria ecuatoriana para historias clínicas. Los datos de facturación se conservan por el
+    plazo exigido por la normativa tributaria. Cumplidos esos plazos, la información se elimina o
+    anonimiza de forma segura.
+  </p>
+
+  <h2>7. Seguridad</h2>
+  <p>
+    Aplicamos controles de acceso por perfil, cifrado en el portal de resultados, registro de
+    auditoría de consultas y acuerdos de confidencialidad con todo el personal. Ningún sistema es
+    infalible: si detectamos una vulneración que afecte sus datos, se lo comunicaremos conforme a la
+    ley.
+  </p>
+
+  <h2>8. Sus derechos</h2>
+  <p>
+    Puede solicitar acceso, rectificación, actualización, eliminación, oposición, portabilidad y la
+    suspensión del tratamiento de sus datos, así como no ser objeto de decisiones automatizadas.
+    Para ejercerlos, escriba a <a href={`mailto:${site.email}`}>{site.email}</a> adjuntando copia de
+    su documento de identidad. Responderemos dentro de los plazos legales. Si considera que su
+    solicitud no fue atendida, puede acudir a la Autoridad de Protección de Datos Personales.
+  </p>
+
+  <h2>9. Menores de edad</h2>
+  <p>
+    Los exámenes de menores de edad se procesan con autorización de su representante legal, quien es
+    también el destinatario del informe de resultados.
+  </p>
+
+  <h2>10. Cambios en esta política</h2>
+  <p>
+    Podemos actualizar este documento para reflejar cambios normativos o de nuestros procesos. La
+    fecha de la última actualización se indica al inicio de la página.
+  </p>
+</LegalLayout>

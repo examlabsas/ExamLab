@@ -1,0 +1,93 @@
+---
+/**
+ * Banner de consentimiento de cookies (ítem 9 de la proforma).
+ *
+ * FASE 1: guarda la decisión en localStorage y no carga ningún script de
+ * terceros. En la Fase 3, cuando se integren Analytics y el píxel de Facebook,
+ * esos scripts deben cargarse únicamente si `examlab-cookies === "aceptadas"`.
+ */
+import Icon from './Icon.astro';
+---
+
+<div
+  id="banner-cookies"
+  hidden
+  role="dialog"
+  aria-live="polite"
+  aria-label="Aviso de cookies"
+  class="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white px-4 pt-4 pb-4 shadow-[0_-8px_30px_rgb(0_90_140/0.12)] sm:px-6"
+>
+  <div class="container-page flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex items-start gap-3.5">
+      <span
+        class="hidden h-10 w-10 flex-none items-center justify-center rounded-xl bg-accent-soft text-accent-dark sm:flex"
+      >
+        <Icon name="escudo" size={20} />
+      </span>
+      <p class="max-w-[640px] text-[13.5px] leading-relaxed text-neutral">
+        Usamos cookies técnicas necesarias para el funcionamiento del sitio y, con su permiso,
+        cookies de medición para entender cómo se usa la página. Puede aceptarlas o rechazarlas.
+        Más detalles en nuestra <a
+          href="/cookies"
+          class="font-semibold text-accent underline underline-offset-2 hover:text-brand"
+          >política de cookies</a
+        >.
+      </p>
+    </div>
+    <div class="flex flex-col gap-2.5 sm:flex-row lg:flex-none">
+      <button
+        type="button"
+        data-cookies="rechazar"
+        class="rounded-2xl border-[1.5px] border-line-strong bg-white px-5 py-3 text-sm font-bold text-brand transition-colors hover:border-accent"
+      >
+        Solo las necesarias
+      </button>
+      <button
+        type="button"
+        data-cookies="aceptar"
+        class="rounded-2xl bg-accent px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-accent-dark"
+      >
+        Aceptar todas
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CLAVE = 'examlab-cookies';
+
+  // El banner se vuelve a montar en cada navegación con transiciones de página.
+  const initCookies = () => {
+    const banner = document.getElementById('banner-cookies');
+    // `astro:page-load` también corre en la carga inicial: sin la guarda se
+    // registraría el listener dos veces.
+    if (!banner || banner.dataset.iniciado === 'true') return;
+    banner.dataset.iniciado = 'true';
+
+    if (localStorage.getItem(CLAVE)) {
+      banner.hidden = true;
+      delete document.body.dataset.cookiesPendiente;
+      return;
+    }
+
+    banner.hidden = false;
+    document.body.dataset.cookiesPendiente = 'true';
+
+    for (const boton of banner.querySelectorAll<HTMLButtonElement>('[data-cookies]')) {
+      boton.addEventListener('click', () => {
+        const decision = boton.dataset.cookies === 'aceptar' ? 'aceptadas' : 'rechazadas';
+        localStorage.setItem(CLAVE, decision);
+        banner.hidden = true;
+        delete document.body.dataset.cookiesPendiente;
+        document.dispatchEvent(new CustomEvent('cookies:decision', { detail: decision }));
+      });
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCookies);
+  } else {
+    initCookies();
+  }
+  document.addEventListener('astro:page-load', initCookies);
+</script>

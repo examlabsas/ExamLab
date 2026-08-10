@@ -1,0 +1,259 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import CtaDomicilio from '@/components/CtaDomicilio.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { site } from '@/lib/site';
+import { whatsappLink } from '@/lib/whatsapp';
+import { breadcrumbSchema } from '@/lib/schema';
+import type { IconName } from '@/lib/iconos';
+
+type Servicio = {
+  id: string;
+  icono: IconName;
+  titulo: string;
+  descripcion: string;
+  puntos: string[];
+  cta: { label: string; href: string };
+};
+
+const servicios: Servicio[] = [
+  {
+    id: 'analisis',
+    icono: 'gota',
+    titulo: 'Análisis clínicos',
+    descripcion:
+      'Más de 400 pruebas de hematología, química sanguínea, hormonas, inmunología, microbiología y biología molecular, procesadas en equipos automatizados con doble validación.',
+    puntos: [
+      'Toma de muestra en cualquiera de las tres sedes',
+      'Resultados en línea el mismo día en pruebas de rutina',
+      'Informes con valores de referencia por edad y sexo',
+    ],
+    cta: { label: 'Ver catálogo de exámenes', href: '/catalogo' },
+  },
+  {
+    id: 'chequeos',
+    icono: 'escudo',
+    titulo: 'Chequeos preventivos',
+    descripcion:
+      'Paquetes anuales diseñados por etapa de vida: adulto joven, adulto mayor, control pediátrico, salud de la mujer y salud del hombre. Una sola toma de muestra y precio preferencial.',
+    puntos: [
+      'Nueve paquetes según edad y factores de riesgo',
+      'Incluyen los exámenes de tamizaje recomendados',
+      'Informe consolidado en un solo documento',
+    ],
+    cta: { label: 'Consultar paquetes', href: whatsappLink('chequeos') },
+  },
+  {
+    id: 'domicilio-servicio',
+    icono: 'casa',
+    titulo: 'Toma de muestra a domicilio',
+    descripcion:
+      `Un profesional acude a su casa u oficina dentro de ${site.ciudad}. Ideal para adultos mayores, personas con movilidad reducida, pacientes postoperatorios y familias que prefieren evitar desplazamientos.`,
+    puntos: [
+      'Agendamiento por WhatsApp con día y hora',
+      'Personal identificado y material estéril de un solo uso',
+      'Cadena de frío controlada hasta el laboratorio',
+    ],
+    cta: { label: 'Agendar visita a domicilio', href: whatsappLink('domicilio') },
+  },
+  {
+    id: 'urgencias',
+    icono: 'mas',
+    titulo: 'Exámenes urgentes',
+    descripcion:
+      'Procesamiento prioritario para pacientes con indicación de urgencia, con entrega el mismo día y notificación telefónica de valores críticos al médico tratante.',
+    puntos: [
+      'Ingreso prioritario en la corrida del día',
+      'Comunicación inmediata de valores críticos',
+      'Disponible en horario de atención de la matriz',
+    ],
+    cta: { label: `Llamar al ${site.emergencias}`, href: `tel:${site.emergenciasE164}` },
+  },
+  {
+    id: 'empresas',
+    icono: 'maletin',
+    titulo: 'Salud ocupacional y convenios',
+    descripcion:
+      'Exámenes de ingreso, periódicos y de retiro para empresas, con toma de muestra en sitio y reportes consolidados por área. Convenios con aseguradoras, clínicas y consultorios.',
+    puntos: [
+      'Brigadas de toma de muestra en su empresa',
+      'Reportes agregados y confidencialidad del dato individual',
+      'Facturación mensual consolidada',
+    ],
+    cta: { label: 'Solicitar propuesta', href: whatsappLink('convenios') },
+  },
+  {
+    id: 'resultados-servicio',
+    icono: 'documento',
+    titulo: 'Resultados en línea',
+    descripcion:
+      'Portal disponible 24/7 donde el paciente descarga sus informes con cédula y código de orden, y el médico tratante consulta el histórico de sus pacientes autorizados.',
+    puntos: [
+      'Informes en PDF con firma de responsable técnico',
+      'Histórico de resultados anteriores',
+      'Acceso independiente para profesionales de la salud',
+    ],
+    cta: { label: 'Ver guía de acceso', href: '/soy-paciente/resultados' },
+  },
+];
+
+const proceso = [
+  {
+    titulo: 'Agende',
+    texto: 'Escríbanos por WhatsApp o acuda directamente a la sede que le quede más cerca.',
+  },
+  {
+    titulo: 'Prepárese',
+    texto: 'Revise en el catálogo si su examen requiere ayuno u otra indicación previa.',
+  },
+  {
+    titulo: 'Toma de muestra',
+    texto: 'En sede o a domicilio, con personal certificado y material de un solo uso.',
+  },
+  {
+    titulo: 'Reciba su resultado',
+    texto: 'Descárguelo del portal en línea apenas esté validado por el responsable técnico.',
+  },
+];
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Servicios', href: '/servicios' },
+  ]),
+];
+---
+
+<BaseLayout
+  titulo="Servicios"
+  descripcion={`Análisis clínicos, chequeos preventivos, toma de muestra a domicilio, exámenes urgentes y convenios empresariales en ${site.ciudad}.`}
+  whatsapp="servicios"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Servicios"
+    titulo="Todo lo que su médico solicita, en un solo laboratorio"
+    descripcion="Desde el examen de rutina hasta el perfil especializado, con la misma exigencia de calidad y tiempos de entrega que puede planificar."
+    migas={[
+      { nombre: 'Inicio', href: '/' },
+      { nombre: 'Servicios', href: '/servicios' },
+    ]}
+  >
+    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Button href={whatsappLink('cita')} icon="whatsapp-marca">Agendar cita</Button>
+      <Button href="/catalogo" variant="sobreOscuro" icon="lupa">Buscar un examen</Button>
+    </div>
+  </PageHero>
+
+  <!-- Manual de Servicios y Catálogo -->
+  <section class="bg-white py-12 lg:py-16">
+    <div class="container-page grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div class="flex flex-col gap-4 rounded-xl bg-brand p-7 lg:p-9 text-white shadow-sm">
+        <div class="inline-flex items-center gap-2 text-accent-light">
+          <Icon name="documento" size={24} strokeWidth={2} />
+          <span class="text-xs font-semibold uppercase tracking-wider">Documento Oficial</span>
+        </div>
+        <h2 class="text-h3 font-bold text-white">Manual de Servicios</h2>
+        <p class="text-sm leading-relaxed text-white/80">
+          Documento oficial con la cartera completa de exámenes, especialidades, condiciones preanalíticas y tiempos de entrega. Dirigido a médicos, clínicas e instituciones.
+        </p>
+        <div class="mt-auto pt-3">
+          <Button href={site.manualServicios} variant="blanco" icon="documento" full>
+            Descargar en PDF
+          </Button>
+          <p class="mt-3 text-xs text-white/60">
+            Archivo oficial del laboratorio.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4 rounded-xl border border-line bg-white p-7 lg:p-9 shadow-sm">
+        <div class="inline-flex items-center gap-2 text-brand">
+          <Icon name="lupa" size={24} strokeWidth={2} />
+          <span class="text-xs font-semibold uppercase tracking-wider text-accent-dark">Buscador en Línea</span>
+        </div>
+        <h2 class="text-h3 font-bold text-brand">Catálogo de Exámenes</h2>
+        <p class="text-sm leading-relaxed text-neutral">
+          Herramienta de consulta en línea: busque por código, nombre o especialidad y revise el tipo de muestra, tiempo de entrega y condiciones del estudio.
+        </p>
+        <div class="mt-auto pt-3">
+          <Button href="/catalogo" icon="lupa" full>Abrir el catálogo</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Listado de servicios -->
+  <section class="bg-surface py-section">
+    <div class="container-page grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {
+        servicios.map((servicio) => (
+          <article
+            id={servicio.id}
+            class="flex scroll-mt-28 flex-col justify-between rounded-xl border border-line bg-white p-6 shadow-sm transition-all duration-200 hover:border-brand hover:shadow-md"
+          >
+            <div class="flex flex-col gap-3.5">
+              <span class="inline-flex items-center text-brand">
+                <Icon name={servicio.icono} size={24} strokeWidth={2} />
+              </span>
+              <h2 class="text-lg font-bold text-brand">{servicio.titulo}</h2>
+              <p class="text-xs leading-relaxed text-neutral">{servicio.descripcion}</p>
+              <ul class="flex flex-col gap-2 pt-1">
+                {servicio.puntos.map((punto) => (
+                  <li class="flex items-start gap-2 text-xs leading-relaxed text-neutral">
+                    <Icon name="check" size={15} strokeWidth={2.2} class="mt-0.5 text-accent shrink-0" />
+                    {punto}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <a
+              href={servicio.cta.href}
+              target={servicio.cta.href.startsWith('http') ? '_blank' : undefined}
+              rel={servicio.cta.href.startsWith('http') ? 'noopener' : undefined}
+              class="mt-5 flex items-center gap-1.5 pt-3 border-t border-line/60 text-xs font-bold text-brand transition-colors hover:text-accent"
+            >
+              {servicio.cta.label}
+              {
+                servicio.cta.href.startsWith('https://wa.me') ? (
+                  <Icon name="whatsapp-marca" size={14} class="text-whatsapp" />
+                ) : (
+                  <Icon name="flecha" size={14} strokeWidth={2.4} class="text-accent" />
+                )
+              }
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <CtaDomicilio />
+
+  <!-- Cómo funciona -->
+  <section class="bg-white py-section">
+    <div class="container-page">
+      <SectionHeading
+        eyebrow="Cómo funciona"
+        titulo="Cuatro pasos, sin vueltas"
+        descripcion="El proceso es el mismo para un examen de rutina y para un perfil especializado."
+      />
+      <ol class="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          proceso.map((paso, i) => (
+            <li class="rounded-3xl bg-surface p-6">
+              <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-[17px] font-bold text-white">
+                {i + 1}
+              </span>
+              <h3 class="mt-4 text-[17px] font-bold text-brand">{paso.titulo}</h3>
+              <p class="mt-2 text-[14px] leading-relaxed text-neutral">{paso.texto}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+</BaseLayout>

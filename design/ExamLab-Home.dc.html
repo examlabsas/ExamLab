@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box}body{margin:0;background:#fff;font-family:'Montserrat',system-ui,sans-serif;color:#000;-webkit-font-smoothing:antialiased;text-wrap:pretty}h1,h2,h3,p{margin:0}h1,h2,h3{font-family:'Chakra Petch','Montserrat',sans-serif;font-weight:600}a{color:#00A3C4;text-decoration:none}a:hover{color:#005A8C}button{font-family:inherit;cursor:pointer}</style></helmet>
+
+<div style="width:100%;overflow-x:hidden">
+
+  <header style="position:sticky;top:0;z-index:60;background:#fff;box-shadow:0 1px 0 #E6E8EA">
+    <sc-if value="{{ showUtilityBar }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#005A8C;color:rgba(255,255,255,.78);font-size:12.5px;font-weight:500">
+        <div style="max-width:1240px;margin:0 auto;padding:9px 24px;display:flex;flex-wrap:wrap;gap:8px 26px;align-items:center;justify-content:space-between">
+          <div style="display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center">
+            <span style="display:flex;align-items:center;gap:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round"><path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 4V6z"></path></svg>(03) 242 8899</span>
+            <span style="display:flex;align-items:center;gap:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg>Lun a Sáb · 06:30 – 19:00</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center">
+            <span style="display:flex;align-items:center;gap:7px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>Ambato, Ecuador</span>
+            <a href="#" style="color:#fff">Portal profesional</a>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <div style="max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px">
+      <a href="#" style="display:flex;align-items:center;gap:11px;flex:none">
+        <span style="width:46px;height:46px;border-radius:12px;overflow:hidden;display:block;flex:none">
+          <img src="uploads/logo.png" alt="ExamLab" style="width:102px;height:102px;display:block;transform:translate(-28px,-6px)">
+        </span>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:174px">
+          <span style="font-family:'Chakra Petch',sans-serif;font-size:23px;font-weight:600;letter-spacing:.3px;line-height:1;color:#005A8C">ExamLab</span>
+          <span style="font-size:8px;font-weight:600;letter-spacing:1.2px;line-height:1.45;color:#6D6E71;text-transform:uppercase;max-width:172px">Laboratorio clínico de innovación y desarrollo</span>
+        </span>
+      </a>
+      <div style="flex:1"></div>
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+        <nav style="display:flex;align-items:center;gap:22px">
+          <a href="#" style="font-size:14px;font-weight:600;color:#005A8C">Inicio</a>
+          <a href="#servicios" style="font-size:14px;font-weight:500;color:#000000">Servicios</a>
+          <a href="#catalogo" style="font-size:14px;font-weight:500;color:#000000">Catálogo de Exámenes</a>
+          <a href="#" style="font-size:14px;font-weight:500;color:#000000">Soy Paciente</a>
+          <a href="#" style="font-size:14px;font-weight:500;color:#000000">Soy Profesional</a>
+          <a href="#noticias" style="font-size:14px;font-weight:500;color:#000000">Noticias</a>
+          <a href="#sedes" style="font-size:14px;font-weight:500;color:#000000">Sedes</a>
+          <a href="#" style="margin-left:6px;display:flex;align-items:center;gap:8px;background:#00A3C4;color:#fff;font-size:14px;font-weight:700;padding:12px 20px;border-radius:999px;box-shadow:0 8px 18px rgba(0,163,196,.3)" style-hover="background:#007E99;color:#fff">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8.5 9h7M8.5 13h7M8.5 17h4"></path></svg>Resultados en línea
+          </a>
+        </nav>
+      </sc-if>
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <a href="#" style="display:flex;align-items:center;gap:7px;background:#00A3C4;color:#fff;font-size:13px;font-weight:700;padding:11px 15px;border-radius:999px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8.5 9h7M8.5 13h7M8.5 17h4"></path></svg>Resultados
+          </a>
+          <button onClick="{{ toggleNav }}" aria-label="Menú" style="width:46px;height:46px;flex:none;border:1px solid #DDDFE2;background:#fff;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px">
+            <span style="width:18px;height:2px;background:#005A8C;border-radius:2px;display:block"></span>
+            <span style="width:18px;height:2px;background:#005A8C;border-radius:2px;display:block"></span>
+            <span style="width:18px;height:2px;background:#005A8C;border-radius:2px;display:block"></span>
+          </button>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{ navOpen }}" hint-placeholder-val="{{ false }}">
+      <nav style="border-top:1px solid #EDEEF0;background:#fff;padding:10px 24px 22px;display:flex;flex-direction:column">
+        <a href="#" onClick="{{ closeNav }}" style="font-size:16px;font-weight:600;color:#005A8C;padding:14px 4px;border-bottom:1px solid #EFF0F2">Inicio</a>
+        <a href="#servicios" onClick="{{ closeNav }}" style="font-size:16px;font-weight:500;color:#000000;padding:14px 4px;border-bottom:1px solid #EFF0F2">Servicios</a>
+        <a href="#catalogo" onClick="{{ closeNav }}" style="font-size:16px;font-weight:500;color:#000000;padding:14px 4px;border-bottom:1px solid #EFF0F2">Catálogo de Exámenes</a>
+        <a href="#" onClick="{{ closeNav }}" style="font-size:16px;font-weight:500;color:#000000;padding:14px 4px;border-bottom:1px solid #EFF0F2">Soy Paciente</a>
+        <a href="#" onClick="{{ closeNav }}" style="font-size:16px;font-weight:500;color:#000000;padding:14px 4px;border-bottom:1px solid #EFF0F2">Soy Profesional</a>
+        <a href="#noticias" onClick="{{ closeNav }}" style="font-size:16px;font-weight:500;color:#000000;padding:14px 4px;border-bottom:1px solid #EFF0F2">Noticias</a>
+        <a href="#sedes" onClick="{{ closeNav }}" style="font-size:16px;font-weight:500;color:#000000;padding:14px 4px">Sedes</a>
+        <a href="#" style="margin-top:16px;text-align:center;background:#005A8C;color:#fff;font-size:15px;font-weight:700;padding:16px;border-radius:16px">Agendar cita por WhatsApp</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <sc-if value="{{ heroSide }}" hint-placeholder-val="{{ true }}">
+    <section style="background:#fff;padding:clamp(34px,5vw,72px) 0 clamp(30px,4vw,56px)">
+      <div style="max-width:1240px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:clamp(32px,4vw,60px);align-items:center">
+        <div>
+          <span style="display:inline-flex;align-items:center;gap:9px;background:#F8E0EE;color:#A81A11;font-size:12.5px;font-weight:700;letter-spacing:.2px;padding:8px 14px;border-radius:999px">
+            <span style="width:7px;height:7px;border-radius:50%;background:#E1251B;display:block"></span>Nueva imagen, la misma trayectoria
+          </span>
+          <h1 style="margin-top:20px;font-size:clamp(34px,4.6vw,56px);line-height:1.05;letter-spacing:-0.4px;font-weight:700;color:#005A8C">Resultados en los que<br>usted puede confiar</h1>
+          <p style="margin-top:20px;font-size:clamp(16px,1.3vw,18.5px);line-height:1.6;color:#6D6E71;max-width:520px">Laboratorio clínico en Ambato con tecnología de análisis moderna, personal profesional y entrega oportuna de resultados. Atención cercana para usted y su familia.</p>
+          <div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px">
+            <a href="#" style="display:flex;align-items:center;gap:10px;background:#00A3C4;color:#fff;font-size:15.5px;font-weight:700;padding:16px 24px;border-radius:16px;box-shadow:0 10px 24px rgba(0,163,196,.32)" style-hover="background:#007E99;color:#fff">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 4V6z"></path></svg>Agendar cita por WhatsApp
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:10px;background:#fff;color:#005A8C;font-size:15.5px;font-weight:700;padding:16px 24px;border-radius:16px;border:1.5px solid #D2D4D7" style-hover="border-color:#005A8C;color:#005A8C">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#005A8C" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8.5 9h7M8.5 13h7M8.5 17h4"></path></svg>Ver mis resultados
+            </a>
+          </div>
+          <div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:10px 26px">
+            <span style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#6D6E71"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.4l2.6 2.6L16 9.6"></path></svg>Resultados en línea 24/7</span>
+            <span style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#6D6E71"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.4l2.6 2.6L16 9.6"></path></svg>Toma de muestra a domicilio</span>
+            <span style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#6D6E71"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.4l2.6 2.6L16 9.6"></path></svg>Personal certificado</span>
+          </div>
+        </div>
+        <div style="position:relative">
+          <img src="uploads/Fotoequipo.png" alt="Sala de equipos y analizadores ExamLab" style="width:100%;height:clamp(290px,36vw,470px);object-fit:cover;border-radius:28px;display:block">
+          <div style="position:absolute;left:18px;bottom:-26px;background:#fff;border-radius:20px;padding:16px 20px;box-shadow:0 16px 40px rgba(0,90,140,.16);display:flex;align-items:center;gap:14px;max-width:290px">
+            <span style="width:44px;height:44px;flex:none;border-radius:14px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg></span>
+            <span style="display:block">
+              <span style="display:block;font-size:15px;font-weight:700;color:#005A8C">Resultados en 24 horas</span>
+              <span style="display:block;font-size:12.5px;color:#6D6E71;margin-top:2px">en la mayoría de exámenes de rutina</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ heroFull }}" hint-placeholder-val="{{ false }}">
+    <section style="position:relative;background:#005A8C">
+      <img src="uploads/Fotoequipo.png" alt="Sala de equipos y analizadores ExamLab" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;display:block">
+      <div style="position:relative;background:linear-gradient(90deg,rgba(0,90,140,.94) 0%,rgba(0,90,140,.72) 55%,rgba(0,90,140,.4) 100%)">
+        <div style="max-width:1240px;margin:0 auto;padding:clamp(56px,8vw,120px) 24px">
+          <span style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.14);color:#fff;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:999px"><span style="width:7px;height:7px;border-radius:50%;background:#E1251B;display:block"></span>Nueva imagen, la misma trayectoria</span>
+          <h1 style="margin-top:20px;font-size:clamp(34px,5vw,60px);line-height:1.05;letter-spacing:-0.4px;font-weight:700;color:#fff;max-width:680px">Resultados en los que usted puede confiar</h1>
+          <p style="margin-top:20px;font-size:clamp(16px,1.3vw,19px);line-height:1.6;color:rgba(255,255,255,.82);max-width:540px">Laboratorio clínico en Ambato con tecnología de análisis moderna, personal profesional y entrega oportuna de resultados.</p>
+          <div style="margin-top:32px;display:flex;flex-wrap:wrap;gap:12px">
+            <a href="#" style="display:flex;align-items:center;gap:10px;background:#00A3C4;color:#fff;font-size:15.5px;font-weight:700;padding:16px 24px;border-radius:16px" style-hover="background:#007E99;color:#fff"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 4V6z"></path></svg>Agendar cita por WhatsApp</a>
+            <a href="#" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);color:#fff;font-size:15.5px;font-weight:700;padding:16px 24px;border-radius:16px;border:1.5px solid rgba(255,255,255,.35)" style-hover="background:#fff;color:#005A8C">Ver mis resultados</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <section id="servicios" style="background:#fff;padding:clamp(46px,5vw,72px) 0 clamp(34px,4vw,56px)">
+    <div style="max-width:1240px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:18px">
+      <a href="#" style="background:#fff;border:1px solid #E6E8EA;border-radius:22px;padding:24px 22px;display:flex;flex-direction:column;gap:12px" style-hover="border-color:#00A3C4;box-shadow:0 14px 30px rgba(0,90,140,.09)">
+        <span style="width:48px;height:48px;border-radius:15px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M8.5 9h7M8.5 13h7M8.5 17h4"></path></svg></span>
+        <span style="display:block;font-size:17px;font-weight:700;color:#005A8C">Resultados en línea</span>
+        <span style="display:block;font-size:13.8px;line-height:1.5;color:#6D6E71">Consulte y descargue sus informes con su cédula y código de orden.</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:#00A3C4;margin-top:2px">Ingresar<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h13M13 7l5 5-5 5"></path></svg></span>
+      </a>
+      <a href="#" style="background:#fff;border:1px solid #E6E8EA;border-radius:22px;padding:24px 22px;display:flex;flex-direction:column;gap:12px" style-hover="border-color:#00A3C4;box-shadow:0 14px 30px rgba(0,90,140,.09)">
+        <span style="width:48px;height:48px;border-radius:15px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M8 3v4M16 3v4M3.5 10h17M8.5 14.5h3"></path></svg></span>
+        <span style="display:block;font-size:17px;font-weight:700;color:#005A8C">Agendar cita</span>
+        <span style="display:block;font-size:13.8px;line-height:1.5;color:#6D6E71">Reserve su turno por WhatsApp y evite tiempos de espera.</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:#00A3C4;margin-top:2px">Escribir<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h13M13 7l5 5-5 5"></path></svg></span>
+      </a>
+      <a href="#catalogo" style="background:#fff;border:1px solid #E6E8EA;border-radius:22px;padding:24px 22px;display:flex;flex-direction:column;gap:12px" style-hover="border-color:#00A3C4;box-shadow:0 14px 30px rgba(0,90,140,.09)">
+        <span style="width:48px;height:48px;border-radius:15px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg></span>
+        <span style="display:block;font-size:17px;font-weight:700;color:#005A8C">Catálogo de exámenes</span>
+        <span style="display:block;font-size:13.8px;line-height:1.5;color:#6D6E71">Preparación, tiempo de entrega y precio de cada análisis.</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:#00A3C4;margin-top:2px">Buscar<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h13M13 7l5 5-5 5"></path></svg></span>
+      </a>
+      <a href="#sedes" style="background:#fff;border:1px solid #E6E8EA;border-radius:22px;padding:24px 22px;display:flex;flex-direction:column;gap:12px" style-hover="border-color:#00A3C4;box-shadow:0 14px 30px rgba(0,90,140,.09)">
+        <span style="width:48px;height:48px;border-radius:15px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg></span>
+        <span style="display:block;font-size:17px;font-weight:700;color:#005A8C">Nuestras sedes</span>
+        <span style="display:block;font-size:13.8px;line-height:1.5;color:#6D6E71">Tres puntos de atención en Ambato con horarios extendidos.</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:#00A3C4;margin-top:2px">Ver mapa<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h13M13 7l5 5-5 5"></path></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <section id="catalogo" style="background:#F6F8FA;padding:clamp(56px,6vw,88px) 0">
+    <div style="max-width:1240px;margin:0 auto;padding:0 24px">
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between">
+        <div style="max-width:560px">
+          <span style="display:block;font-size:12.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#007E99">Categorías de exámenes</span>
+          <h2 style="margin-top:12px;font-size:clamp(27px,3.1vw,40px);line-height:1.12;letter-spacing:-0.3px;font-weight:700;color:#005A8C">Más de 400 análisis clínicos en un solo lugar</h2>
+        </div>
+        <a href="#" style="display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;color:#005A8C;border:1.5px solid #D2D4D7;background:#fff;padding:13px 20px;border-radius:14px" style-hover="border-color:#00A3C4;color:#005A8C">Ver catálogo completo<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h13M13 7l5 5-5 5"></path></svg></a>
+      </div>
+      <div style="margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:20px">
+        <div style="background:#fff;border-radius:24px;padding:28px 24px;box-shadow:0 2px 10px rgba(0,90,140,.05)" style-hover="box-shadow:0 18px 38px rgba(0,90,140,.1)">
+          <span style="width:52px;height:52px;border-radius:16px;background:#005A8C;display:flex;align-items:center;justify-content:center"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="1.9" stroke-linecap="round"><path d="M12 3.2s6 6.3 6 10.1a6 6 0 0 1-12 0C6 9.5 12 3.2 12 3.2z"></path></svg></span>
+          <h3 style="margin-top:18px;font-size:18.5px;font-weight:700;color:#005A8C">Exámenes de sangre</h3>
+          <p style="margin-top:9px;font-size:14.2px;line-height:1.55;color:#6D6E71">Hematología, química sanguínea, perfil lipídico y hormonal con analizadores automatizados.</p>
+          <span style="display:block;margin-top:16px;font-size:12.5px;font-weight:700;color:#007E99">128 exámenes</span>
+        </div>
+        <div style="background:#fff;border-radius:24px;padding:28px 24px;box-shadow:0 2px 10px rgba(0,90,140,.05)" style-hover="box-shadow:0 18px 38px rgba(0,90,140,.1)">
+          <span style="width:52px;height:52px;border-radius:16px;background:#005A8C;display:flex;align-items:center;justify-content:center"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><circle cx="10" cy="10" r="1.6"></circle><circle cx="14.5" cy="13.5" r="1.2"></circle><circle cx="9.5" cy="15" r="1"></circle></svg></span>
+          <h3 style="margin-top:18px;font-size:18.5px;font-weight:700;color:#005A8C">Microbiología</h3>
+          <p style="margin-top:9px;font-size:14.2px;line-height:1.55;color:#6D6E71">Cultivos, antibiogramas y estudios de infecciones con lectura profesional.</p>
+          <span style="display:block;margin-top:16px;font-size:12.5px;font-weight:700;color:#007E99">64 exámenes</span>
+        </div>
+        <div style="background:#fff;border-radius:24px;padding:28px 24px;box-shadow:0 2px 10px rgba(0,90,140,.05)" style-hover="box-shadow:0 18px 38px rgba(0,90,140,.1)">
+          <span style="width:52px;height:52px;border-radius:16px;background:#005A8C;display:flex;align-items:center;justify-content:center"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="1.9" stroke-linecap="round"><path d="M12 3.4l7 2.9v5.6c0 4.4-2.9 7.6-7 8.7-4.1-1.1-7-4.3-7-8.7V6.3l7-2.9z"></path><path d="M9 12.2l2.3 2.3L15 10.7"></path></svg></span>
+          <h3 style="margin-top:18px;font-size:18.5px;font-weight:700;color:#005A8C">Chequeos preventivos</h3>
+          <p style="margin-top:9px;font-size:14.2px;line-height:1.55;color:#6D6E71">Paquetes anuales para adultos, niños y adultos mayores a precio preferencial.</p>
+          <span style="display:block;margin-top:16px;font-size:12.5px;font-weight:700;color:#007E99">9 paquetes</span>
+        </div>
+        <div style="background:#fff;border-radius:24px;padding:28px 24px;box-shadow:0 2px 10px rgba(0,90,140,.05)" style-hover="box-shadow:0 18px 38px rgba(0,90,140,.1)">
+          <span style="width:52px;height:52px;border-radius:16px;background:#005A8C;display:flex;align-items:center;justify-content:center"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="1.9" stroke-linecap="round"><path d="M9 3h6M10 3v10.5a2 2 0 0 0 4 0V3"></path><path d="M10.2 12.5h3.6"></path></svg></span>
+          <h3 style="margin-top:18px;font-size:18.5px;font-weight:700;color:#005A8C">Perfiles especializados</h3>
+          <p style="margin-top:9px;font-size:14.2px;line-height:1.55;color:#6D6E71">Marcadores tumorales, autoinmunidad, alergias y pruebas moleculares.</p>
+          <span style="display:block;margin-top:16px;font-size:12.5px;font-weight:700;color:#007E99">73 exámenes</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#005A8C">
+    <div style="max-width:1240px;margin:0 auto;padding:clamp(40px,4.5vw,60px) 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,3vw,48px);align-items:center">
+      <div style="display:flex;gap:18px;align-items:flex-start">
+        <span style="width:54px;height:54px;flex:none;border-radius:17px;background:rgba(0,163,196,.18);display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6FD8EA" stroke-width="1.9" stroke-linecap="round"><path d="M4 11.5L12 5l8 6.5"></path><path d="M6.5 11v8h11v-8"></path><path d="M10.5 19v-4.5h3V19"></path></svg></span>
+        <div>
+          <h3 style="font-size:clamp(21px,2.2vw,26px);font-weight:700;color:#fff;letter-spacing:0px">Exámenes a domicilio</h3>
+          <p style="margin-top:9px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.75);max-width:380px">Toma de muestra en su casa u oficina, en toda Ambato. Agende el día y la hora que le convenga.</p>
+          <a href="#" style="margin-top:18px;display:inline-flex;align-items:center;gap:9px;background:#00A3C4;color:#fff;font-size:14.5px;font-weight:700;padding:14px 20px;border-radius:14px" style-hover="background:#fff;color:#005A8C"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 4V6z"></path></svg>Agendar por WhatsApp</a>
+        </div>
+      </div>
+      <div style="display:flex;gap:18px;align-items:flex-start;border-left:1px solid rgba(255,255,255,.16);padding-left:clamp(0px,3vw,40px)">
+        <span style="width:54px;height:54px;flex:none;border-radius:17px;background:rgba(225,37,27,.2);display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF6F66" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+        <div>
+          <h3 style="font-size:clamp(21px,2.2vw,26px);font-weight:700;color:#fff;letter-spacing:0px">Atención de emergencia</h3>
+          <p style="margin-top:9px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.75);max-width:380px">Exámenes urgentes con procesamiento prioritario y entrega el mismo día.</p>
+          <a href="#" style="margin-top:18px;display:inline-flex;align-items:center;gap:10px;color:#fff;font-size:19px;font-weight:700;letter-spacing:0px" style-hover="color:#FF6F66"><span style="width:8px;height:8px;border-radius:50%;background:#E1251B;display:block"></span>0999 123 456</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#fff;padding:clamp(56px,6vw,88px) 0">
+    <div style="max-width:1240px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:clamp(34px,4vw,60px);align-items:center">
+      <div style="position:relative">
+        <img src="uploads/Fotolaboratorio.png" alt="Profesionales de ExamLab analizando muestras" style="width:100%;height:clamp(300px,38vw,480px);object-fit:cover;border-radius:28px;display:block">
+        <div style="position:absolute;right:18px;top:18px;background:rgba(255,255,255,.94);border-radius:16px;padding:12px 16px;font-size:12.5px;font-weight:700;color:#005A8C;box-shadow:0 10px 26px rgba(0,90,140,.14)">Control de calidad interno y externo</div>
+      </div>
+      <div>
+        <span style="display:block;font-size:12.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#007E99">Por qué elegirnos</span>
+        <h2 style="margin-top:12px;font-size:clamp(27px,3.1vw,40px);line-height:1.12;letter-spacing:-0.3px;font-weight:700;color:#005A8C">Precisión clínica con atención humana</h2>
+        <div style="margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px">
+          <div>
+            <span style="width:44px;height:44px;border-radius:14px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"></circle><path d="M8.2 12.4l2.6 2.6 5-5.4"></path></svg></span>
+            <h3 style="margin-top:14px;font-size:16.5px;font-weight:700;color:#005A8C">Resultados confiables</h3>
+            <p style="margin-top:7px;font-size:14px;line-height:1.55;color:#6D6E71">Doble validación técnica y controles de calidad en cada corrida.</p>
+          </div>
+          <div>
+            <span style="width:44px;height:44px;border-radius:14px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"></circle><path d="M12 7.4V12l3.2 2.1"></path></svg></span>
+            <h3 style="margin-top:14px;font-size:16.5px;font-weight:700;color:#005A8C">Entrega oportuna</h3>
+            <p style="margin-top:7px;font-size:14px;line-height:1.55;color:#6D6E71">Informes en línea el mismo día en la mayoría de exámenes de rutina.</p>
+          </div>
+          <div>
+            <span style="width:44px;height:44px;border-radius:14px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.6" r="3.6"></circle><path d="M5.5 19.5c1.1-3.2 3.6-4.8 6.5-4.8s5.4 1.6 6.5 4.8"></path></svg></span>
+            <h3 style="margin-top:14px;font-size:16.5px;font-weight:700;color:#005A8C">Personal profesional</h3>
+            <p style="margin-top:7px;font-size:14px;line-height:1.55;color:#6D6E71">Bioquímicos y tecnólogos médicos con formación continua.</p>
+          </div>
+          <div>
+            <span style="width:44px;height:44px;border-radius:14px;background:#E6F5F9;display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#007E99" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="11" rx="2.4"></rect><path d="M9 20h6M12 16v4"></path></svg></span>
+            <h3 style="margin-top:14px;font-size:16.5px;font-weight:700;color:#005A8C">Tecnología moderna</h3>
+            <p style="margin-top:7px;font-size:14px;line-height:1.55;color:#6D6E71">Analizadores automatizados y trazabilidad digital de cada muestra.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sedes" style="background:#F6F8FA;padding:clamp(56px,6vw,88px) 0">
+    <div style="max-width:1240px;margin:0 auto;padding:0 24px">
+      <span style="display:block;font-size:12.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#007E99">Nuestras sedes</span>
+      <h2 style="margin-top:12px;font-size:clamp(27px,3.1vw,40px);line-height:1.12;letter-spacing:-0.3px;font-weight:700;color:#005A8C;max-width:540px">Tres puntos de atención en Ambato</h2>
+      <div style="margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+        <div style="background:#fff;border-radius:24px;padding:26px;display:flex;flex-direction:column;gap:16px;box-shadow:0 2px 10px rgba(0,90,140,.05)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:19px;font-weight:700;color:#005A8C">Matriz Centro</span>
+            <span style="background:#E6F5F9;color:#007E99;font-size:11px;font-weight:700;letter-spacing:.4px;padding:5px 9px;border-radius:8px;text-transform:uppercase">Matriz</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg><span style="font-size:14.2px;line-height:1.5;color:#6D6E71">Av. Cevallos 12-34 y Montalvo, planta baja</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="8.6"></circle><path d="M12 7.4V12l3.2 2.1"></path></svg><span style="font-size:14.2px;line-height:1.5;color:#6D6E71">Lun a Vie 06:30 – 19:00<br>Sáb 07:00 – 13:00</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:auto">
+            <a href="#" style="flex:1;min-width:130px;text-align:center;background:#005A8C;color:#fff;font-size:13.8px;font-weight:700;padding:13px 14px;border-radius:13px" style-hover="background:#00A3C4;color:#fff">Ver en el mapa</a>
+            <a href="#" style="flex:1;min-width:110px;text-align:center;background:#fff;color:#005A8C;font-size:13.8px;font-weight:700;padding:13px 14px;border-radius:13px;border:1.5px solid #D9DBDE" style-hover="border-color:#00A3C4;color:#005A8C">Llamar</a>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:24px;padding:26px;display:flex;flex-direction:column;gap:16px;box-shadow:0 2px 10px rgba(0,90,140,.05)">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:19px;font-weight:700;color:#005A8C">Sede Ficoa</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg><span style="font-size:14.2px;line-height:1.5;color:#6D6E71">Av. Los Guaytambos y Las Delicias, local 3</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="8.6"></circle><path d="M12 7.4V12l3.2 2.1"></path></svg><span style="font-size:14.2px;line-height:1.5;color:#6D6E71">Lun a Vie 07:00 – 18:00<br>Sáb 07:00 – 12:30</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:auto">
+            <a href="#" style="flex:1;min-width:130px;text-align:center;background:#005A8C;color:#fff;font-size:13.8px;font-weight:700;padding:13px 14px;border-radius:13px" style-hover="background:#00A3C4;color:#fff">Ver en el mapa</a>
+            <a href="#" style="flex:1;min-width:110px;text-align:center;background:#fff;color:#005A8C;font-size:13.8px;font-weight:700;padding:13px 14px;border-radius:13px;border:1.5px solid #D9DBDE" style-hover="border-color:#00A3C4;color:#005A8C">Llamar</a>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:24px;padding:26px;display:flex;flex-direction:column;gap:16px;box-shadow:0 2px 10px rgba(0,90,140,.05)">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:19px;font-weight:700;color:#005A8C">Sede Huachi</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg><span style="font-size:14.2px;line-height:1.5;color:#6D6E71">Av. Atahualpa y Rio Cutuchi, junto al centro comercial</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A3C4" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="8.6"></circle><path d="M12 7.4V12l3.2 2.1"></path></svg><span style="font-size:14.2px;line-height:1.5;color:#6D6E71">Lun a Vie 06:30 – 18:00<br>Sáb 07:00 – 13:00</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:auto">
+            <a href="#" style="flex:1;min-width:130px;text-align:center;background:#005A8C;color:#fff;font-size:13.8px;font-weight:700;padding:13px 14px;border-radius:13px" style-hover="background:#00A3C4;color:#fff">Ver en el mapa</a>
+            <a href="#" style="flex:1;min-width:110px;text-align:center;background:#fff;color:#005A8C;font-size:13.8px;font-weight:700;padding:13px 14px;border-radius:13px;border:1.5px solid #D9DBDE" style-hover="border-color:#00A3C4;color:#005A8C">Llamar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ showNews }}" hint-placeholder-val="{{ true }}">
+    <section id="noticias" style="background:#fff;padding:clamp(56px,6vw,88px) 0">
+      <div style="max-width:1240px;margin:0 auto;padding:0 24px">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between">
+          <div>
+            <span style="display:block;font-size:12.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#007E99">Noticias y salud</span>
+            <h2 style="margin-top:12px;font-size:clamp(27px,3.1vw,40px);line-height:1.12;letter-spacing:-0.3px;font-weight:700;color:#005A8C">Información útil para su cuidado</h2>
+          </div>
+          <a href="#" style="font-size:14.5px;font-weight:700;color:#005A8C">Ver todas las noticias →</a>
+        </div>
+        <div style="margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px">
+          <a href="#" style="display:flex;flex-direction:column;background:#fff;border:1px solid #E6E8EA;border-radius:24px;overflow:hidden" style-hover="border-color:#00A3C4;box-shadow:0 16px 34px rgba(0,90,140,.09)">
+            <span style="display:flex;align-items:center;justify-content:center;height:172px;background:repeating-linear-gradient(45deg,#F0F1F3 0 9px,#E4E6E9 9px 18px)"><span style="font:11.5px/1 ui-monospace,Menlo,monospace;color:#9A9B9E;background:rgba(255,255,255,.85);padding:6px 10px;border-radius:6px">imagen nota 1 · 16:9</span></span>
+            <span style="display:block;padding:22px">
+              <span style="display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700;color:#007E99"><span>PREVENCIÓN</span><span style="color:#9A9B9E">12 jul 2026</span></span>
+              <span style="display:block;margin-top:10px;font-size:17.5px;font-weight:700;line-height:1.3;color:#005A8C">Cómo prepararse para un examen de sangre en ayunas</span>
+              <span style="display:block;margin-top:9px;font-size:14px;line-height:1.55;color:#6D6E71">Cuántas horas de ayuno necesita, qué puede tomar y qué evitar antes de su cita.</span>
+            </span>
+          </a>
+          <a href="#" style="display:flex;flex-direction:column;background:#fff;border:1px solid #E6E8EA;border-radius:24px;overflow:hidden" style-hover="border-color:#00A3C4;box-shadow:0 16px 34px rgba(0,90,140,.09)">
+            <span style="display:flex;align-items:center;justify-content:center;height:172px;background:repeating-linear-gradient(45deg,#F0F1F3 0 9px,#E4E6E9 9px 18px)"><span style="font:11.5px/1 ui-monospace,Menlo,monospace;color:#9A9B9E;background:rgba(255,255,255,.85);padding:6px 10px;border-radius:6px">imagen nota 2 · 16:9</span></span>
+            <span style="display:block;padding:22px">
+              <span style="display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700;color:#007E99"><span>LABORATORIO</span><span style="color:#9A9B9E">28 jun 2026</span></span>
+              <span style="display:block;margin-top:10px;font-size:17.5px;font-weight:700;line-height:1.3;color:#005A8C">Nuevos analizadores automatizados en nuestra matriz</span>
+              <span style="display:block;margin-top:9px;font-size:14px;line-height:1.55;color:#6D6E71">Más capacidad de procesamiento y tiempos de entrega más cortos para usted.</span>
+            </span>
+          </a>
+          <a href="#" style="display:flex;flex-direction:column;background:#fff;border:1px solid #E6E8EA;border-radius:24px;overflow:hidden" style-hover="border-color:#00A3C4;box-shadow:0 16px 34px rgba(0,90,140,.09)">
+            <span style="display:flex;align-items:center;justify-content:center;height:172px;background:repeating-linear-gradient(45deg,#F0F1F3 0 9px,#E4E6E9 9px 18px)"><span style="font:11.5px/1 ui-monospace,Menlo,monospace;color:#9A9B9E;background:rgba(255,255,255,.85);padding:6px 10px;border-radius:6px">imagen nota 3 · 16:9</span></span>
+            <span style="display:block;padding:22px">
+              <span style="display:flex;gap:10px;align-items:center;font-size:12px;font-weight:700;color:#007E99"><span>CHEQUEOS</span><span style="color:#9A9B9E">03 jun 2026</span></span>
+              <span style="display:block;margin-top:10px;font-size:17.5px;font-weight:700;line-height:1.3;color:#005A8C">Chequeo anual: los 6 exámenes que no debe posponer</span>
+              <span style="display:block;margin-top:9px;font-size:14px;line-height:1.55;color:#6D6E71">Una guía sencilla para cuidar su salud durante todo el año.</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <footer style="background:#005A8C;color:rgba(255,255,255,.72)">
+    <div style="max-width:1240px;margin:0 auto;padding:clamp(48px,5vw,72px) 24px clamp(24px,3vw,36px);display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:clamp(30px,3vw,48px)">
+      <div>
+        <div style="display:flex;align-items:center;gap:11px">
+          <span style="width:44px;height:44px;border-radius:12px;overflow:hidden;display:block;flex:none;background:rgba(255,255,255,.06)">
+            <img src="uploads/logo.png" alt="ExamLab" style="width:98px;height:98px;display:block;transform:translate(-27px,-6px)">
+          </span>
+          <span style="display:flex;flex-direction:column;gap:5px;min-width:200px">
+            <span style="font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:600;color:#fff;letter-spacing:.3px;line-height:1">ExamLab <span style="font-size:13px;font-weight:600;color:rgba(255,255,255,.6)">S.A.S.</span></span>
+            <span style="font-size:8.5px;font-weight:600;letter-spacing:1.35px;line-height:1.45;color:rgba(255,255,255,.6);text-transform:uppercase;max-width:198px">Laboratorio clínico de innovación y desarrollo</span>
+          </span>
+        </div>
+        <p style="margin-top:18px;font-size:14px;line-height:1.6;max-width:290px">Años de trayectoria al servicio de la salud de las familias de Ambato y Tungurahua.</p>
+        <div style="margin-top:20px;display:flex;gap:10px">
+          <a href="#" aria-label="Facebook" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.24);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff" style-hover="background:#00A3C4;color:#fff">fb</a>
+          <a href="#" aria-label="Instagram" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.24);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff" style-hover="background:#00A3C4;color:#fff">ig</a>
+          <a href="#" aria-label="TikTok" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.24);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff" style-hover="background:#00A3C4;color:#fff">tt</a>
+        </div>
+      </div>
+      <div>
+        <span style="display:block;font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#fff">Enlaces rápidos</span>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:11px">
+          <a href="#servicios" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Servicios</a>
+          <a href="#catalogo" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Catálogo de exámenes</a>
+          <a href="#" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Soy paciente</a>
+          <a href="#" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Soy profesional</a>
+          <a href="#noticias" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Noticias</a>
+        </div>
+      </div>
+      <div>
+        <span style="display:block;font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#fff">Servicios</span>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:11px">
+          <a href="#" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Resultados en línea</a>
+          <a href="#" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Exámenes a domicilio</a>
+          <a href="#" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Chequeos preventivos</a>
+          <a href="#" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Convenios empresariales</a>
+          <a href="#sedes" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">Nuestras sedes</a>
+        </div>
+      </div>
+      <div>
+        <span style="display:block;font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#fff">Contacto</span>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:13px">
+          <span style="font-size:14.2px;line-height:1.5">Av. Cevallos 12-34 y Montalvo<br>Ambato, Tungurahua</span>
+          <a href="#" style="font-size:16px;font-weight:700;color:#fff" style-hover="color:#6FD8EA">(03) 242 8899</a>
+          <a href="#" style="font-size:14.2px;color:rgba(255,255,255,.72)" style-hover="color:#6FD8EA">contacto@examlab.ec</a>
+          <span style="font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.6)">Lun a Vie 06:30 – 19:00<br>Sáb 07:00 – 13:00</span>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.14)">
+      <div style="max-width:1240px;margin:0 auto;padding:20px 24px 26px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;justify-content:space-between">
+        <span style="font-size:12.8px;color:rgba(255,255,255,.55)">© 2026 ExamLab · Laboratorio clínico · Ambato, Ecuador</span>
+        <span style="display:flex;flex-wrap:wrap;gap:10px 20px">
+          <a href="#" style="font-size:12.8px;color:rgba(255,255,255,.6)" style-hover="color:#6FD8EA">Política de privacidad</a>
+          <a href="#" style="font-size:12.8px;color:rgba(255,255,255,.6)" style-hover="color:#6FD8EA">Términos y condiciones</a>
+          <a href="#" style="font-size:12.8px;color:rgba(255,255,255,.6)" style-hover="color:#6FD8EA">Cookies</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <a href="#" aria-label="Escríbenos por WhatsApp" style="position:fixed;right:20px;bottom:20px;z-index:80;display:flex;align-items:center;gap:10px;background:#00A3C4;color:#fff;padding:14px 18px;border-radius:999px;box-shadow:0 12px 30px rgba(0,90,140,.28);font-size:14.5px;font-weight:700" style-hover="background:#007E99;color:#fff">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 4V6z"></path><path d="M8.5 8.5h7M8.5 12h4.5"></path></svg>
+    <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}"><span>Escríbenos</span></sc-if>
+  </a>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroVariant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;imagen al costado&quot;,&quot;imagen a fondo completo&quot;],&quot;default&quot;:&quot;imagen al costado&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;showUtilityBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Header&quot;},&quot;showNews&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Secciones&quot;}}">
+class Component extends DCLogic {
+  state = { w: typeof window !== 'undefined' ? window.innerWidth : 1440, navOpen: false };
+  componentDidMount() {
+    this._onResize = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this._onResize);
+    this._onResize();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+  renderVals() {
+    const isDesktop = this.state.w >= 1000;
+    const variant = this.props.heroVariant ?? 'imagen al costado';
+    return {
+      isDesktop,
+      isMobile: !isDesktop,
+      navOpen: !isDesktop && this.state.navOpen,
+      toggleNav: () => this.setState(s => ({ navOpen: !s.navOpen })),
+      closeNav: () => this.setState({ navOpen: false }),
+      showUtilityBar: (this.props.showUtilityBar ?? true) && isDesktop,
+      showNews: this.props.showNews ?? true,
+      heroSide: variant === 'imagen al costado',
+      heroFull: variant === 'imagen a fondo completo'
+    };
+  }
+}
+</script>
+</body>
+</html>

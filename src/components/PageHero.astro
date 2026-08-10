@@ -1,0 +1,57 @@
+---
+/** Cabecera compacta para las páginas internas. */
+import Icon from './Icon.astro';
+
+interface Props {
+  eyebrow?: string;
+  titulo: string;
+  descripcion?: string;
+  migas?: { nombre: string; href: string }[];
+}
+
+const { eyebrow, titulo, descripcion, migas = [] } = Astro.props;
+---
+
+<section class="bg-brand">
+  <div class="container-page py-12 lg:py-16">
+    {
+      migas.length > 0 && (
+        <nav aria-label="Ruta de navegación" class="mb-6">
+          <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-white/60">
+            {migas.map((miga, i) => (
+              <li class="flex items-center gap-2">
+                {i > 0 && <span aria-hidden="true">/</span>}
+                {i === migas.length - 1 ? (
+                  <span class="text-white/85" aria-current="page">
+                    {miga.nombre}
+                  </span>
+                ) : (
+                  <a href={miga.href} class="transition-colors hover:text-accent-light">
+                    {miga.nombre}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+    {
+      eyebrow && (
+        <span class="flex items-center gap-2.5 text-[12.5px] font-bold tracking-[1.8px] text-accent-light uppercase">
+          <Icon name="gota" size={14} strokeWidth={1.9} />
+          {eyebrow}
+        </span>
+      )
+    }
+    <h1 class="mt-3 max-w-[760px] text-h1 font-bold text-white">{titulo}</h1>
+    {
+      descripcion && (
+        <p class="mt-5 max-w-[620px] text-lead text-white/80">{descripcion}</p>
+      )
+    }
+    <div class="mt-7 empty:mt-0">
+      <slot />
+    </div>
+  </div>
+</section>

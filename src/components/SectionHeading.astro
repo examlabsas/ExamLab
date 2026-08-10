@@ -1,0 +1,83 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  eyebrow?: string;
+  titulo: string;
+  descripcion?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  /** Estilo de la sección sobre fondo oscuro. */
+  oscuro?: boolean;
+  maxTitulo?: string;
+}
+
+const { eyebrow, titulo, descripcion, ctaLabel, ctaHref, oscuro = false, maxTitulo } =
+  Astro.props;
+
+// Si el enlace abre WhatsApp, se muestra su glifo en vez de la flecha.
+const esWhatsApp = !!ctaHref?.startsWith('https://wa.me');
+---
+
+<div class="flex flex-wrap items-end justify-between gap-6">
+  <div class="max-w-[620px]">
+    {
+      eyebrow && (
+        <span
+          class:list={[
+            'inline-flex items-center gap-2 rounded-lg px-3 py-1 text-xs font-semibold tracking-wide',
+            oscuro 
+              ? 'bg-white/10 text-accent-light border border-white/15' 
+              : 'bg-brand-soft/60 text-brand border border-brand/10',
+          ]}
+        >
+          {eyebrow}
+        </span>
+      )
+    }
+    <h2
+      class:list={[
+        eyebrow ? 'mt-3' : 'mt-0',
+        'text-h2 font-bold tracking-tight',
+        oscuro ? 'text-white' : 'text-brand',
+        maxTitulo,
+      ]}
+    >
+      {titulo}
+    </h2>
+    {
+      descripcion && (
+        <p
+          class:list={[
+            'mt-3.5 text-lead leading-relaxed',
+            oscuro ? 'text-white/80' : 'text-neutral',
+          ]}
+        >
+          {descripcion}
+        </p>
+      )
+    }
+  </div>
+  {
+    ctaLabel && ctaHref && (
+      <a
+        href={ctaHref}
+        class:list={[
+          'inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-200 shadow-sm',
+          oscuro
+            ? 'border-white/30 bg-white/10 text-white hover:border-white hover:bg-white hover:text-brand'
+            : 'border-line-strong bg-white text-brand hover:border-brand hover:bg-brand-soft/40',
+        ]}
+      >
+        {ctaLabel}
+        {
+          esWhatsApp ? (
+            <Icon name="whatsapp-marca" size={15} class="text-whatsapp" />
+          ) : (
+            <Icon name="flecha" size={15} strokeWidth={2.4} class="text-accent" />
+          )
+        }
+      </a>
+    )
+  }
+</div>

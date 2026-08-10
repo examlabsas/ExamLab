@@ -1,0 +1,134 @@
+---
+/**
+ * Indicador "Abierto ahora / Cerrado".
+ *
+ * Calcula el estado con la hora real de Ecuador (America/Guayaquil), no con la
+ * del visitante: alguien que consulte desde otro país debe ver si el
+ * laboratorio está abierto allá, no acá.
+ *
+ * Como el sitio es estático, el cálculo va en el navegador. Sin JavaScript se
+ * muestra el horario resumido, que sigue siendo información útil.
+ */
+import { ZONA_HORARIA, type HorarioSemanal } from '@/lib/site';
+
+interface Props {
+  horario: HorarioSemanal;
+  /** Texto de reserva mientras no hay JavaScript. */
+  respaldo: string;
+  /** `true` sobre fondo azul (barra superior). */
+  oscuro?: boolean;
+  class?: string;
+}
+
+const { horario, respaldo, oscuro = false, class: className } = Astro.props;
+---
+
+<span
+  class:list={['inline-flex items-center gap-2', className]}
+  data-apertura
+  data-horario={JSON.stringify(horario)}
+  data-zona={ZONA_HORARIA}
+>
+  <span
+    class:list={[
+      'h-2 w-2 flex-none rounded-full bg-current opacity-60 transition-colors',
+      oscuro ? 'text-white/60' : 'text-neutral',
+    ]}
+    data-punto
+    aria-hidden="true"></span>
+  <span data-texto>{respaldo}</span>
+</span>
+
+<script>
+  const initApertura = () => {
+    const nodos = document.querySelectorAll<HTMLElement>('[data-apertura]');
+    if (nodos.length === 0) return;
+
+    type Franja = { abre: string; cierra: string } | null;
+
+    const aMinutos = (hhmm: string) => {
+      const [h, m] = hhmm.split(':').map(Number);
+      return (h ?? 0) * 60 + (m ?? 0);
+    };
+
+    /** Día y minutos actuales en la zona horaria del laboratorio. */
+    const ahoraEnZona = (zona: string) => {
+      const partes = new Intl.DateTimeFormat('en-US', {
+        timeZone: zona,
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).formatToParts(new Date());
+
+      const buscar = (tipo: string) => partes.find((p) => p.type === tipo)?.value ?? '';
+      const dias: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      // A las 24:00 algunos navegadores devuelven "24"; se normaliza a 0.
+      const hora = Number(buscar('hour')) % 24;
+
+      return { dia: dias[buscar('weekday')] ?? 0, minutos: hora * 60 + Number(buscar('minute')) };
+    };
+
+    const nombreDia = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+    const calcular = (semana: Franja[], zona: string) => {
+      const { dia, minutos } = ahoraEnZona(zona);
+      const hoy = semana[dia] ?? null;
+
+      if (hoy) {
+        const abre = aMinutos(hoy.abre);
+        const cierra = aMinutos(hoy.cierra);
+
+        if (minutos >= abre && minutos < cierra) {
+          const faltan = cierra - minutos;
+          return {
+            abierto: true,
+            texto: faltan <= 60 ? `Cierra en ${faltan} min` : `Abierto · cierra ${hoy.cierra}`,
+          };
+        }
+        if (minutos < abre) {
+          return { abierto: false, texto: `Cerrado · abre hoy ${hoy.abre}` };
+        }
+      }
+
+      // Cerrado: se busca el próximo día con atención.
+      for (let i = 1; i <= 7; i++) {
+        const indice = (dia + i) % 7;
+        const franja = semana[indice];
+        if (!franja) continue;
+        const cuando = i === 1 ? 'mañana' : `el ${nombreDia[indice]}`;
+        return { abierto: false, texto: `Cerrado · abre ${cuando} ${franja.abre}` };
+      }
+      return { abierto: false, texto: 'Cerrado' };
+    };
+
+    const pintar = () => {
+      for (const nodo of nodos) {
+        let semana: Franja[];
+        try {
+          semana = JSON.parse(nodo.dataset.horario ?? '[]');
+        } catch {
+          continue;
+        }
+
+        const { abierto, texto } = calcular(semana, nodo.dataset.zona ?? 'America/Guayaquil');
+        const punto = nodo.querySelector<HTMLElement>('[data-punto]');
+        const etiqueta = nodo.querySelector<HTMLElement>('[data-texto]');
+
+        if (etiqueta) etiqueta.textContent = texto;
+        if (punto) {
+          punto.classList.remove('opacity-60');
+          punto.style.color = abierto ? '#25D366' : '#E1251B';
+        }
+        nodo.dataset.abierto = String(abierto);
+      }
+    };
+
+    pintar();
+    // Se refresca cada minuto para que el estado no quede congelado.
+    window.setInterval(pintar, 60_000);
+  };
+
+  initApertura();
+  document.addEventListener('astro:page-load', initApertura);
+</script>

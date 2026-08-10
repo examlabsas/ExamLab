@@ -1,0 +1,115 @@
+---
+/**
+ * Isotipo + logotipo de ExamLab.
+ *
+ * `logo.png` es el emblema circular sobre un fondo oscuro cuadrado. Se recorta
+ * en círculo para que el fondo de las esquinas desaparezca y el isotipo funcione
+ * tanto sobre blanco (cabecera) como sobre azul (pie).
+ * TODO: sustituir por un SVG con fondo transparente cuando marca lo entregue.
+ */
+import { site } from '@/lib/site';
+
+interface Props {
+  /** Diámetro del isotipo en px. El texto se dimensiona a partir de este valor. */
+  box?: number;
+  /** `oscuro` = sobre fondo azul (pie de página). */
+  variant?: 'claro' | 'oscuro';
+  /** Muestra el sufijo S.A.S. junto al nombre. */
+  razonSocial?: boolean;
+  /**
+   * Bajada bajo el nombre. En la cabecera va desactivada: repetía la misma
+   * frase del distintivo del hero y apretaba el conjunto en móvil.
+   */
+  bajada?: boolean;
+  class?: string;
+}
+
+const {
+  box = 54,
+  variant = 'claro',
+  razonSocial = false,
+  bajada: conBajada = true,
+  class: className,
+} = Astro.props;
+
+const oscuro = variant === 'oscuro';
+
+/*
+  Sin bajada, el nombre ocupa el alto del emblema. Con bajada, las
+  proporciones hacen que nombre + separación + dos líneas de bajada midan
+  juntos lo mismo que el emblema.
+*/
+const nombreRatio = conBajada ? 0.56 : 0.74;
+const nombre = Math.round(box * nombreRatio * 10) / 10;
+const bajada = Math.round(box * 0.148 * 10) / 10;
+const separacion = Math.round(box * 0.055 * 10) / 10;
+const anchoBajada = Math.round(box * 4.05);
+
+/*
+  En pantallas angostas el conjunto se encoge para que quepa junto al botón de
+  resultados y el menú, y recupera su tamaño nominal en pantallas anchas. Sin
+  bajada el nombre es mucho más ancho, así que necesita encogerse más: medido a
+  360 px, con estos valores quedan ~24 px de holgura antes del botón de menú.
+*/
+const fluido = (valor: number, vw: number, minRatio: number) =>
+  `clamp(${Math.round(valor * minRatio * 10) / 10}px, ${vw}vw, ${valor}px)`;
+
+const cajaFluida = conBajada ? fluido(box, 12, 0.85) : fluido(box, 11, 0.72);
+const nombreFluido = conBajada
+  ? fluido(nombre, 6.8, 0.85)
+  : fluido(nombre, 7.8, 0.65);
+---
+
+<span class:list={['flex items-center gap-3', className]}>
+  <span
+    class="block shrink-0 overflow-hidden rounded-full"
+    style={`width:${cajaFluida};height:${cajaFluida}`}
+  >
+    <!--
+      El emblema no está centrado en el PNG (bordes medidos: 5,47% izq · 1,95% arriba ·
+      4,1% der · 3,52% abajo). El desplazamiento lo centra y el escalado hace que llene
+      el recorte circular sin dejar fondo oscuro a la vista.
+    -->
+    <img
+      src="/images/logo.png"
+      alt=""
+      width={box}
+      height={box}
+      class="block h-full w-full object-cover"
+      style="transform: translate(-0.72%, 0.83%) scale(1.06)"
+      loading="eager"
+      decoding="async"
+    />
+  </span>
+
+  <span class="flex min-w-0 flex-col" style={`gap:${separacion}px`}>
+    <span
+      class:list={[
+        'font-display leading-none font-semibold tracking-[0.3px]',
+        oscuro ? 'text-white' : 'text-brand',
+      ]}
+      style={`font-size:${nombreFluido}`}
+    >
+      {site.nombre}{
+        razonSocial && (
+          <span
+            class="font-semibold text-white/60"
+            style={`font-size:${Math.round(nombre * 0.42)}px`}
+          >
+            {' '}S.A.S.
+          </span>
+        )
+      }
+    </span>
+    {
+      conBajada && (
+        <span
+          class:list={['font-semibold uppercase', oscuro ? 'text-white/60' : 'text-neutral']}
+          style={`font-size:${bajada}px;line-height:1.3;letter-spacing:0.135em;max-width:${anchoBajada}px`}
+        >
+          {site.claim}
+        </span>
+      )
+    }
+  </span>
+</span>

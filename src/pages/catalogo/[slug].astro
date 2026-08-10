@@ -1,0 +1,40 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ExamenFicha from '@/components/ExamenFicha.astro';
+import { examenes, getRelacionados, resumenCorto } from '@/lib/examenes';
+import { breadcrumbSchema, medicalTestSchema } from '@/lib/schema';
+
+export function getStaticPaths() {
+  return examenes.map((examen) => ({
+    params: { slug: examen.slug },
+    props: { examen },
+  }));
+}
+
+// El tipo de `examen` se infiere de las props devueltas por getStaticPaths.
+const { examen } = Astro.props;
+const relacionados = getRelacionados(examen, examenes);
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Catálogo de exámenes', href: '/catalogo' },
+    { nombre: examen.nombre, href: `/catalogo/${examen.slug}` },
+  ]),
+  medicalTestSchema(examen),
+];
+---
+
+<BaseLayout
+  titulo={examen.nombre}
+  descripcion={`${resumenCorto(examen)} Especialidad ${examen.especialidad}, muestra: ${examen.tipoMuestra}. Entrega en ${examen.tiempoEntrega.toLowerCase()}.`}
+  whatsapp="catalogo"
+  schema={schema}
+>
+  <ExamenFicha
+    examen={examen}
+    relacionados={relacionados}
+    basePath="/catalogo"
+    catalogoLabel="Catálogo"
+  />
+</BaseLayout>

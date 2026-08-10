@@ -1,0 +1,244 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import BuscadorExamenes from '@/components/BuscadorExamenes.astro';
+import { site } from '@/lib/site';
+import { whatsappLink } from '@/lib/whatsapp';
+import { breadcrumbSchema } from '@/lib/schema';
+import type { IconName } from '@/lib/iconos';
+
+const beneficios: { icono: IconName; titulo: string; texto: string }[] = [
+  {
+    icono: 'monitor',
+    titulo: 'Portal para el profesional',
+    texto:
+      'Consulte el histórico de resultados de sus pacientes autorizados, descargue informes en PDF y reciba notificaciones cuando una orden se valida.',
+  },
+  {
+    icono: 'alerta',
+    titulo: 'Aviso de valores críticos',
+    texto:
+      'Todo valor crítico se comunica telefónicamente al profesional solicitante dentro de la hora siguiente a su validación, con registro en la orden.',
+  },
+  {
+    icono: 'escudo',
+    titulo: 'Control de calidad documentado',
+    texto:
+      'Control interno diario y participación en programas de evaluación externa del desempeño. Entregamos la documentación cuando la requiera.',
+  },
+  {
+    icono: 'camion',
+    titulo: 'Recolección en su consultorio',
+    texto:
+      'Ruta de recolección de muestras en consultorios y clínicas de Ambato, con cadena de frío controlada y trazabilidad por código de barras.',
+  },
+  {
+    icono: 'maletin',
+    titulo: 'Convenios institucionales',
+    texto:
+      'Tarifario preferencial para clínicas, consultorios, aseguradoras y empresas, con facturación mensual consolidada.',
+  },
+  {
+    icono: 'usuarios',
+    titulo: 'Apoyo científico',
+    texto:
+      'Nuestro equipo de bioquímicos está disponible para orientar sobre la selección de pruebas, condiciones preanalíticas e interpretación técnica.',
+  },
+];
+
+const preanalitico = [
+  {
+    titulo: 'Identificación',
+    texto: 'Cada muestra debe rotularse con nombre completo, cédula y fecha/hora de la toma.',
+  },
+  {
+    titulo: 'Tubo correcto',
+    texto: 'Verifique el anticoagulante y el volumen mínimo requerido antes de la extracción.',
+  },
+  {
+    titulo: 'Homogenización',
+    texto: 'Invierta el tubo suavemente de 5 a 8 veces; no agite para evitar hemólisis.',
+  },
+  {
+    titulo: 'Transporte',
+    texto: 'Envíe la muestra dentro de las 2 horas o refrigerada según la prueba solicitada.',
+  },
+];
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Soy profesional', href: '/soy-profesional' },
+  ]),
+];
+---
+
+<BaseLayout
+  titulo="Soy profesional"
+  descripcion="Portal de resultados, convenios institucionales, recolección de muestras y soporte científico para profesionales de la salud en Ambato."
+  whatsapp="profesional"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Para profesionales de la salud"
+    titulo="Un laboratorio que trabaja con usted, no solo para usted"
+    descripcion="Resultados trazables, comunicación de valores críticos y un equipo técnico disponible para resolver sus consultas."
+    migas={[
+      { nombre: 'Inicio', href: '/' },
+      { nombre: 'Soy profesional', href: '/soy-profesional' },
+    ]}
+  >
+    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Button href={site.portalProfesional} icon="monitor">Portal profesional</Button>
+      <Button href={whatsappLink('profesional')} variant="sobreOscuro" icon="whatsapp-marca">
+        Hablar con el equipo
+      </Button>
+    </div>
+
+    <!-- Un profesional entra a buscar una prueba concreta, no a leer. -->
+    <BuscadorExamenes
+      id="buscar-profesional"
+      oscuro
+      class="mt-5"
+      placeholder="Busque una prueba: código, nombre o especialidad…"
+    />
+  </PageHero>
+
+  <!-- Beneficios -->
+  <section class="bg-white py-section">
+    <div class="container-page">
+      <SectionHeading
+        eyebrow="Qué le ofrecemos"
+        titulo="Soporte real en cada etapa del proceso"
+      />
+      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {
+          beneficios.map((item) => (
+            <article class="rounded-3xl border border-line bg-white p-7 transition-shadow duration-200 hover:shadow-card-hover">
+              <span class="flex h-13 w-13 items-center justify-center rounded-2xl bg-brand text-accent">
+                <Icon name={item.icono} size={25} strokeWidth={1.9} />
+              </span>
+              <h2 class="mt-4.5 text-[18px] font-bold text-brand">{item.titulo}</h2>
+              <p class="mt-2.5 text-[14.2px] leading-relaxed text-neutral">{item.texto}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Fase preanalítica -->
+  <section class="bg-surface py-section">
+    <div class="container-page grid grid-cols-1 gap-9 lg:grid-cols-2 lg:gap-14">
+      <div class="relative">
+        <img
+          src="/images/Fotolaboratorio.png"
+          alt="Equipo técnico de ExamLab procesando muestras"
+          width="1024"
+          height="768"
+          loading="lazy"
+          decoding="async"
+          class="h-[clamp(280px,34vw,440px)] w-full rounded-[28px] object-cover"
+        />
+      </div>
+      <div>
+        <SectionHeading
+          eyebrow="Fase preanalítica"
+          titulo="El 70% de los errores ocurre antes del analizador"
+          descripcion="Cuatro puntos que protegen la calidad del resultado cuando la muestra se toma fuera del laboratorio."
+        />
+        <ol class="mt-7 flex flex-col gap-4">
+          {
+            preanalitico.map((paso, i) => (
+              <li class="flex items-start gap-4 rounded-2xl bg-white p-5 shadow-card">
+                <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-brand text-[13px] font-bold text-white">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3 class="text-[16px] font-bold text-brand">{paso.titulo}</h3>
+                  <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">{paso.texto}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Convenios para médicos referentes -->
+  <section id="convenios-medicos" class="scroll-mt-24 bg-white py-section">
+    <div class="container-page">
+      <SectionHeading
+        eyebrow="Convenios para médicos"
+        titulo="Beneficios para el profesional que refiere pacientes"
+        descripcion="Un acuerdo simple, sin volumen mínimo, pensado para el médico de consulta privada."
+      />
+
+      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+        {
+          [
+            {
+              icono: 'maletin' as const,
+              titulo: 'Tarifa preferencial',
+              texto: 'Valores especiales para los pacientes que usted refiere, aplicados al presentar su orden.',
+            },
+            {
+              icono: 'monitor' as const,
+              titulo: 'Acceso a resultados',
+              texto: 'Consulte el histórico de los pacientes que le autorizan, desde cualquier dispositivo.',
+            },
+            {
+              icono: 'alerta' as const,
+              titulo: 'Aviso de valores críticos',
+              texto: 'Le llamamos dentro de la hora siguiente a la validación de un resultado crítico.',
+            },
+            {
+              icono: 'camion' as const,
+              titulo: 'Retiro en consultorio',
+              texto: 'Coordinamos el retiro de muestras tomadas en su consultorio, con cadena de frío.',
+            },
+          ].map((item) => (
+            <article class="flex flex-col gap-3 rounded-3xl border border-line bg-white p-6">
+              <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+                <Icon name={item.icono} size={23} />
+              </span>
+              <h3 class="text-[17px] font-bold text-brand">{item.titulo}</h3>
+              <p class="text-[13.8px] leading-relaxed text-neutral">{item.texto}</p>
+            </article>
+          ))
+        }
+      </div>
+
+      <div
+        id="contacto"
+        class="mt-8 grid scroll-mt-24 grid-cols-1 gap-8 rounded-[32px] bg-brand p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12 lg:p-12"
+      >
+        <div>
+          <span class="block text-[12.5px] font-bold tracking-[1.8px] text-accent-light uppercase">
+            Contacto directo
+          </span>
+          <h2 class="mt-3 max-w-[560px] text-h2 font-bold text-white">
+            Hable directamente con el equipo técnico
+          </h2>
+          <p class="mt-4 max-w-[560px] text-[15px] leading-relaxed text-white/75">
+            Línea exclusiva para profesionales de la salud, clínicas e instituciones de {site.provincia}.
+            Consultas técnicas, convenios y coordinación de retiro de muestras.
+          </p>
+        </div>
+        <div class="flex flex-col gap-3">
+          <Button href={whatsappLink('medicos')} icon="whatsapp-marca">Soy médico referente</Button>
+          <Button href={whatsappLink('convenios')} variant="sobreOscuro" icon="whatsapp-marca">
+            Convenio institucional
+          </Button>
+          <Button href={`mailto:${site.email}`} variant="sobreOscuro" icon="correo">
+            {site.email}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

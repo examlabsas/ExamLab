@@ -1,0 +1,238 @@
+---
+/**
+ * Franja de logos que rotan con desenfoque.
+ *
+ * Réplica nativa del componente LogoBlur de Framer, con sus mismos valores:
+ * 5 espacios en escritorio y 3 en móvil, cambio cada 3 segundos, 150 ms de
+ * desfase entre espacios, entrada de 0,5 s y salida de 0,4 s, desenfoque de
+ * 8 px, desplazamiento del 60 % hacia arriba, y escala de grises al 100 % con
+ * 60 % de opacidad que se restaura al pasar el cursor.
+ *
+ * Pesa ~1,5 KB contra los 322 KB que costaba cargar React para el original.
+ * Sin JavaScript se ven los primeros logos, quietos.
+ */
+export type LogoItem = {
+  nombre: string;
+  /** Ruta a la imagen del logo. Si falta, se muestra el nombre como texto. */
+  imagen?: string;
+  tipo?: string;
+};
+
+interface Props {
+  logos: LogoItem[];
+  visiblesEscritorio?: number;
+  visiblesMovil?: number;
+  class?: string;
+}
+
+const { logos, visiblesEscritorio = 5, visiblesMovil = 3, class: className } = Astro.props;
+
+// Cada espacio arranca mostrando un logo distinto.
+const espacios = Array.from({ length: visiblesEscritorio }, (_, i) => logos[i % logos.length]!);
+---
+
+<div
+  class:list={['franja-logos', className]}
+  data-franja
+  data-logos={JSON.stringify(logos)}
+  data-visibles={visiblesEscritorio}
+  data-visibles-movil={visiblesMovil}
+  style={`--visibles: ${visiblesEscritorio}; --visibles-movil: ${visiblesMovil}`}
+>
+  {
+    espacios.map((logo, i) => (
+      <div class="franja-espacio" data-espacio data-indice={i}>
+        <span class="franja-logo" data-logo>
+          {logo.imagen ? (
+            <img src={logo.imagen} alt={logo.nombre} loading="lazy" decoding="async" />
+          ) : (
+            <span class="franja-texto">{logo.nombre}</span>
+          )}
+        </span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .franja-logos {
+    display: grid;
+    grid-template-columns: repeat(var(--visibles-movil), minmax(0, 1fr));
+    align-items: center;
+    gap: 32px; /* mismo `gap` que el original */
+    padding-block: 8px;
+  }
+
+  /* Los espacios que sobran se ocultan en móvil, como en el original. */
+  .franja-espacio:nth-child(n + 4) {
+    display: none;
+  }
+
+  @media (min-width: 40rem) {
+    .franja-logos {
+      grid-template-columns: repeat(var(--visibles), minmax(0, 1fr));
+    }
+
+    .franja-espacio:nth-child(n + 4) {
+      display: flex;
+    }
+  }
+
+  .franja-espacio {
+    display: flex;
+    height: 56px; /* logoHeight 40 + aire */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .franja-logo {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    /* monochrome: grayscale 100 %, opacidad 0.6 */
+    opacity: 0.6;
+    filter: grayscale(100%);
+    transition:
+      transform 0.5s ease-in-out,
+      opacity 0.5s ease-in-out,
+      filter 0.5s ease-in-out;
+  }
+
+  /* hoverRestore: al pasar el cursor vuelve el color */
+  .franja-espacio:hover .franja-logo {
+    opacity: 1;
+    filter: grayscale(0%);
+  }
+
+  .franja-logo img {
+    max-height: 40px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .franja-texto {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-brand);
+    letter-spacing: 0.01em;
+  }
+
+  /* Salida: sube, se desvanece y se desenfoca (0,4 s) */
+  .franja-logo.saliendo {
+    transform: translateY(-60%);
+    opacity: 0;
+    filter: grayscale(100%) blur(8px);
+    transition-duration: 0.4s;
+  }
+
+  /* Punto de partida de la entrada, sin transición */
+  .franja-logo.por-entrar {
+    transform: translateY(60%);
+    opacity: 0;
+    filter: grayscale(100%) blur(8px);
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .franja-logo,
+    .franja-logo.saliendo,
+    .franja-logo.por-entrar {
+      transform: none;
+      filter: grayscale(100%);
+      opacity: 0.6;
+      transition: opacity 0.3s linear;
+    }
+  }
+</style>
+
+<script>
+  // Tiempos tomados del componente original de Framer.
+  const INTERVALO = 3000;
+  const DESFASE = 150;
+  const SALIDA = 400;
+
+  const initFranjas = () => {
+    for (const franja of document.querySelectorAll<HTMLElement>('[data-franja]')) {
+      // `astro:page-load` corre también en la carga inicial.
+      if (franja.dataset.iniciado === 'true') continue;
+      franja.dataset.iniciado = 'true';
+
+      let logos: { nombre: string; imagen?: string }[] = [];
+      try {
+        logos = JSON.parse(franja.dataset.logos ?? '[]');
+      } catch {
+        continue;
+      }
+
+      const espacios = [...franja.querySelectorAll<HTMLElement>('[data-espacio]')];
+      // Sin logos de sobra no hay nada que rotar.
+      if (logos.length <= espacios.length) continue;
+
+      const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const siguiente = new Map<number, number>();
+      espacios.forEach((_, i) => siguiente.set(i, i));
+
+      const pintar = (espacio: HTMLElement, logo: { nombre: string; imagen?: string }) => {
+        const caja = espacio.querySelector<HTMLElement>('[data-logo]');
+        if (!caja) return;
+        caja.innerHTML = logo.imagen
+          ? `<img src="${logo.imagen}" alt="${logo.nombre}" loading="lazy" decoding="async">`
+          : `<span class="franja-texto">${logo.nombre}</span>`;
+      };
+
+      const rotar = (espacio: HTMLElement, i: number) => {
+        const caja = espacio.querySelector<HTMLElement>('[data-logo]');
+        if (!caja) return;
+
+        const indice = (siguiente.get(i)! + espacios.length) % logos.length;
+        siguiente.set(i, indice);
+        const logo = logos[indice]!;
+
+        if (sinMovimiento) {
+          pintar(espacio, logo);
+          return;
+        }
+
+        caja.classList.add('saliendo');
+        window.setTimeout(() => {
+          pintar(espacio, logo);
+          caja.classList.remove('saliendo');
+          caja.classList.add('por-entrar');
+          // Se fuerza el recálculo para que la entrada sí se anime.
+          void caja.offsetHeight;
+          caja.classList.remove('por-entrar');
+        }, SALIDA);
+      };
+
+      // Solo rota mientras la franja está a la vista.
+      let temporizador: number | undefined;
+      const arrancar = () => {
+        if (temporizador !== undefined) return;
+        temporizador = window.setInterval(() => {
+          espacios.forEach((espacio, i) => {
+            window.setTimeout(() => rotar(espacio, i), i * DESFASE);
+          });
+        }, INTERVALO);
+      };
+      const parar = () => {
+        if (temporizador === undefined) return;
+        window.clearInterval(temporizador);
+        temporizador = undefined;
+      };
+
+      new IntersectionObserver((entradas) => {
+        for (const entrada of entradas) {
+          entrada.isIntersecting ? arrancar() : parar();
+        }
+      }).observe(franja);
+    }
+  };
+
+  initFranjas();
+  document.addEventListener('astro:page-load', initFranjas);
+</script>

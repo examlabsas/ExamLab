@@ -1,0 +1,48 @@
+---
+import { formatoFecha } from '@/lib/fechas';
+
+interface Props {
+  slug: string;
+  titulo: string;
+  descripcion: string;
+  categoria: string;
+  fecha: Date;
+  imagen?: string;
+  indice?: number;
+}
+
+const { slug, titulo, descripcion, categoria, fecha, imagen, indice = 1 } = Astro.props;
+---
+
+<a
+  href={`/noticias/${slug}`}
+  class="group flex flex-col overflow-hidden rounded-xl border border-line bg-white transition-all duration-200 hover:border-brand hover:shadow-md"
+>
+  {
+    imagen ? (
+      <img
+        src={imagen}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="h-43 w-full object-cover"
+      />
+    ) : (
+      <span
+        class="flex h-43 items-center justify-center bg-[repeating-linear-gradient(45deg,#F0F1F3_0_9px,#E4E6E9_9px_18px)]"
+      >
+        <span class="rounded-md bg-white/85 px-2.5 py-1.5 font-mono text-[11.5px] text-[#9A9B9E]">
+          imagen nota {indice} · 16:9
+        </span>
+      </span>
+    )
+  }
+  <span class="block p-5.5">
+    <span class="flex items-center gap-2.5 text-xs font-bold text-accent-dark">
+      <span class="uppercase">{categoria}</span>
+      <span class="text-[#9A9B9E]">{formatoFecha(fecha)}</span>
+    </span>
+    <span class="mt-2.5 block text-[17.5px] leading-snug font-bold text-brand">{titulo}</span>
+    <span class="mt-2 block text-sm leading-relaxed text-neutral">{descripcion}</span>
+  </span>
+</a>

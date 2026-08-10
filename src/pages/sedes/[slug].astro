@@ -1,0 +1,216 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import SedeCard from '@/components/SedeCard.astro';
+import EstadoApertura from '@/components/EstadoApertura.astro';
+import { sedes, mapaEmbed, mapaEnlace, site } from '@/lib/site';
+import { breadcrumbSchema, sedeSchema } from '@/lib/schema';
+import { whatsappSede, whatsappLink } from '@/lib/whatsapp';
+
+export function getStaticPaths() {
+  return sedes.map((sede) => ({
+    params: { slug: sede.slug },
+    props: { sede },
+  }));
+}
+
+const { sede } = Astro.props;
+const otras = sedes.filter((s) => s.slug !== sede.slug);
+const waHref = whatsappSede(sede.nombre);
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Sedes', href: '/sedes' },
+    { nombre: sede.nombre, href: `/sedes/${sede.slug}` },
+  ]),
+  sedeSchema(sede),
+];
+---
+
+<BaseLayout
+  titulo={`${sede.nombre} — Laboratorio clínico en ${sede.ciudad}`}
+  descripcion={`Dirección, mapa, horarios y teléfono de ${site.nombre} ${sede.nombre}, en ${sede.ciudad}, ${sede.provincia}. Toma de muestra y entrega de resultados en línea.`}
+  whatsapp="sedes"
+  schema={schema}
+>
+  <section class="bg-brand">
+    <div class="container-page py-10 lg:py-14">
+      <nav aria-label="Ruta de navegación" class="mb-6">
+        <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-white/60">
+          <li><a href="/" class="transition-colors hover:text-accent-light">Inicio</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href="/sedes" class="transition-colors hover:text-accent-light">Sedes</a></li>
+          <li aria-hidden="true">/</li>
+          <li class="text-white/85" aria-current="page">{sede.nombre}</li>
+        </ol>
+      </nav>
+
+      <span class="flex items-center gap-2.5 text-[12.5px] font-bold tracking-[1.8px] text-accent-light uppercase">
+        <Icon name="pin" size={14} />
+        {sede.ciudad}, {sede.provincia}
+      </span>
+      <h1 class="mt-3 text-h1 font-bold text-white">{sede.nombre}</h1>
+      <p class="mt-5 max-w-[560px] text-lead text-white/80">
+        {sede.direccion}{sede.referencia && ` · ${sede.referencia}`}
+      </p>
+
+      <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Button href={waHref} icon="whatsapp-marca">Agendar en esta sede</Button>
+        <Button href={mapaEnlace(sede)} variant="sobreOscuro" icon="pin">Cómo llegar</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mapa y datos -->
+  <section class="bg-white py-10 lg:py-14">
+    <div class="container-page grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px] lg:gap-12">
+      <div class="overflow-hidden rounded-[28px] border border-line">
+        <iframe
+          src={mapaEmbed(sede)}
+          title={`Mapa de ${site.nombre} ${sede.nombre}`}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          class="h-[320px] w-full border-0 lg:h-[460px]"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <div class="rounded-3xl bg-surface p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 class="text-[17px] font-bold text-brand">Horarios</h2>
+            <EstadoApertura
+              horario={sede.horarioSemanal}
+              respaldo={sede.horarios[0]!.horas}
+              class="text-[13px] font-semibold text-brand"
+            />
+          </div>
+          <dl class="mt-4 flex flex-col divide-y divide-line">
+            {
+              sede.horarios.map((h) => (
+                <div class="flex flex-wrap items-baseline justify-between gap-2 py-2.5 first:pt-0 last:pb-0">
+                  <dt class="text-[14px] font-semibold text-brand">{h.dias}</dt>
+                  <dd class="text-[14px] text-neutral">{h.horas}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          {
+            sede.notaHorario && (
+              <p class="mt-4 border-t border-line pt-4 text-[13px] leading-relaxed text-neutral">
+                {sede.notaHorario}
+              </p>
+            )
+          }
+        </div>
+
+        <div class="rounded-3xl border border-line p-6">
+          <h2 class="text-[17px] font-bold text-brand">Contacto</h2>
+          <div class="mt-4 flex flex-col gap-3">
+            <a
+              href={`tel:${sede.telefonoE164}`}
+              class="flex items-center gap-3 text-[15px] font-bold text-brand transition-colors hover:text-accent"
+            >
+              <Icon name="telefono" size={18} class="text-accent" />
+              {sede.telefono}
+            </a>
+            <a
+              href={`mailto:${site.email}`}
+              class="flex items-center gap-3 text-[14.5px] text-neutral transition-colors hover:text-accent"
+            >
+              <Icon name="correo" size={18} class="text-accent" />
+              {site.email}
+            </a>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener"
+              class="flex items-center gap-3 text-[14.5px] text-neutral transition-colors hover:text-accent"
+            >
+              <Icon name="whatsapp-marca" size={17} class="text-accent" />
+              Escribir por WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <div class="rounded-3xl border border-line p-6">
+          <h2 class="text-[17px] font-bold text-brand">Servicios en esta sede</h2>
+          <ul class="mt-4 flex flex-col gap-2.5">
+            {
+              sede.servicios.map((servicio) => (
+                <li class="flex items-start gap-2.5 text-[14px] leading-relaxed text-neutral">
+                  <Icon name="check" size={17} strokeWidth={2.2} class="mt-0.5 text-accent" />
+                  {servicio}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Accesos -->
+  <section class="bg-surface py-section">
+    <div class="container-page grid grid-cols-1 gap-5 md:grid-cols-3">
+      <a
+        href="/soy-paciente/pedir-cita"
+        class="group flex flex-col gap-3 rounded-3xl border border-line bg-white p-6 transition-colors hover:border-accent"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+          <Icon name="calendario" size={23} />
+        </span>
+        <span class="text-[17px] font-bold text-brand">Pedir cita</span>
+        <span class="text-[13.8px] leading-relaxed text-neutral">
+          Reserve su turno en {sede.nombre} y evite tiempos de espera.
+        </span>
+      </a>
+      <a
+        href="/catalogo"
+        class="group flex flex-col gap-3 rounded-3xl border border-line bg-white p-6 transition-colors hover:border-accent"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+          <Icon name="lupa" size={23} />
+        </span>
+        <span class="text-[17px] font-bold text-brand">Catálogo de exámenes</span>
+        <span class="text-[13.8px] leading-relaxed text-neutral">
+          Consulte especialidad, muestra y condiciones de cada análisis.
+        </span>
+      </a>
+      <a
+        href="/soy-paciente/resultados"
+        class="group flex flex-col gap-3 rounded-3xl border border-line bg-white p-6 transition-colors hover:border-accent"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+          <Icon name="documento" size={23} />
+        </span>
+        <span class="text-[17px] font-bold text-brand">Resultados en línea</span>
+        <span class="text-[13.8px] leading-relaxed text-neutral">
+          Guía paso a paso para acceder a su informe en Avalab.
+        </span>
+      </a>
+    </div>
+  </section>
+
+  {
+    otras.length > 0 && (
+      <section class="bg-white py-section">
+        <div class="container-page">
+          <h2 class="text-h2 font-bold text-brand">Otras sedes</h2>
+          <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2">
+            {otras.map((otra) => (
+              <SedeCard sede={otra} />
+            ))}
+          </div>
+          <div class="mt-8">
+            <Button href={whatsappLink('domicilio')} variant="secondary" icon="whatsapp-marca">
+              ¿Prefiere toma a domicilio?
+            </Button>
+          </div>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>

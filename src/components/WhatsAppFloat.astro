@@ -1,0 +1,42 @@
+---
+/**
+ * Botón flotante de WhatsApp.
+ * Cada página pasa la sección para que el mensaje precargado sea distinto.
+ */
+import Icon from './Icon.astro';
+import { whatsappLink, whatsappUrl, type SeccionWhatsApp } from '@/lib/whatsapp';
+
+interface Props {
+  seccion?: SeccionWhatsApp;
+  /** Mensaje libre; tiene prioridad sobre `seccion`. */
+  mensaje?: string;
+  etiqueta?: string;
+}
+
+const { seccion = 'general', mensaje, etiqueta = 'Escríbenos' } = Astro.props;
+const href = mensaje ? whatsappUrl(mensaje) : whatsappLink(seccion);
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener"
+  aria-label="Escríbenos por WhatsApp"
+  class="wa-float fixed right-5 bottom-5 z-40 flex items-center gap-2.5 rounded-full bg-whatsapp px-4 py-3.5 text-[14.5px] font-bold text-white shadow-[0_12px_30px_rgb(37_211_102/0.38)] transition-all duration-200 hover:bg-whatsapp-dark menu:px-4.5"
+>
+  <Icon name="whatsapp-marca" size={22} />
+  <span class="hidden menu:inline">{etiqueta}</span>
+</a>
+
+<style is:global>
+  /* Mientras el banner de cookies está visible, el botón sube para no taparlo. */
+  body[data-cookies-pendiente='true'] .wa-float {
+    bottom: 12.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    body[data-cookies-pendiente='true'] .wa-float {
+      bottom: 7.5rem;
+    }
+  }
+</style>

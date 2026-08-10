@@ -1,0 +1,156 @@
+---
+/**
+ * Banco de pruebas para componentes de Framer.
+ *
+ * Seis de los siete componentes funcionan: solo necesitan `addPropertyControls`,
+ * `ControlType`, `useIsStaticRenderer` y `RenderTarget`, que están cubiertos por
+ * el sustituto en src/lib/framer-shim.ts.
+ *
+ * Feature Flipper quedó fuera: depende de 13 utilidades del motor interno de
+ * Framer (variantes, tipografías, contenedores de viewport) que no se
+ * distribuyen. Su código está en design/framer-referencia/.
+ *
+ * Todos usan `client:only="react"`: no se renderizan en el servidor, porque
+ * usan APIs del navegador durante el render y eso rompe el build estático.
+ *
+ * Lleva `noindex`. BORRAR ESTA PÁGINA antes de la publicación final.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+import OriginButton from '@/components/framer/OriginButton';
+import StatsSection from '@/components/framer/StatsSection';
+import LogoPreloader from '@/components/framer/LogoPreloader';
+import LogoBlur from '@/components/framer/LogoBlur';
+import CounterFX from '@/components/framer/CounterFX';
+import PDFViewer from '@/components/framer/PDFViewer';
+---
+
+<BaseLayout
+  titulo="Banco de pruebas · Framer"
+  descripcion="Página interna para probar componentes de Framer antes de integrarlos."
+  noindex
+>
+  <section class="bg-white py-section">
+    <div class="container-page sin-reveal">
+      <span
+        class="inline-flex items-center gap-2 rounded-lg border border-alert/25 bg-alert-soft px-3 py-1 text-xs font-bold tracking-wide text-alert-dark uppercase"
+      >
+        Página interna · borrar antes de publicar
+      </span>
+
+      <h1 class="mt-4 text-h2 font-bold text-brand">Banco de pruebas de componentes</h1>
+      <p class="mt-3 max-w-[680px] text-lead text-neutral">
+        Seis de los siete componentes de Framer, descargados al proyecto — no se piden a
+        framer.com. Revise cuáles sirven y en qué página los quiere.
+      </p>
+
+      <div class="mt-12 flex flex-col gap-14">
+        <!-- 1 · OriginButton -->
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">1 · OriginButton</h2>
+          <p class="mt-1.5 text-[14px] text-neutral">
+            Botón animado. Le pasé los colores de la marca: azul institucional y cian.
+          </p>
+          <div class="mt-4 flex justify-center rounded-2xl border border-dashed border-line-strong p-8">
+            <!--
+              En Framer este componente va posicionado con un tamaño fijo, así
+              que fuera de Framer no tiene alto propio: hay que dárselo.
+            -->
+            <div style="width: 240px; height: 64px">
+              <OriginButton
+                client:only="react"
+                rectangleColor="#005A8C"
+                circleColor="#00A3C4"
+                style={{ width: '100%', height: '100%' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 · StatsSection -->
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">2 · StatsSection</h2>
+          <p class="mt-1.5 text-[14px] text-neutral">
+            Sección de cifras que cuentan al entrar en pantalla. Serviría para "400+ análisis",
+            "2 sedes", "24 h de entrega".
+          </p>
+          <div class="mt-4 rounded-2xl border border-dashed border-line-strong p-8">
+            <StatsSection client:only="react" />
+          </div>
+        </div>
+
+        <!-- 3 · Counter FX -->
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">3 · Counter FX</h2>
+          <p class="mt-1.5 text-[14px] text-neutral">
+            Contador individual. Configurado como "400+" en azul de marca.
+          </p>
+          <div class="mt-4 rounded-2xl border border-dashed border-line-strong p-8">
+            <CounterFX
+              client:only="react"
+              from={0}
+              to={400}
+              duration={2}
+              suffix="+"
+              tint="#005A8C"
+            />
+          </div>
+        </div>
+
+        <!-- 4 · LogoBlur -->
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">4 · LogoBlur</h2>
+          <p class="mt-1.5 text-[14px] text-neutral">
+            Franja de logos con desenfoque en los bordes. Encajaría en la sección de convenios con
+            aseguradoras.
+          </p>
+          <div
+            class="mt-4 overflow-hidden rounded-2xl border border-dashed border-line-strong"
+            style="height: 140px"
+          >
+            <LogoBlur client:only="react" style={{ width: '100%', height: '100%' }} />
+          </div>
+        </div>
+
+        <!-- 5 · LogoPreloader -->
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">5 · LogoPreloader</h2>
+          <p class="mt-1.5 text-[14px] text-neutral">
+            Pantalla de carga con logo. Va dentro de un recuadro a propósito: si intenta cubrir
+            toda la pantalla, se nota aquí sin romper la página.
+          </p>
+          <div
+            class="relative mt-4 overflow-hidden rounded-2xl border border-dashed border-line-strong"
+            style="height: 360px; contain: layout paint"
+          >
+            <LogoPreloader client:only="react" style={{ width: '100%', height: '100%' }} />
+          </div>
+        </div>
+
+        <!-- 6 · PDF Viewer -->
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">6 · PDF Viewer</h2>
+          <p class="mt-1.5 text-[14px] text-neutral">
+            Visor de PDF. Sin archivo cargado todavía: mostrará su estado vacío. Serviría para el
+            Manual de Servicios cuando el laboratorio lo entregue.
+          </p>
+          <!-- Sin alto fijo: el visor trae el suyo (~870px) y se recortaba. -->
+          <div class="mt-4 overflow-hidden rounded-2xl border border-dashed border-line-strong">
+            <PDFViewer client:only="react" style={{ width: '100%' }} />
+          </div>
+        </div>
+
+        <!-- 7 · Feature Flipper: no disponible -->
+        <div class="rounded-2xl border border-alert/25 bg-alert-soft/40 p-6">
+          <h2 class="text-[17px] font-bold text-brand">7 · Feature Flipper — no se puede importar</h2>
+          <p class="mt-2 max-w-[680px] text-[14px] leading-relaxed text-neutral">
+            Es el único que depende del motor interno de Framer: necesita 13 utilidades de
+            variantes, tipografías y contenedores que la empresa no distribuye como paquete. Su
+            código quedó en <code class="font-mono text-accent-dark">design/framer-referencia/</code>
+            por si se decide reconstruirlo de forma nativa.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

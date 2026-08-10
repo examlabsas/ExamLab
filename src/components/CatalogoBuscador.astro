@@ -1,0 +1,209 @@
+---
+/**
+ * Buscador de exámenes reutilizable.
+ *
+ * Lo usan el catálogo público (`/catalogo`) y el de laboratorios asociados
+ * (`/laboratorios-asociados/catalogo`). Cada uno pasa su propia lista, así que
+ * cuando lleguen los catálogos definitivos basta con cambiar el JSON.
+ */
+import ExamCard from './ExamCard.astro';
+import Icon from './Icon.astro';
+import Button from './Button.astro';
+import { getEspecialidades, type Examen } from '@/lib/examenes';
+
+interface Props {
+  lista: Examen[];
+  /** Ruta base para los enlaces de detalle. */
+  basePath: string;
+  /** Enlace de WhatsApp del estado "sin resultados". */
+  whatsappHref: string;
+  /** Texto del aviso al pie del buscador. */
+  aviso: string;
+  placeholder?: string;
+  /** Modo laboratorio: las tarjetas muestran datos preanalíticos. */
+  tecnico?: boolean;
+}
+
+const {
+  lista,
+  basePath,
+  whatsappHref,
+  aviso,
+  placeholder = 'Ej. HEM-001, biometría, TSH, microbiología…',
+  tecnico = false,
+} = Astro.props;
+
+const especialidades = getEspecialidades(lista);
+---
+
+<section class="bg-surface py-10 lg:py-14">
+  <div class="container-page sin-reveal">
+    <!-- Buscador -->
+    <div class="rounded-3xl bg-white p-5 shadow-card lg:p-7">
+      <label for="buscador" class="block text-[13px] font-bold text-brand">Buscar examen</label>
+      <div class="relative mt-2.5">
+        <Icon
+          name="lupa"
+          size={20}
+          class="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-neutral"
+        />
+        <input
+          type="search"
+          id="buscador"
+          name="q"
+          autocomplete="off"
+          placeholder={placeholder}
+          class="w-full rounded-2xl border border-line-strong bg-white py-4 pr-4 pl-12 text-[15px] text-black placeholder:text-neutral/70 focus:border-accent focus:outline-none"
+        />
+      </div>
+
+      <fieldset class="mt-5">
+        <legend class="text-[13px] font-bold text-brand">Especialidad</legend>
+        <div class="mt-2.5 flex flex-wrap gap-2" id="filtros">
+          {
+            /*
+              El estado visual lo decide `aria-pressed`, no clases que el script
+              agregue y quite: así el `hover` del botón inactivo no puede
+              aplicarse al seleccionado (pintaba texto azul sobre fondo azul).
+            */
+          }
+          {
+            ['todas', ...especialidades].map((especialidad) => (
+              <button
+                type="button"
+                data-filtro={especialidad}
+                aria-pressed={especialidad === 'todas' ? 'true' : 'false'}
+                class="filtro rounded-full border-[1.5px] border-line-strong bg-white px-4 py-2.5 text-[13px] font-bold text-neutral transition-colors hover:border-accent hover:text-brand aria-pressed:border-brand aria-pressed:bg-brand aria-pressed:text-white aria-pressed:hover:border-brand-dark aria-pressed:hover:bg-brand-dark aria-pressed:hover:text-white"
+              >
+                {especialidad === 'todas' ? 'Todas' : especialidad}
+              </button>
+            ))
+          }
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- Resultados -->
+    <p class="mt-7 text-sm font-semibold text-neutral" id="conteo" aria-live="polite">
+      {lista.length} exámenes disponibles
+    </p>
+
+    <div class="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3" id="resultados">
+      {lista.map((examen) => <ExamCard examen={examen} basePath={basePath} tecnico={tecnico} />)}
+    </div>
+
+    <div
+      id="sin-resultados"
+      hidden
+      class="mt-4 rounded-3xl border border-dashed border-line-strong bg-white p-10 text-center"
+    >
+      <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+        <Icon name="lupa" size={26} />
+      </span>
+      <h2 class="mt-4 text-[19px] font-bold text-brand">No encontramos ese examen</h2>
+      <p class="mx-auto mt-2 max-w-[420px] text-sm leading-relaxed text-neutral">
+        Trabajamos con más de 400 análisis y este catálogo muestra una selección. Escríbanos y le
+        confirmamos disponibilidad y preparación.
+      </p>
+      <div class="mt-6 flex justify-center">
+        <Button href={whatsappHref} icon="whatsapp-marca" size="sm">Consultar por WhatsApp</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Aviso -->
+<section class="bg-white py-12">
+  <div class="container-page">
+    <div class="flex flex-col gap-4 rounded-3xl border border-line bg-surface p-6 sm:flex-row lg:p-8">
+      <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white text-accent-dark">
+        <Icon name="alerta" size={22} />
+      </span>
+      <div>
+        <h2 class="text-[17px] font-bold text-brand">Sobre las condiciones del estudio</h2>
+        <p class="mt-2 max-w-[720px] text-sm leading-relaxed text-neutral">{aviso}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Se vuelve a montar en cada navegación con transiciones de página.
+  const initCatalogo = () => {
+    const input = document.getElementById('buscador') as HTMLInputElement | null;
+    // `astro:page-load` también corre en la carga inicial: sin la guarda se
+    // registrarían los listeners del buscador dos veces.
+    if (!input || input.dataset.iniciado === 'true') return;
+    input.dataset.iniciado = 'true';
+
+    const contenedor = document.getElementById('resultados');
+    const conteo = document.getElementById('conteo');
+    const vacio = document.getElementById('sin-resultados');
+    const botones = Array.from(document.querySelectorAll<HTMLButtonElement>('.filtro'));
+    if (!contenedor || !conteo || !vacio) return;
+
+    const tarjetas = Array.from(contenedor.querySelectorAll<HTMLElement>('[data-examen]'));
+    let especialidadActiva = 'todas';
+
+    const normalizar = (texto: string) =>
+      texto
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+
+    // El aspecto lo resuelve el CSS a partir de `aria-pressed`: aquí solo se
+    // marca cuál está activo.
+    const activarBoton = (valor: string) => {
+      especialidadActiva = valor;
+      for (const boton of botones) {
+        boton.setAttribute('aria-pressed', String(boton.dataset.filtro === valor));
+      }
+    };
+
+    const filtrar = () => {
+      const termino = normalizar(input.value.trim());
+      let visibles = 0;
+
+      for (const tarjeta of tarjetas) {
+        const indice = tarjeta.dataset.indice ?? '';
+        const coincideTexto = termino === '' || indice.includes(termino);
+        const coincideEspecialidad =
+          especialidadActiva === 'todas' || tarjeta.dataset.especialidad === especialidadActiva;
+        const visible = coincideTexto && coincideEspecialidad;
+        tarjeta.hidden = !visible;
+        if (visible) visibles++;
+      }
+
+      conteo.textContent =
+        visibles === 1 ? '1 examen encontrado' : `${visibles} exámenes encontrados`;
+      vacio.hidden = visibles > 0;
+      contenedor.hidden = visibles === 0;
+    };
+
+    input.addEventListener('input', filtrar);
+
+    for (const boton of botones) {
+      boton.addEventListener('click', () => {
+        activarBoton(boton.dataset.filtro ?? 'todas');
+        filtrar();
+      });
+    }
+
+    // Estado inicial desde la URL: ?q=tsh&especialidad=Microbiología
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    const especialidad = params.get('especialidad');
+    if (q) input.value = q;
+    if (especialidad && botones.some((b) => b.dataset.filtro === especialidad)) {
+      activarBoton(especialidad);
+    }
+    if (q || especialidad) filtrar();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCatalogo);
+  } else {
+    initCatalogo();
+  }
+  document.addEventListener('astro:page-load', initCatalogo);
+</script>

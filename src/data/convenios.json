@@ -1,0 +1,8 @@
+[
+  { "nombre": "Salud S.A.", "tipo": "Aseguradora" },
+  { "nombre": "Ecuasanitas", "tipo": "Medicina prepagada" },
+  { "nombre": "BMI Ecuador", "tipo": "Aseguradora" },
+  { "nombre": "Confiamed", "tipo": "Medicina prepagada" },
+  { "nombre": "Humana", "tipo": "Medicina prepagada" },
+  { "nombre": "Best Doctors", "tipo": "Aseguradora" }
+]

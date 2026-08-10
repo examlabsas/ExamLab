@@ -1,0 +1,58 @@
+---
+/** Franja azul: exámenes a domicilio + atención de emergencia. */
+import Icon from './Icon.astro';
+import { site } from '@/lib/site';
+import { whatsappLink } from '@/lib/whatsapp';
+---
+
+<section id="domicilio" class="scroll-mt-24 bg-brand py-12 text-white">
+  <div class="container-page grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+    <!-- Domicilio -->
+    <div class="flex flex-col justify-between rounded-2xl bg-white/5 border border-white/15 p-7">
+      <div>
+        <div class="inline-flex items-center gap-2 text-accent-light">
+          <Icon name="casa" size={22} strokeWidth={2} />
+          <span class="text-xs font-semibold tracking-wider uppercase">Servicio a Domicilio</span>
+        </div>
+        <h3 class="mt-3 text-2xl font-bold text-white">Toma de Muestras a Domicilio</h3>
+        <p class="mt-2.5 max-w-[460px] text-sm leading-relaxed text-white/80">
+          Atención en la comodidad de su hogar u oficina en {site.ciudad} y zonas aledañas. Agende su turno con previa confirmación por WhatsApp.
+        </p>
+      </div>
+      <div class="mt-6">
+        <a
+          href={whatsappLink('domicilio')}
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2.5 rounded-xl bg-accent px-5 py-3.5 text-sm font-bold text-white shadow-md transition-all duration-200 hover:bg-accent-dark"
+        >
+          <Icon name="whatsapp-marca" size={16} />
+          Agendar muestra a domicilio
+        </a>
+      </div>
+    </div>
+
+    <!-- Emergencias -->
+    <div class="flex flex-col justify-between rounded-2xl bg-alert/15 border border-alert/30 p-7" id="emergencias">
+      <div>
+        <div class="inline-flex items-center gap-2 text-alert-light">
+          <span class="h-2 w-2 rounded-full bg-alert"></span>
+          <span class="text-xs font-semibold tracking-wider uppercase">Atención Prioritaria</span>
+        </div>
+        <h3 class="mt-3 text-2xl font-bold text-white">Exámenes de Urgencia</h3>
+        <p class="mt-2.5 max-w-[460px] text-sm leading-relaxed text-white/80">
+          Procesamiento prioritario en casos de emergencia clínica con entrega oportuna de resultados el mismo día.
+        </p>
+      </div>
+      <div class="mt-6">
+        <a
+          href={`tel:${site.emergenciasE164}`}
+          class="inline-flex items-center gap-3 rounded-xl bg-alert px-5 py-3.5 text-sm font-bold text-white shadow-md transition-all duration-200 hover:bg-alert-dark"
+        >
+          <Icon name="telefono" size={17} />
+          Llamar a Urgencias: {site.emergencias}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

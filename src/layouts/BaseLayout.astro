@@ -1,0 +1,232 @@
+---
+import '@/styles/global.css';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import WhatsAppFloat from '@/components/WhatsAppFloat.astro';
+import CookieBanner from '@/components/CookieBanner.astro';
+import { ClientRouter } from 'astro:transitions';
+import { site } from '@/lib/site';
+import { medicalBusinessSchema, webSiteSchema } from '@/lib/schema';
+import type { SeccionWhatsApp } from '@/lib/whatsapp';
+
+interface Props {
+  titulo: string;
+  descripcion?: string;
+  /** Sección que define el mensaje precargado del botón flotante. */
+  whatsapp?: SeccionWhatsApp;
+  /** Imagen para redes sociales, ruta absoluta desde /public. */
+  imagen?: string;
+  noindex?: boolean;
+  /** Bloques JSON-LD adicionales de la página. */
+  schema?: Record<string, unknown>[];
+}
+
+const {
+  titulo,
+  descripcion = site.descripcion,
+  whatsapp = 'general',
+  imagen = '/images/Fotolaboratorio.png',
+  noindex = false,
+  schema = [],
+} = Astro.props;
+
+const tituloCompleto = titulo.includes(site.nombre)
+  ? titulo
+  : `${titulo} | ${site.nombre} · Laboratorio clínico en ${site.ciudad}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).toString();
+const imagenAbsoluta = new URL(imagen, Astro.site ?? site.url).toString();
+
+// Datos estructurados: la ficha MedicalBusiness va en todas las páginas.
+const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
+---
+
+<!doctype html>
+<html lang="es-EC">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#005A8C" />
+    <meta name="geo.region" content="EC-T" />
+    <meta name="geo.placename" content={site.ciudad} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.nombre} />
+    <meta property="og:locale" content="es_EC" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imagenAbsoluta} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={tituloCompleto} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={imagenAbsoluta} />
+
+    <!-- Tipografías de marca (Montserrat - web equivalent Gotham Book) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+    />
+
+    <!--
+      Marca que hay JS antes del primer pintado. Todas las animaciones dependen
+      de la clase `js`, así que si el script falla el contenido se ve igual.
+    -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
+    <!-- Transiciones suaves entre páginas (nativo de Astro, sin dependencias) -->
+    <ClientRouter />
+
+    <!-- Datos estructurados Schema.org -->
+    {
+      bloques.map((bloque) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(bloque)} />
+      ))
+    }
+
+    <slot name="head" />
+  </head>
+  <body class="overflow-x-hidden">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:rounded-xl focus:bg-brand focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-white"
+    >
+      Saltar al contenido
+    </a>
+
+    <Header />
+
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <Footer />
+    <WhatsAppFloat seccion={whatsapp} />
+    <CookieBanner />
+
+    <script>
+      // Selector único: elementos marcados a mano + todas las secciones
+      // internas de cualquier página (ver global.css).
+      const SELECTOR =
+        '.reveal, .reveal-stagger, main > section:not(:first-of-type) > .container-page:not(.sin-reveal)';
+
+      /**
+       * `true`  → la animación se repite cada vez que el bloque vuelve a entrar
+       *           en pantalla. Se nota más, útil para presentar el sitio.
+       * `false` → cada bloque se anima una sola vez por carga de página. Es el
+       *           comportamiento habitual en sitios de contenido: no distrae
+       *           al releer y consume menos.
+       */
+      const REPETIR = true;
+
+      const initReveals = () => {
+        const elementos = Array.from(document.querySelectorAll<HTMLElement>(SELECTOR)).filter(
+          // `astro:page-load` también corre en la carga inicial: sin este
+          // filtro se crearían observadores duplicados.
+          (el) => !el.dataset.observado,
+        );
+        if (elementos.length === 0) return;
+
+        // Observador 1 — REVELAR.
+        // Con el margen inferior negativo, avisa cuando el bloque ya entró un
+        // buen tramo en pantalla, para que el movimiento ocurra a la vista.
+        const observadorRevelar = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add('is-visible');
+              if (!REPETIR) observadorRevelar.unobserve(entry.target);
+            }
+          },
+          { threshold: 0, rootMargin: '0px 0px -18% 0px' },
+        );
+
+        // Observador 2 — REARMAR (solo en modo repetición).
+        //
+        // Hace falta uno aparte: un IntersectionObserver avisa solo cuando se
+        // cruza el umbral, y no vuelve a avisar mientras siga fuera. Con el
+        // margen negativo del primero, la salida se notificaba cuando el bloque
+        // todavía estaba a un 82% de la pantalla — o sea, aún visible — así que
+        // no se podía rearmar en ese momento sin que el contenido desapareciera
+        // delante del usuario. Sin margen, "no interseca" significa
+        // exactamente "quedó fuera de pantalla", que es cuándo sí se puede.
+        const observadorRearmar = REPETIR
+          ? new IntersectionObserver(
+              (entries) => {
+                for (const entry of entries) {
+                  if (entry.isIntersecting) continue;
+                  const el = entry.target as HTMLElement;
+
+                  // El borde por el que salió determina por dónde va a volver
+                  // a entrar, y por lo tanto de qué lado debe animarse: si
+                  // quedó arriba de la pantalla, el usuario está subiendo y el
+                  // bloque tiene que bajar hacia su sitio, no subir.
+                  if (entry.boundingClientRect.bottom <= 0) {
+                    el.style.setProperty('--reveal-signo', '-1');
+                  } else {
+                    el.style.setProperty('--reveal-signo', '1');
+                  }
+
+                  el.classList.remove('is-visible');
+                }
+              },
+              /*
+                Margen positivo: el área de observación se agranda 200px por
+                lado, así que "no interseca" significa "quedó bien lejos de la
+                pantalla", no "apenas salió".
+
+                Sin ese margen los dos observadores se peleaban: al revelarse,
+                el bloque se desplaza 64px hacia su sitio; ese movimiento podía
+                sacarlo del área del segundo observador, que le quitaba la
+                clase, lo que lo devolvía 64px atrás y volvía a activar al
+                primero. Eso era el temblor: dos observadores empujando el
+                mismo bloque decenas de veces por segundo.
+
+                200px > los 64px que recorre el bloque, así que ya no puede
+                oscilar entre ambas zonas.
+              */
+              { threshold: 0, rootMargin: '200px' },
+            )
+          : null;
+
+        for (const el of elementos) {
+          el.dataset.observado = 'true';
+          observadorRevelar.observe(el);
+          observadorRearmar?.observe(el);
+
+          // Seguro por si el observador tardara en emitir su primer aviso:
+          // lo que ya está en pantalla se revela de una vez.
+          const caja = el.getBoundingClientRect();
+          if (caja.top < window.innerHeight && caja.bottom > 0) {
+            el.classList.add('is-visible');
+          }
+        }
+      };
+
+      // Red de seguridad: si algo falla en el revelado, se quita la clase `js`
+      // y todo el contenido queda visible. Nunca debe perderse contenido por
+      // culpa de una animación.
+      const revelarConSeguridad = () => {
+        try {
+          initReveals();
+        } catch (error) {
+          document.documentElement.classList.remove('js');
+          console.error('[reveal] desactivado por error:', error);
+        }
+      };
+
+      revelarConSeguridad();
+      document.addEventListener('astro:page-load', revelarConSeguridad);
+    </script>
+  </body>
+</html>

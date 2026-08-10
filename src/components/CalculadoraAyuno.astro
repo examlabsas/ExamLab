@@ -1,0 +1,205 @@
+---
+/**
+ * Calculadora de ayuno.
+ *
+ * Responde en concreto la pregunta más frecuente del laboratorio —"¿cuántas
+ * horas de ayuno necesito?"— convirtiéndola en una hora exacta: el paciente
+ * elige su examen y la hora de su cita, y se le dice a qué hora dejar de comer.
+ *
+ * Usa los datos que ya están en el catálogo (`ayuno` y `ayunoHoras`), así que
+ * cuando llegue la cartera real de exámenes se actualiza sola.
+ *
+ * Sin JavaScript se muestra un aviso que remite al catálogo, donde la misma
+ * información está escrita en cada ficha.
+ */
+import Icon from './Icon.astro';
+import { interpretarAyuno, type Examen } from '@/lib/examenes';
+
+interface Props {
+  examenes: Examen[];
+}
+
+const { examenes } = Astro.props;
+
+/*
+  Solo lo que la calculadora necesita. El ayuno se deduce del texto de
+  CONDICIONES CLÍNICAS que entrega el laboratorio, así que cuando lleguen los
+  400 exámenes reales no hay que etiquetar ninguno a mano.
+*/
+const datos = examenes.map((e) => {
+  const ayuno = interpretarAyuno(e);
+  return {
+    slug: e.slug,
+    nombre: e.nombre,
+    ayuno: ayuno.requiere,
+    horas: ayuno.horas,
+    texto: ayuno.texto,
+  };
+});
+
+// Los que requieren ayuno van primero: es lo que la gente viene a consultar.
+const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
+---
+
+<div
+  class="rounded-3xl border border-line bg-white p-6 lg:p-8"
+  data-ayuno
+  data-examenes={JSON.stringify(datos)}
+>
+  <div class="flex items-start gap-4">
+    <span
+      class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-accent-soft text-accent-dark"
+    >
+      <Icon name="reloj" size={24} />
+    </span>
+    <div>
+      <h3 class="text-[19px] font-bold text-brand">¿A qué hora dejo de comer?</h3>
+      <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+        Elija su examen y la hora de su cita. Le decimos el momento exacto en que debe empezar el
+        ayuno.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+      <label for="ayuno-examen" class="block text-[13px] font-bold text-brand">Examen</label>
+      <select
+        id="ayuno-examen"
+        class="mt-2 w-full rounded-xl border border-line-strong bg-white px-3.5 py-3 text-[14px] text-black focus:border-accent focus:outline-none"
+      >
+        {ordenados.map((e) => <option value={e.slug}>{e.nombre}</option>)}
+      </select>
+    </div>
+
+    <div>
+      <label for="ayuno-cita" class="block text-[13px] font-bold text-brand">
+        Fecha y hora de su cita
+      </label>
+      <input
+        type="datetime-local"
+        id="ayuno-cita"
+        class="mt-2 w-full rounded-xl border border-line-strong bg-white px-3.5 py-3 text-[14px] text-black focus:border-accent focus:outline-none"
+      />
+    </div>
+  </div>
+
+  <!-- El resultado se anuncia a lectores de pantalla al cambiar. -->
+  <div
+    class="mt-5 rounded-2xl border border-dashed border-line-strong bg-surface p-5"
+    data-resultado
+    aria-live="polite"
+  >
+    <p class="text-[14px] leading-relaxed text-neutral" data-mensaje>
+      Complete los dos campos para ver su hora de ayuno.
+    </p>
+  </div>
+
+  <noscript>
+    <p class="mt-4 text-[13px] leading-relaxed text-neutral">
+      La calculadora necesita JavaScript. Las horas de ayuno de cada examen también están escritas
+      en su ficha del <a href="/catalogo" class="font-semibold text-accent underline">catálogo</a>.
+    </p>
+  </noscript>
+
+  <p class="mt-4 text-[12.5px] leading-relaxed text-neutral">
+    Si su médico le indicó un ayuno distinto, siga siempre la indicación de su médico.
+  </p>
+</div>
+
+<script>
+  const initAyuno = () => {
+    for (const caja of document.querySelectorAll<HTMLElement>('[data-ayuno]')) {
+      // `astro:page-load` corre también en la carga inicial.
+      if (caja.dataset.iniciado === 'true') continue;
+      caja.dataset.iniciado = 'true';
+
+      type Item = { slug: string; nombre: string; ayuno: boolean; horas: number };
+      let examenes: Item[] = [];
+      try {
+        examenes = JSON.parse(caja.dataset.examenes ?? '[]');
+      } catch {
+        continue;
+      }
+
+      const selector = caja.querySelector<HTMLSelectElement>('#ayuno-examen');
+      const cita = caja.querySelector<HTMLInputElement>('#ayuno-cita');
+      const panel = caja.querySelector<HTMLElement>('[data-resultado]');
+      const mensaje = caja.querySelector<HTMLElement>('[data-mensaje]');
+      if (!selector || !cita || !panel || !mensaje) continue;
+
+      // 24 horas, igual que los horarios de las sedes en el resto del sitio.
+      const formatoLargo = new Intl.DateTimeFormat('es-EC', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+
+      const pintar = (estado: 'vacio' | 'sin-ayuno' | 'ok' | 'pasado', html: string) => {
+        mensaje.innerHTML = html;
+        panel.classList.remove(
+          'border-dashed',
+          'border-line-strong',
+          'bg-surface',
+          'border-accent',
+          'bg-accent-soft/40',
+          'border-alert/30',
+          'bg-alert-soft/40',
+        );
+        if (estado === 'ok') panel.classList.add('border-accent', 'bg-accent-soft/40');
+        else if (estado === 'pasado') panel.classList.add('border-alert/30', 'bg-alert-soft/40');
+        else panel.classList.add('border-dashed', 'border-line-strong', 'bg-surface');
+      };
+
+      const calcular = () => {
+        const examen = examenes.find((e) => e.slug === selector.value);
+        if (!examen) return;
+
+        if (!examen.ayuno) {
+          pintar(
+            'sin-ayuno',
+            `<strong class="font-semibold text-brand">${examen.nombre}</strong> no requiere ayuno. Puede comer normalmente antes de su cita.`,
+          );
+          return;
+        }
+
+        if (!cita.value) {
+          pintar(
+            'vacio',
+            `<strong class="font-semibold text-brand">${examen.nombre}</strong> requiere <strong class="font-semibold text-brand">${examen.horas} horas</strong> de ayuno. Indique la fecha y hora de su cita para calcular el momento exacto.`,
+          );
+          return;
+        }
+
+        const momentoCita = new Date(cita.value);
+        if (Number.isNaN(momentoCita.getTime())) return;
+
+        const inicioAyuno = new Date(momentoCita.getTime() - examen.horas * 60 * 60 * 1000);
+        const yaPaso = inicioAyuno.getTime() < Date.now();
+
+        pintar(
+          yaPaso ? 'pasado' : 'ok',
+          `Para <strong class="font-semibold text-brand">${examen.nombre}</strong> necesita
+           <strong class="font-semibold text-brand">${examen.horas} horas</strong> de ayuno.<br>
+           Debe dejar de comer el
+           <strong class="font-semibold text-brand">${formatoLargo.format(inicioAyuno)}</strong>.
+           ${
+             yaPaso
+               ? '<br><span class="text-alert-dark">Esa hora ya pasó: si comió después, conviene reprogramar la cita.</span>'
+               : '<br>Puede tomar agua durante todo el ayuno.'
+           }`,
+        );
+      };
+
+      selector.addEventListener('change', calcular);
+      cita.addEventListener('input', calcular);
+      calcular();
+    }
+  };
+
+  initAyuno();
+  document.addEventListener('astro:page-load', initAyuno);
+</script>

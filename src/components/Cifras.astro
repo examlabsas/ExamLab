@@ -1,0 +1,140 @@
+---
+/**
+ * Cifras con conteo animado al entrar en pantalla.
+ *
+ * Réplica nativa del componente StatsSection de Framer. Se copiaron sus
+ * valores exactos: curva easeOutExpo, 2 segundos de duración, disparo al
+ * entrar en vista y separador de miles.
+ *
+ * Pesa ~1 KB contra los 322 KB que costaba cargar React para el original.
+ *
+ * Sin JavaScript se ven los números finales: se renderizan ya escritos y el
+ * script los reinicia a cero solo si va a poder animarlos.
+ */
+export type Cifra = {
+  valor: number;
+  prefijo?: string;
+  sufijo?: string;
+  etiqueta: string;
+  decimales?: number;
+};
+
+interface Props {
+  cifras: Cifra[];
+  /** `true` sobre fondo azul. */
+  oscuro?: boolean;
+  class?: string;
+}
+
+const { cifras, oscuro = false, class: className } = Astro.props;
+
+const formatear = (c: Cifra) =>
+  c.valor.toLocaleString('es-EC', {
+    minimumFractionDigits: c.decimales ?? 0,
+    maximumFractionDigits: c.decimales ?? 0,
+  });
+---
+
+<dl
+  class:list={[
+    'grid grid-cols-2 gap-x-8 gap-y-8 lg:grid-cols-4',
+    className,
+  ]}
+  data-cifras
+>
+  {
+    cifras.map((cifra) => (
+      <div class="flex flex-col gap-1">
+        <dd
+          class:list={[
+            'font-display text-[clamp(2rem,4vw,3rem)] leading-none font-bold tabular-nums',
+            oscuro ? 'text-white' : 'text-brand',
+          ]}
+          data-cifra
+          data-valor={cifra.valor}
+          data-decimales={cifra.decimales ?? 0}
+          data-prefijo={cifra.prefijo ?? ''}
+          data-sufijo={cifra.sufijo ?? ''}
+        >
+          {cifra.prefijo}{formatear(cifra)}{cifra.sufijo}
+        </dd>
+        <dt
+          class:list={[
+            'text-[13.5px] leading-snug font-semibold',
+            oscuro ? 'text-white/70' : 'text-neutral',
+          ]}
+        >
+          {cifra.etiqueta}
+        </dt>
+      </div>
+    ))
+  }
+</dl>
+
+<script>
+  // Curva y duración tomadas del componente original de Framer.
+  const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+  const DURACION = 2000;
+
+  const initCifras = () => {
+    const grupos = document.querySelectorAll<HTMLElement>('[data-cifras]');
+    if (grupos.length === 0) return;
+
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const animar = (grupo: HTMLElement) => {
+      const numeros = grupo.querySelectorAll<HTMLElement>('[data-cifra]');
+
+      for (const nodo of numeros) {
+        const destino = Number(nodo.dataset.valor ?? 0);
+        const decimales = Number(nodo.dataset.decimales ?? 0);
+        const prefijo = nodo.dataset.prefijo ?? '';
+        const sufijo = nodo.dataset.sufijo ?? '';
+
+        const escribir = (valor: number) => {
+          nodo.textContent =
+            prefijo +
+            valor.toLocaleString('es-EC', {
+              minimumFractionDigits: decimales,
+              maximumFractionDigits: decimales,
+            }) +
+            sufijo;
+        };
+
+        // Con movimiento reducido se deja el valor final, ya escrito en el HTML.
+        if (sinMovimiento) continue;
+
+        const inicio = performance.now();
+        const paso = (ahora: number) => {
+          const avance = Math.min((ahora - inicio) / DURACION, 1);
+          escribir(easeOutExpo(avance) * destino);
+          if (avance < 1) requestAnimationFrame(paso);
+        };
+        escribir(0);
+        requestAnimationFrame(paso);
+      }
+    };
+
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        for (const entrada of entradas) {
+          if (!entrada.isIntersecting) continue;
+          animar(entrada.target as HTMLElement);
+          observador.unobserve(entrada.target);
+        }
+      },
+      { threshold: 0.3 },
+    );
+
+    for (const grupo of grupos) {
+      // `astro:page-load` corre también en la carga inicial: sin la guarda se
+      // registrarían observadores duplicados.
+      if (grupo.dataset.iniciado === 'true') continue;
+      grupo.dataset.iniciado = 'true';
+      observador.observe(grupo);
+    }
+  };
+
+  initCifras();
+  document.addEventListener('astro:page-load', initCifras);
+</script>

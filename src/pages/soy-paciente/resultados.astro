@@ -1,0 +1,209 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import { site } from '@/lib/site';
+import { whatsappLink } from '@/lib/whatsapp';
+import { breadcrumbSchema } from '@/lib/schema';
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Soy paciente', href: '/soy-paciente' },
+    { nombre: 'Resultados', href: '/soy-paciente/resultados' },
+  ]),
+];
+
+const pasos = [
+  {
+    titulo: 'Ingrese a Avalab',
+    texto:
+      'Abra el sistema de resultados desde el botón de esta página o desde el menú superior del sitio.',
+    detalle: 'Puede hacerlo desde el celular, la tablet o la computadora.',
+  },
+  {
+    titulo: 'Escriba su número de cédula',
+    texto:
+      'Use el mismo número con el que se registró al momento de la toma de muestra, sin guiones ni espacios.',
+    detalle: 'Para menores de edad, se usa la cédula del representante registrado.',
+  },
+  {
+    titulo: 'Ingrese el código de orden',
+    texto:
+      'Es el código que aparece en el comprobante que se le entregó al momento del pago.',
+    detalle: 'Si perdió el comprobante, escríbanos por WhatsApp y se lo reenviamos.',
+  },
+  {
+    titulo: 'Descargue su informe',
+    texto:
+      'Verá el listado de sus exámenes disponibles y podrá descargar cada informe en PDF.',
+    detalle: 'El informe incluye la firma del responsable técnico y sus valores de referencia.',
+  },
+];
+
+const problemas = [
+  {
+    pregunta: 'El sistema no reconoce mi cédula',
+    respuesta:
+      'Verifique que la esté escribiendo sin puntos, guiones ni espacios. Si el problema continúa, es posible que exista un error de digitación en su registro: escríbanos por WhatsApp y lo corregimos.',
+  },
+  {
+    pregunta: 'Perdí mi código de orden',
+    respuesta:
+      'Escríbanos por WhatsApp con su nombre completo y número de cédula, y le reenviamos el código que corresponde a su última orden.',
+  },
+  {
+    pregunta: 'Mi resultado todavía no aparece',
+    respuesta:
+      'Los informes se publican una vez validados por el responsable técnico. Revise el tiempo de entrega del examen en el catálogo; si ya pasó ese plazo, contáctenos.',
+  },
+  {
+    pregunta: '¿Puedo retirar el resultado impreso?',
+    respuesta:
+      'Sí. Puede retirarlo en la sede donde se tomó la muestra, presentando su cédula. Si lo retira otra persona, necesita una autorización escrita suya.',
+  },
+  {
+    pregunta: '¿Mi médico puede ver mis resultados?',
+    respuesta:
+      'Sí. El profesional que solicitó el examen accede a su informe desde el portal para profesionales. También puede compartirle el PDF que usted descargue.',
+  },
+];
+---
+
+<BaseLayout
+  titulo="Resultados en línea"
+  descripcion="Guía paso a paso para acceder a sus resultados de laboratorio en el sistema Avalab de ExamLab, con su cédula y código de orden."
+  whatsapp="resultados"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Resultados"
+    titulo="Acceda a sus resultados en línea"
+    descripcion="Sus informes están disponibles 24/7 en Avalab, el sistema de resultados del laboratorio. Solo necesita su cédula y el código de orden."
+    migas={[
+      { nombre: 'Inicio', href: '/' },
+      { nombre: 'Soy paciente', href: '/soy-paciente' },
+      { nombre: 'Resultados', href: '/soy-paciente/resultados' },
+    ]}
+  >
+    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Button href={site.avalab} icon="documento">Ingresar a Avalab</Button>
+      <Button href={whatsappLink('resultados')} variant="sobreOscuro" icon="whatsapp-marca">
+        Necesito ayuda
+      </Button>
+    </div>
+  </PageHero>
+
+  <!-- Qué necesita -->
+  <section class="bg-white py-12 lg:py-16">
+    <div class="container-page grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex items-start gap-4 rounded-3xl border border-line bg-white p-6">
+        <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+          <Icon name="usuario" size={21} />
+        </span>
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">Su número de cédula</h2>
+          <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+            El mismo con el que se registró al tomarse la muestra, sin guiones ni espacios.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 rounded-3xl border border-line bg-white p-6">
+        <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+          <Icon name="documento" size={21} />
+        </span>
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">Su código de orden</h2>
+          <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+            Aparece impreso en el comprobante que se le entrega al momento del pago.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pasos -->
+  <section class="bg-surface py-section">
+    <div class="container-page">
+      <SectionHeading
+        eyebrow="Paso a paso"
+        titulo="Cómo descargar su informe en Avalab"
+        descripcion="Avalab es el sistema de resultados del laboratorio, administrado por su proveedor externo. Este sitio web no almacena resultados médicos."
+      />
+      <ol class="mt-9 flex flex-col gap-4">
+        {
+          pasos.map((paso, i) => (
+            <li class="flex flex-col gap-4 rounded-3xl bg-white p-6 shadow-card sm:flex-row sm:items-start lg:p-7">
+              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-brand text-[19px] font-bold text-white">
+                {i + 1}
+              </span>
+              <div>
+                <h3 class="text-[18px] font-bold text-brand">{paso.titulo}</h3>
+                <p class="mt-2 text-[15px] leading-relaxed text-neutral">{paso.texto}</p>
+                <p class="mt-2 flex items-start gap-2 text-[13.5px] leading-relaxed text-accent-dark">
+                  <Icon name="check" size={16} strokeWidth={2.2} class="mt-0.5" />
+                  {paso.detalle}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Button href={site.avalab} icon="documento">Ingresar a Avalab</Button>
+        <Button href={whatsappLink('resultados')} variant="secondary" icon="whatsapp-marca">
+          Escribirnos por WhatsApp
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problemas frecuentes -->
+  <section class="bg-white py-section">
+    <div class="container-page">
+      <SectionHeading eyebrow="Si algo no funciona" titulo="Problemas frecuentes al ingresar" />
+      <div class="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {
+          problemas.map((item) => (
+            <details class="group rounded-3xl border border-line bg-white p-6 open:border-accent">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[16.5px] font-bold text-brand">
+                {item.pregunta}
+                <Icon
+                  name="mas"
+                  size={20}
+                  class="flex-none text-accent transition-transform duration-200 group-open:rotate-45"
+                />
+              </summary>
+              <p class="mt-3.5 text-[14.5px] leading-relaxed text-neutral">{item.respuesta}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacidad -->
+  <section class="bg-surface pb-section">
+    <div class="container-page">
+      <div class="flex flex-col gap-4 rounded-3xl bg-brand p-7 sm:flex-row lg:p-9">
+        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-white/12 text-accent-light">
+          <Icon name="escudo" size={24} />
+        </span>
+        <div>
+          <h2 class="text-h3 font-bold text-white">Sus resultados son confidenciales</h2>
+          <p class="mt-3 max-w-[680px] text-[15px] leading-relaxed text-white/75">
+            El acceso a los informes está protegido por su cédula y su código de orden. Este sitio
+            web no almacena resultados ni datos clínicos: la información reside exclusivamente en
+            Avalab. Conozca más en nuestra
+            <a href="/privacidad" class="font-semibold text-accent-light underline underline-offset-2">
+              política de privacidad</a
+            >.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

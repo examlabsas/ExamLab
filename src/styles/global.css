@@ -1,0 +1,391 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Tokens de marca ExamLab (Tailwind v4 · configuración vía @theme)
+   Genera automáticamente utilidades: bg-brand, text-accent, border-line…
+------------------------------------------------------------------- */
+@theme {
+  /* Paleta corporativa aprobada */
+  --color-brand: #005a8c; /* azul institucional */
+  --color-brand-dark: #00456b;
+  --color-brand-soft: #e6eef4;
+  --color-accent: #00a3c4; /* cian de acción */
+  --color-accent-dark: #007e99;
+  --color-accent-light: #6fd8ea;
+  --color-accent-soft: #e6f5f9;
+  --color-neutral: #6d6e71; /* gris de texto secundario */
+  --color-alert: #e1251b; /* rojo de énfasis / urgencias */
+  --color-alert-dark: #a81a11;
+  --color-alert-light: #ff6f66;
+  --color-alert-soft: #f8e0ee;
+
+  /* Verde oficial de WhatsApp (solo para el botón flotante) */
+  --color-whatsapp: #25d366;
+  --color-whatsapp-dark: #1da851;
+
+  /* Superficies y bordes derivados */
+  --color-surface: #f6f8fa;
+  --color-line: #e6e8ea;
+  --color-line-strong: #d2d4d7;
+
+  /* Tipografías oficiales (Gotham Book web equivalent: Montserrat) */
+  --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+
+  /* Escala tipográfica fluida del diseño aprobado */
+  --text-h1: clamp(2.125rem, 4.6vw, 3.5rem);
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.025rem;
+  --text-h2: clamp(1.6875rem, 3.1vw, 2.5rem);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.019rem;
+  --text-h3: clamp(1.3125rem, 2.2vw, 1.625rem);
+  --text-h3--line-height: 1.2;
+  --text-lead: clamp(1rem, 1.3vw, 1.156rem);
+  --text-lead--line-height: 1.6;
+
+  /* Ritmo vertical de secciones */
+  --spacing-section: clamp(3.5rem, 6vw, 5.5rem);
+  --spacing-section-sm: clamp(2.875rem, 5vw, 4.5rem);
+
+  /* Sombras de marca */
+  --shadow-card: 0 2px 10px rgb(0 90 140 / 0.05);
+  --shadow-card-hover: 0 18px 38px rgb(0 90 140 / 0.1);
+  --shadow-float: 0 12px 30px rgb(0 90 140 / 0.28);
+  --shadow-accent: 0 10px 24px rgb(0 163 196 / 0.32);
+
+  /*
+    Punto de quiebre propio para la cabecera. Con ocho secciones —incluida
+    "Laboratorios Asociados"— el menú completo necesita ~1150px; por debajo de
+    eso se usa el menú hamburguesa.
+  */
+  --breakpoint-menu: 75rem;
+
+  /* Curvas del sistema de animaciones */
+  --ease-suave: cubic-bezier(0.16, 1, 0.3, 1); /* frenado marcado, se lee "suave" */
+  --ease-rebote: cubic-bezier(0.34, 1.28, 0.64, 1); /* rebote leve, para tarjetas */
+}
+
+/* ------------------------------------------------------------------
+   Intensidad de las animaciones. Subir o bajar estos cuatro valores
+   cambia todo el sitio; no hace falta tocar nada más.
+------------------------------------------------------------------- */
+:root {
+  --reveal-distancia: 64px; /* cuánto sube cada bloque al aparecer */
+  --reveal-duracion: 1s; /* cuánto dura ese recorrido */
+  --reveal-escala: 0.97; /* tamaño inicial del bloque */
+  --stagger-paso: 0.1s; /* retardo entre tarjeta y tarjeta */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: #fff;
+    color: #000;
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  /* Accesibilidad: foco visible coherente con la marca */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    /*
+      No se anula todo con `*` y `!important`: dentro de una capa, un
+      `!important` gana incluso a las reglas sin capa, y eso impedía definir
+      un comportamiento propio para el sistema de animaciones (ver el bloque
+      `prefers-reduced-motion` del final del archivo, que sí deja un fundido).
+      Aquí solo se desactivan animaciones largas o en bucle.
+    */
+    *,
+    *::before,
+    *::after {
+      animation-iteration-count: 1;
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Utilidades de composición reutilizadas en todas las páginas
+------------------------------------------------------------------- */
+
+/* Ancho de contenido del diseño: 1240px + 24px de aire lateral */
+@utility container-page {
+  width: 100%;
+  max-width: 77.5rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Contenido editorial (artículos, textos legales) */
+@utility prose-examlab {
+  & h2 {
+    margin-top: 2.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  & h3 {
+    margin-top: 2rem;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  & p {
+    margin-top: 1rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-neutral);
+  }
+
+  & ul,
+  & ol {
+    margin-top: 1rem;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-neutral);
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li::marker {
+    color: var(--color-accent);
+  }
+
+  & a {
+    color: var(--color-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  & a:hover {
+    color: var(--color-brand);
+  }
+
+  & strong {
+    color: var(--color-brand);
+    font-weight: 700;
+  }
+
+  & blockquote {
+    margin-top: 1.5rem;
+    border-left: 3px solid var(--color-accent);
+    background: var(--color-surface);
+    border-radius: 0 1rem 1rem 0;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-brand);
+  }
+
+  & img {
+    margin-top: 1.5rem;
+    border-radius: 1.25rem;
+    width: 100%;
+    height: auto;
+  }
+
+  & hr {
+    margin-block: 2.5rem;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Animaciones fluidas y elegantes de revelado al hacer scroll
+   (Hardware accelerated: opacity & transform 60fps)
+------------------------------------------------------------------- */
+/*
+  Solo se activa con JS (clase `js` en <html>): sin JS el contenido se ve
+  siempre. La regla del final aplica el efecto a todas las secciones internas
+  del sitio sin tener que marcarlas una por una; para excluir una sección se
+  le añade la clase `sin-reveal` a su `.container-page`.
+*/
+/*
+  `--reveal-signo` decide de qué lado entra el bloque: 1 = desde abajo (scroll
+  hacia abajo, el caso normal), -1 = desde arriba (cuando el usuario sube). Lo
+  fija el script según el borde por el que el bloque salió de pantalla.
+*/
+.js .reveal,
+.js main > section:not(:first-of-type) > .container-page:not(.sin-reveal) {
+  opacity: 0;
+  transform: translateY(calc(var(--reveal-distancia) * var(--reveal-signo, 1)))
+    scale(var(--reveal-escala));
+  transition:
+    opacity var(--reveal-duracion) var(--ease-suave),
+    transform var(--reveal-duracion) var(--ease-suave);
+}
+
+/*
+  Ojo con la especificidad: la regla que oculta usa dos `:not()`, así que la
+  que muestra debe repetirlos para poder ganarle. Si no, `is-visible` se
+  aplica pero el bloque se queda invisible.
+*/
+.js .reveal.is-visible,
+.js main > section:not(:first-of-type) > .container-page.is-visible:not(.sin-reveal) {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* Entrada escalonada para rejillas de tarjetas, con rebote leve al asentar. */
+.js .reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(calc(48px * var(--reveal-signo, 1))) scale(0.94);
+  transition:
+    opacity 0.75s var(--ease-suave),
+    transform 0.75s var(--ease-rebote);
+}
+
+.js .reveal-stagger.is-visible > * {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+.js .reveal-stagger.is-visible > *:nth-child(1) { transition-delay: calc(var(--stagger-paso) * 0); }
+.js .reveal-stagger.is-visible > *:nth-child(2) { transition-delay: calc(var(--stagger-paso) * 1); }
+.js .reveal-stagger.is-visible > *:nth-child(3) { transition-delay: calc(var(--stagger-paso) * 2); }
+.js .reveal-stagger.is-visible > *:nth-child(4) { transition-delay: calc(var(--stagger-paso) * 3); }
+.js .reveal-stagger.is-visible > *:nth-child(5) { transition-delay: calc(var(--stagger-paso) * 4); }
+.js .reveal-stagger.is-visible > *:nth-child(6) { transition-delay: calc(var(--stagger-paso) * 5); }
+.js .reveal-stagger.is-visible > *:nth-child(7) { transition-delay: calc(var(--stagger-paso) * 6); }
+.js .reveal-stagger.is-visible > *:nth-child(8) { transition-delay: calc(var(--stagger-paso) * 7); }
+
+/* La capa de composición se reserva solo mientras la animación está pendiente. */
+.js .reveal:not(.is-visible),
+.js .reveal-stagger:not(.is-visible) > * {
+  will-change: opacity, transform;
+}
+
+/* ------------------------------------------------------------------
+   Entrada del hero: corre al cargar, sin depender del scroll
+------------------------------------------------------------------- */
+@keyframes entrada-arriba {
+  from {
+    opacity: 0;
+    transform: translateY(44px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes entrada-imagen {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.js .entrada {
+  opacity: 0;
+  animation: entrada-arriba 0.9s var(--ease-suave) forwards;
+}
+
+.js .entrada-imagen {
+  opacity: 0;
+  animation: entrada-imagen 1.2s var(--ease-suave) 0.2s forwards;
+}
+
+.js .entrada-1 { animation-delay: 0.1s; }
+.js .entrada-2 { animation-delay: 0.22s; }
+.js .entrada-3 { animation-delay: 0.34s; }
+.js .entrada-4 { animation-delay: 0.46s; }
+.js .entrada-5 { animation-delay: 0.58s; }
+
+/* ------------------------------------------------------------------
+   Cabecera: sombra y compactado al hacer scroll
+------------------------------------------------------------------- */
+.cabecera {
+  transition: box-shadow 0.3s var(--ease-suave);
+}
+
+.cabecera[data-scroll='true'] {
+  box-shadow: 0 8px 24px rgb(0 90 140 / 0.1);
+}
+
+/*
+  La cabecera solo cambia la sombra al hacer scroll: NO cambia de alto.
+
+  Antes se compactaba reduciendo el `padding-block`, y eso provocaba un
+  temblor: al encogerse, el documento perdía 12px de alto; el anclaje de
+  scroll del navegador corregía la posición para mantener el contenido
+  quieto, esa corrección bajaba `scrollY` por debajo del umbral, la cabecera
+  volvía a crecer, y el ciclo se repetía varias veces por segundo.
+  La sombra no ocupa espacio en el diseño, así que no puede realimentarse.
+*/
+
+/* ------------------------------------------------------------------
+   Preferencia del sistema de reducir movimiento: el contenido se ve
+   igual, simplemente aparece sin desplazamiento.
+------------------------------------------------------------------- */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Sin desplazamiento ni escalado, pero se conserva un fundido corto:
+     la preferencia del sistema es sobre el movimiento, no sobre la opacidad. */
+  .js .entrada,
+  .js .entrada-imagen {
+    transform: none !important;
+    animation: aparecer 0.7s ease-out forwards !important;
+  }
+
+  .js .reveal,
+  .js .reveal-stagger > *,
+  .js main > section:not(:first-of-type) > .container-page:not(.sin-reveal) {
+    transform: none !important;
+    animation: none !important;
+    transition: opacity 0.7s ease-out !important;
+  }
+}
+
