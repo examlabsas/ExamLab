@@ -1,0 +1,18 @@
+{
+  // Configuración para publicar en Cloudflare mediante `wrangler deploy`.
+  //
+  // El sitio es HTML estático: no hay código de servidor, así que no se declara
+  // `main`. Cloudflare sirve directamente los archivos compilados y el conjunto
+  // se comporta igual que un proyecto de Pages, incluidos `_headers`.
+  //
+  // Solo hace falta si se despliega por la vía de Workers. Con Pages, este
+  // archivo se ignora sin causar ningún problema.
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "examlabsas",
+  "compatibility_date": "2026-08-11",
+  "assets": {
+    "directory": "./dist",
+    // Sirve la página 404 propia del sitio en vez del error genérico.
+    "not_found_handling": "404-page"
+  }
+}
