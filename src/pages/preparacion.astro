@@ -11,6 +11,7 @@
  * que el propio laboratorio pueda entregarla en papel.
  */
 import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
 import Button from '@/components/Button.astro';
@@ -23,9 +24,13 @@ import { breadcrumbSchema } from '@/lib/schema';
   La ilustración de la recolección de heces la entrega el laboratorio. Mientras
   el archivo no exista en public/images/ no se dibuja la figura: así el sitio
   nunca muestra una imagen rota, y aparece sola en cuanto se copie el archivo.
+
+  Se resuelve desde la raíz del proyecto y no desde `import.meta.url`: al
+  compilar, Astro empaqueta este módulo y esa URL deja de apuntar al archivo
+  fuente, así que la comprobación fallaba y la figura desaparecía del sitio
+  publicado aunque en desarrollo se viera bien.
 */
-const hayImagen = (ruta: string) =>
-  existsSync(new URL(`../../public${ruta}`, import.meta.url));
+const hayImagen = (ruta: string) => existsSync(resolve(process.cwd(), `public${ruta}`));
 
 /*
   Enlace de «compartir»: sin número de destino, para que sea el propio paciente
