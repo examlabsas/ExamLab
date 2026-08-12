@@ -5,8 +5,11 @@
  * recepción se identifique de inmediato de dónde viene la consulta.
  */
 
-/** Número que recibe los mensajes, en formato internacional sin signos. */
-export const WHATSAPP_NUMERO = '593999123456';
+/**
+ * Número que recibe los mensajes, en formato internacional sin signos.
+ * Es el que consta en el manual para pacientes del laboratorio (0963820177).
+ */
+export const WHATSAPP_NUMERO = '593963820177';
 
 export const mensajes = {
   general: 'Hola ExamLab, quisiera información sobre sus servicios.',

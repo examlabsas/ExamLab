@@ -6,6 +6,9 @@
  * valores exactos: curva easeOutExpo, 2 segundos de duración, disparo al
  * entrar en vista y separador de miles.
  *
+ * A diferencia del original, el conteo se repite cada vez que el bloque vuelve
+ * a entrar en pantalla (ver `REPETIR` en el script).
+ *
  * Pesa ~1 KB contra los 322 KB que costaba cargar React para el original.
  *
  * Sin JavaScript se ven los números finales: se renderizan ya escritos y el
@@ -76,51 +79,74 @@ const formatear = (c: Cifra) =>
   const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
   const DURACION = 2000;
 
+  /** `false` deja el conteo una sola vez por carga de página. */
+  const REPETIR = true;
+
   const initCifras = () => {
     const grupos = document.querySelectorAll<HTMLElement>('[data-cifras]');
     if (grupos.length === 0) return;
 
     const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Con movimiento reducido se dejan los valores finales, ya escritos en el HTML.
+    if (sinMovimiento) return;
+
+    // Un solo bucle por grupo, cancelable: al reentrar en pantalla antes de que
+    // termine el conteo anterior, dos bucles escribirían sobre el mismo nodo.
+    const enCurso = new WeakMap<HTMLElement, number>();
 
     const animar = (grupo: HTMLElement) => {
-      const numeros = grupo.querySelectorAll<HTMLElement>('[data-cifra]');
+      const anterior = enCurso.get(grupo);
+      if (anterior !== undefined) cancelAnimationFrame(anterior);
 
-      for (const nodo of numeros) {
+      const escritores = [...grupo.querySelectorAll<HTMLElement>('[data-cifra]')].map((nodo) => {
         const destino = Number(nodo.dataset.valor ?? 0);
         const decimales = Number(nodo.dataset.decimales ?? 0);
         const prefijo = nodo.dataset.prefijo ?? '';
         const sufijo = nodo.dataset.sufijo ?? '';
 
-        const escribir = (valor: number) => {
+        return (factor: number) => {
           nodo.textContent =
             prefijo +
-            valor.toLocaleString('es-EC', {
+            (destino * factor).toLocaleString('es-EC', {
               minimumFractionDigits: decimales,
               maximumFractionDigits: decimales,
             }) +
             sufijo;
         };
+      });
 
-        // Con movimiento reducido se deja el valor final, ya escrito en el HTML.
-        if (sinMovimiento) continue;
+      const inicio = performance.now();
+      const paso = (ahora: number) => {
+        const avance = Math.min((ahora - inicio) / DURACION, 1);
+        const factor = easeOutExpo(avance);
+        for (const escribir of escritores) escribir(factor);
+        if (avance < 1) enCurso.set(grupo, requestAnimationFrame(paso));
+        else enCurso.delete(grupo);
+      };
 
-        const inicio = performance.now();
-        const paso = (ahora: number) => {
-          const avance = Math.min((ahora - inicio) / DURACION, 1);
-          escribir(easeOutExpo(avance) * destino);
-          if (avance < 1) requestAnimationFrame(paso);
-        };
-        escribir(0);
-        requestAnimationFrame(paso);
-      }
+      for (const escribir of escritores) escribir(0);
+      enCurso.set(grupo, requestAnimationFrame(paso));
     };
 
+    /*
+      Un único observador basta: IntersectionObserver avisa al cruzar el umbral
+      en los dos sentidos, así que la misma llamada que dispara el conteo al
+      entrar sirve para rearmarlo al salir. `data-contando` evita que un
+      reajuste de la caja vuelva a lanzar la animación estando ya visible.
+    */
     const observador = new IntersectionObserver(
       (entradas) => {
         for (const entrada of entradas) {
-          if (!entrada.isIntersecting) continue;
-          animar(entrada.target as HTMLElement);
-          observador.unobserve(entrada.target);
+          const grupo = entrada.target as HTMLElement;
+
+          if (entrada.isIntersecting) {
+            if (grupo.dataset.contando === 'true') continue;
+            grupo.dataset.contando = 'true';
+            animar(grupo);
+            if (!REPETIR) observador.unobserve(grupo);
+          } else if (REPETIR) {
+            delete grupo.dataset.contando;
+          }
         }
       },
       { threshold: 0.3 },

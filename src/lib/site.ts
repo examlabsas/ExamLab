@@ -13,16 +13,23 @@ export const site = {
   claim: 'Laboratorio clínico de innovación y desarrollo',
   descripcion:
     'Laboratorio clínico en Ambato y Pelileo con tecnología de análisis moderna, personal profesional y entrega oportuna de resultados.',
-  url: 'https://www.examlab.ec', // PROVISIONAL: dominio por definir
-  email: 'info@examlab.ec', // PROVISIONAL
-  telefono: '(03) 242 8899', // PROVISIONAL
-  telefonoE164: '+59332428899', // PROVISIONAL
-  emergencias: '0999 123 456', // PROVISIONAL
-  emergenciasE164: '+593999123456', // PROVISIONAL
+  // Debe coincidir con `site` de astro.config.mjs: de ahí salen el sitemap,
+  // las etiquetas canonical y el QR impreso de /preparacion.
+  url: 'https://examlabsas.com', // Confirmado por Netlife: dominio del laboratorio.
+  // Buzón real del laboratorio, administrado por Netlife (korreoweb.com).
+  // POR CONFIRMAR: ¿es este el que debe aparecer al público?
+  email: 'administracion@examlabsas.com',
+  // Número que consta en el manual para pacientes entregado por el laboratorio.
+  telefono: '096 382 0177',
+  telefonoE164: '+593963820177',
+  emergencias: '096 382 0177', // POR CONFIRMAR: ¿hay una línea distinta para urgencias?
+  emergenciasE164: '+593963820177',
   ciudad: 'Ambato',
   provincia: 'Tungurahua',
   pais: 'Ecuador',
-  horarioResumen: 'Lun a Sáb · 06:30 – 19:00',
+  // Respaldo que se muestra si el navegador no puede calcular la hora local.
+  // Debe concordar con `horarioMatriz`, más abajo.
+  horarioResumen: 'Lun a Vie · 07:00 – 18:00',
   fundacion: '2008', // PROVISIONAL
   redes: {
     facebook: 'https://facebook.com/examlab',
@@ -114,14 +121,15 @@ export type Sede = {
 };
 
 // Horarios estructurados. Índice 0 = domingo, 6 = sábado.
+// Tomados del sitio que el laboratorio tiene publicado hoy en examlabsas.com.
 const horarioMatriz: HorarioSemanal = [
   null, // domingo
-  { abre: '06:30', cierra: '19:00' },
-  { abre: '06:30', cierra: '19:00' },
-  { abre: '06:30', cierra: '19:00' },
-  { abre: '06:30', cierra: '19:00' },
-  { abre: '06:30', cierra: '19:00' },
-  { abre: '07:00', cierra: '13:00' }, // sábado
+  { abre: '07:00', cierra: '18:00' },
+  { abre: '07:00', cierra: '18:00' },
+  { abre: '07:00', cierra: '18:00' },
+  { abre: '07:00', cierra: '18:00' },
+  { abre: '07:00', cierra: '18:00' },
+  { abre: '07:30', cierra: '13:00' }, // sábado
 ];
 
 const horarioPelileo: HorarioSemanal = [
@@ -139,12 +147,13 @@ export const sedes: Sede[] = [
     slug: 'ambato-matriz',
     nombre: 'Matriz Ambato',
     etiqueta: 'Matriz',
-    direccion: 'Av. Rodrigo Pachano y Reina Claudia',
-    referencia: 'Sector Ficoa, junto al parque',
+    // Dirección completa según el sitio actual del laboratorio.
+    direccion: 'Av. Rodrigo Pachano y Reina Claudia s/n',
+    referencia: 'Parroquia Ficoa · Código postal 180101',
     ciudad: 'Ambato',
     provincia: 'Tungurahua',
-    telefono: '(03) 242 8899', // PROVISIONAL
-    telefonoE164: '+59332428899',
+    telefono: '096 382 0177', // Número del manual para pacientes.
+    telefonoE164: '+593963820177',
     horarioSemanal: horarioMatriz,
     horarios: horariosLegibles(horarioMatriz),
     notaHorario: 'Domingos y feriados: solo urgencias coordinadas por teléfono.',
@@ -162,8 +171,10 @@ export const sedes: Sede[] = [
     direccion: 'Dirección por confirmar', // PROVISIONAL
     ciudad: 'Pelileo',
     provincia: 'Tungurahua',
-    telefono: '(03) 242 8890', // PROVISIONAL
-    telefonoE164: '+59332428890',
+    // POR CONFIRMAR: se usa el número general del laboratorio hasta que
+    // entreguen uno propio de Pelileo. Antes había uno inventado.
+    telefono: '096 382 0177',
+    telefonoE164: '+593963820177',
     horarioSemanal: horarioPelileo,
     horarios: horariosLegibles(horarioPelileo),
     servicios: [
@@ -205,6 +216,9 @@ export const navPrincipal: NavLink[] = [
   {
     label: 'Soy Paciente',
     href: '/soy-paciente',
+    // Se muestra como primera entrada del submenú: sin ella la página no
+    // tendría forma de alcanzarse, porque el título solo despliega la lista.
+    descripcion: 'Antes, durante y después de su examen',
     hijos: [
       {
         label: 'Pedir cita',
@@ -222,9 +236,9 @@ export const navPrincipal: NavLink[] = [
         descripcion: 'Direcciones, mapas y horarios',
       },
       {
-        label: 'Guía para pacientes',
-        href: '/soy-paciente#guia',
-        descripcion: 'Recomendaciones antes de su examen',
+        label: 'Preparación para sus exámenes',
+        href: '/preparacion',
+        descripcion: 'Cómo prepararse según el tipo de muestra',
       },
       {
         label: 'Preguntas frecuentes',
@@ -241,6 +255,7 @@ export const navPrincipal: NavLink[] = [
   {
     label: 'Soy Profesional',
     href: '/soy-profesional',
+    descripcion: 'Convenios, catálogo técnico y contacto directo',
     hijos: [
       {
         label: 'Catálogo de Exámenes',
@@ -262,6 +277,7 @@ export const navPrincipal: NavLink[] = [
   {
     label: 'Laboratorios Asociados',
     href: '/laboratorios-asociados',
+    descripcion: 'Órdenes, catálogo de derivación y resultados',
     hijos: [
       {
         label: 'Ingresar orden',
@@ -289,11 +305,13 @@ export const footerEnlaces: NavLink[] = [
   { label: 'Catálogo de exámenes', href: '/catalogo' },
   { label: 'Soy paciente', href: '/soy-paciente' },
   { label: 'Soy profesional', href: '/soy-profesional' },
+  { label: 'Laboratorios asociados', href: '/laboratorios-asociados' },
   { label: 'Noticias', href: '/noticias' },
 ];
 
 export const footerServicios: NavLink[] = [
   { label: 'Pedir cita', href: '/soy-paciente/pedir-cita' },
+  { label: 'Preparación para sus exámenes', href: '/preparacion' },
   { label: 'Resultados en línea', href: '/soy-paciente/resultados' },
   { label: 'Exámenes a domicilio', href: '/servicios#domicilio' },
   { label: 'Convenios para médicos', href: '/soy-profesional#convenios-medicos' },

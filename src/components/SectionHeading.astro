@@ -10,17 +10,32 @@ interface Props {
   /** Estilo de la sección sobre fondo oscuro. */
   oscuro?: boolean;
   maxTitulo?: string;
+  /** Centra el bloque. Para secciones de una sola columna estrecha. */
+  centrado?: boolean;
 }
 
-const { eyebrow, titulo, descripcion, ctaLabel, ctaHref, oscuro = false, maxTitulo } =
-  Astro.props;
+const {
+  eyebrow,
+  titulo,
+  descripcion,
+  ctaLabel,
+  ctaHref,
+  oscuro = false,
+  maxTitulo,
+  centrado = false,
+} = Astro.props;
 
 // Si el enlace abre WhatsApp, se muestra su glifo en vez de la flecha.
 const esWhatsApp = !!ctaHref?.startsWith('https://wa.me');
 ---
 
-<div class="flex flex-wrap items-end justify-between gap-6">
-  <div class="max-w-[620px]">
+<div
+  class:list={[
+    'flex flex-wrap items-end gap-6',
+    centrado ? 'justify-center text-center' : 'justify-between',
+  ]}
+>
+  <div class:list={['max-w-[620px]', centrado && 'mx-auto']}>
     {
       eyebrow && (
         <span

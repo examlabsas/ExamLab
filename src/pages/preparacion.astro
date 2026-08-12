@@ -1,0 +1,842 @@
+---
+/**
+ * Preparación para sus exámenes — manual para pacientes.
+ *
+ * URL corta y estable a propósito: es el destino del código QR que el
+ * laboratorio imprime en frascos, órdenes y afiches. NO cambiar la ruta ni las
+ * anclas de cada bloque una vez impreso el QR.
+ *
+ * Pensada para llegar desde el celular: índice de accesos directos arriba,
+ * bloques cortos y teléfono siempre a mano. Incluye estilos de impresión para
+ * que el propio laboratorio pueda entregarla en papel.
+ */
+import { existsSync } from 'node:fs';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import { bloquesPreparacion, ejemploOrina24, resaltar } from '@/data/preparacion';
+import { site } from '@/lib/site';
+import { whatsappLink } from '@/lib/whatsapp';
+import { breadcrumbSchema } from '@/lib/schema';
+
+/*
+  La ilustración de la recolección de heces la entrega el laboratorio. Mientras
+  el archivo no exista en public/images/ no se dibuja la figura: así el sitio
+  nunca muestra una imagen rota, y aparece sola en cuanto se copie el archivo.
+*/
+const hayImagen = (ruta: string) =>
+  existsSync(new URL(`../../public${ruta}`, import.meta.url));
+
+/*
+  Enlace de «compartir»: sin número de destino, para que sea el propio paciente
+  quien elija a quién se lo manda.
+*/
+const compartirWhatsApp = `https://wa.me/?text=${encodeURIComponent(
+  `Indicaciones de preparación de ${site.nombre}: ${new URL('/preparacion', site.url).toString()}`,
+)}`;
+
+const schema = [
+  breadcrumbSchema([
+    { nombre: 'Inicio', href: '/' },
+    { nombre: 'Preparación para sus exámenes', href: '/preparacion' },
+  ]),
+];
+---
+
+<BaseLayout
+  titulo="Preparación para sus exámenes"
+  descripcion="Cómo prepararse antes de su examen de laboratorio: ayuno, recolección de orina, heces, secreción vaginal, espermatograma y faringe. Instrucciones oficiales de ExamLab."
+  whatsapp="paciente"
+  schema={schema}
+>
+  <!--
+    Membrete que solo aparece al imprimir. La cabecera del sitio se oculta en
+    papel, así que sin esto la hoja saldría sin identificar de quién es.
+  -->
+  <div class="solo-imprimir">
+    <strong>{site.nombre}</strong> · Preparación para sus exámenes<br />
+    {site.telefono} · {site.url.replace('https://', '')}/preparacion
+  </div>
+
+  <!-- Cabecera -->
+  <section class="bg-brand">
+    <div class="container-page py-10 lg:py-14">
+      <nav aria-label="Ruta de navegación" class="mb-6 sin-imprimir">
+        <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-white/60">
+          <li><a href="/" class="transition-colors hover:text-accent-light">Inicio</a></li>
+          <li aria-hidden="true">/</li>
+          <li class="text-white/85" aria-current="page">Preparación</li>
+        </ol>
+      </nav>
+
+      <span
+        class="inline-block rounded-lg bg-white/12 px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-light uppercase"
+      >
+        Manual para pacientes
+      </span>
+
+      <h1 class="mt-4 max-w-[19ch] text-h1 font-bold text-white">Preparación para sus exámenes</h1>
+
+      <p class="mt-4 max-w-[62ch] text-lead leading-relaxed text-white/75">
+        Prepararse bien evita repetir la toma de muestra. Busque abajo el tipo de muestra que le
+        indicaron y siga las instrucciones. Si tiene dudas, llámenos antes de venir.
+      </p>
+
+      <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sin-imprimir">
+        <Button href={`tel:${site.telefonoE164}`} icon="telefono">
+          Llamar al {site.telefono}
+        </Button>
+        <Button href={whatsappLink('paciente')} variant="sobreOscuro" icon="whatsapp-marca">
+          Consultar por WhatsApp
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Índice de accesos directos -->
+  <!--
+    Carrusel de accesos directos, a todo el ancho de la pantalla.
+
+    Se renderiza una sola copia: el script clona las que hagan falta para
+    llenar la pantalla. Sin JavaScript queda una franja deslizable normal, que
+    es exactamente lo que se necesita.
+  -->
+  <section id="tipos" class="bloque border-b border-line bg-white sin-imprimir">
+    <h2 class="sr-only">Ir a un tipo de muestra</h2>
+    <div class="carrusel" data-carrusel>
+      <ul class="pista" data-pista>
+        {
+          bloquesPreparacion.map((bloque) => (
+            <li>
+              <a
+                href={`#${bloque.id}`}
+                class="flex items-center gap-2.5 rounded-full border border-line-strong px-5 py-3.5 text-[15px] font-semibold whitespace-nowrap text-brand transition-colors hover:border-accent hover:bg-accent-soft"
+              >
+                <Icon name={bloque.icono} size={19} class="flex-none text-accent-dark" />
+                {bloque.titulo}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Bloques -->
+  <section class="bg-surface py-section">
+    <!--
+      `sin-reveal`: la animación de entrada aplica un `transform` al contenedor,
+      y un ancestro transformado altera el comportamiento de `position: sticky`
+      de los títulos. Además, en una página de instrucciones a la que se llega
+      con el frasco en la mano, el contenido debe estar legible de inmediato.
+    -->
+    <div class="container-page sin-reveal flex max-w-[860px] flex-col gap-10">
+      {
+        bloquesPreparacion.map((bloque) => (
+          <article
+            id={bloque.id}
+            class="bloque rounded-3xl border border-line bg-white p-6 lg:p-8"
+          >
+            {/*
+              Solo el icono y el título se quedan pegados. El resumen va debajo,
+              en flujo normal: dentro de la banda pegajosa ocupaba 187px en el
+              celular y se comía un tercio de la pantalla mientras se lee.
+            */}
+            <header class="cabecera-bloque">
+              <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-accent-soft text-accent-dark lg:h-12 lg:w-12 lg:rounded-2xl">
+                <Icon name={bloque.icono} size={22} />
+              </span>
+              {/* En el celular no cabe el tamaño completo sin partirse en dos
+                  líneas, y la banda pegajosa crecería de 85 a 108 píxeles. */}
+              <h2 class="text-[22px] leading-tight font-bold text-brand lg:text-h2">
+                {bloque.titulo}
+              </h2>
+            </header>
+
+            <p class="mt-5 text-[14.5px] leading-relaxed text-neutral">{bloque.resumen}</p>
+
+            {bloque.destacado && (
+              <p class="mt-6 flex items-start gap-3 rounded-2xl border border-accent/30 bg-accent-soft/50 px-4 py-3.5 text-[15px] leading-relaxed font-semibold text-brand">
+                <Icon name="alerta" size={19} class="mt-0.5 flex-none text-accent-dark" />
+                <span>
+                  {resaltar(bloque.destacado).map((tramo) =>
+                    tramo.fuerte ? <strong class="clave">{tramo.texto}</strong> : tramo.texto,
+                  )}
+                </span>
+              </p>
+            )}
+
+            <ol class="mt-6 flex flex-col gap-4">
+              {bloque.indicaciones.map((indicacion, i) => (
+                <li class="flex items-start gap-3.5">
+                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-brand text-[12px] font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <span class="text-[15px] leading-relaxed text-neutral">
+                    {resaltar(indicacion).map((tramo) =>
+                      tramo.fuerte ? <strong class="clave">{tramo.texto}</strong> : tramo.texto,
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ol>
+
+            {bloque.id === 'orina-24-horas' && (
+              <div class="mt-7 rounded-2xl border border-line bg-surface p-5">
+                <h3 class="text-[14px] font-bold tracking-[0.3px] text-brand uppercase">
+                  Ejemplo de un día de recolección
+                </h3>
+                <ol class="mt-4 flex flex-col gap-3.5">
+                  {ejemploOrina24.map((paso) => (
+                    <li class="grid grid-cols-1 gap-1 sm:grid-cols-[190px_1fr] sm:gap-4">
+                      <span class="text-[13px] font-bold text-accent-dark">{paso.hora}</span>
+                      <span class="text-[14.5px] leading-relaxed text-neutral">{paso.texto}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {bloque.imagen && hayImagen(bloque.imagen.src) && (
+              <figure class="mt-7">
+                <img
+                  src={bloque.imagen.src}
+                  alt={bloque.imagen.alt}
+                  width="1254"
+                  height="1254"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full max-w-[380px] rounded-2xl border border-line bg-white"
+                />
+                <figcaption class="mt-2.5 text-[13px] leading-relaxed text-neutral">
+                  {bloque.imagen.pie}
+                </figcaption>
+              </figure>
+            )}
+
+            {/*
+              Era un enlace de texto y se perdía al final de la lista. Es la
+              acción más útil de toda la sección de sangre: convierte el rango
+              de 8 a 12 horas en una hora concreta.
+            */}
+            {bloque.id === 'sangre' && (
+              <div class="mt-7 flex flex-col gap-3 rounded-2xl bg-accent-soft/40 p-5 sm:flex-row sm:items-center sm:justify-between sin-imprimir">
+                <p class="text-[14.5px] leading-relaxed text-neutral">
+                  <strong class="clave">¿A qué hora exacta debe dejar de comer?</strong>
+                  <br />
+                  Se lo calculamos según la hora de su cita.
+                </p>
+                <Button href="/soy-paciente#ayuno" icon="reloj" size="sm" class="flex-none">
+                  Calcular mi ayuno
+                </Button>
+              </div>
+            )}
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Nota final del laboratorio -->
+  <section class="bg-white py-section">
+    <div class="container-page max-w-[860px]">
+      <div class="rounded-3xl bg-brand p-7 lg:p-10">
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-accent-light">
+          <Icon name="telefono" size={23} />
+        </span>
+        <h2 class="mt-5 text-h3 font-bold text-white">¿Le queda alguna duda?</h2>
+        <p class="mt-3 max-w-[58ch] text-[15px] leading-relaxed text-white/75">
+          En caso de requerir mayor información sobre las condiciones clínicas para acudir al
+          laboratorio, comuníquese con nosotros. Es preferible preguntar antes que repetir la toma
+          de muestra.
+        </p>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Button href={`tel:${site.telefonoE164}`} variant="blanco" icon="telefono">
+            {site.telefono}
+          </Button>
+          <Button href={whatsappLink('paciente')} icon="whatsapp-marca">Escribir por WhatsApp</Button>
+        </div>
+      </div>
+
+      <!--
+        Muchas veces quien recoge la muestra no es quien vino al laboratorio:
+        la madre de un bebé, un familiar que ayuda. Reenviar las indicaciones
+        por WhatsApp evita que se transmitan de memoria.
+      -->
+      <div class="mt-8 flex flex-col gap-4 rounded-3xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sin-imprimir">
+        <div>
+          <h2 class="text-[17px] font-bold text-brand">¿Otra persona recoge la muestra?</h2>
+          <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+            Envíele estas indicaciones para que no se transmitan de memoria.
+          </p>
+        </div>
+        <Button href={compartirWhatsApp} variant="secondary" icon="whatsapp-marca" class="flex-none">
+          Compartir
+        </Button>
+      </div>
+
+      <p class="mt-8 text-[13px] leading-relaxed text-neutral">
+        Si su médico le entregó una indicación distinta a las de esta página, siga siempre la
+        indicación de su médico.
+      </p>
+    </div>
+  </section>
+
+  <!--
+    Atajo al índice. La página es larga y quien busca su tipo de muestra suele
+    equivocarse a la primera. Va abajo a la izquierda para no chocar con el
+    botón flotante de WhatsApp.
+  -->
+  <a href="#tipos" class="volver-indice sin-imprimir" data-volver hidden>
+    <Icon name="flecha" size={16} strokeWidth={2.4} class="-rotate-90" />
+    Índice
+  </a>
+</BaseLayout>
+
+<style>
+  /*
+    El carrusel es un contenedor con scroll real, no una pista con `transform`.
+    Así el deslizamiento táctil, la rueda del ratón y el teclado funcionan solos,
+    y la animación se limita a empujar `scrollLeft` un poco en cada fotograma.
+  */
+  .carrusel {
+    overflow: hidden;
+    /*
+      El relleno va aquí y no en la <section>: así toda la franja blanca
+      responde al arrastre, no solo la altura exacta de los botones.
+    */
+    padding-block: 1.875rem;
+    cursor: grab;
+    /*
+      Deja el desplazamiento vertical de la página al navegador y reserva el
+      horizontal para el arrastre. Sin esto, en el móvil el gesto lateral no
+      llega al script.
+    */
+    touch-action: pan-y;
+    /* Se difuminan los extremos para insinuar que la franja continúa. */
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 4rem,
+      #000 calc(100% - 4rem),
+      transparent
+    );
+  }
+
+  .carrusel[data-arrastrando='true'] {
+    cursor: grabbing;
+  }
+
+  /*
+    Separación al saltar a un ancla. Debe superar el alto de la cabecera, que
+    es pegajosa: 72px en móvil y 123px en escritorio, cuando aparece la barra
+    de utilidades. Con los 96px que había antes, el título del bloque quedaba
+    a cinco píxeles del borde de la cabecera.
+  */
+  .bloque {
+    scroll-margin-top: 5.5rem;
+  }
+
+  @media (min-width: 75rem) {
+    .bloque {
+      scroll-margin-top: 9rem;
+    }
+  }
+
+  /*
+    El título se queda pegado mientras se lee su sección, como en las listas de
+    contactos del teléfono. Con ocho secciones de instrucciones médicas, nadie
+    debería poder leer un punto sin saber a qué muestra pertenece.
+
+    Los márgenes negativos sangran la cabecera hasta el borde de la tarjeta: sin
+    eso, al pegarse dejaría ver el contenido pasando por los costados.
+  */
+  .cabecera-bloque {
+    position: sticky;
+    top: 4.5rem;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: -1.5rem -1.5rem 0;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-line);
+    border-radius: 1.5rem 1.5rem 0 0;
+    background: #fff;
+  }
+
+  @media (min-width: 64rem) {
+    .cabecera-bloque {
+      margin: -2rem -2rem 0;
+      padding: 1.5rem 2rem;
+    }
+  }
+
+  /* Encima de 75rem aparece la barra de utilidades y la cabecera crece. */
+  @media (min-width: 75rem) {
+    .cabecera-bloque {
+      top: 7.75rem;
+    }
+  }
+
+  /*
+    Quien llega por el QR aterriza directamente en una sección. El resalte le
+    confirma dónde cayó, en vez de dejarlo dudando si la página se movió.
+  */
+  /*
+    Solo las tarjetas se resaltan; la franja del índice únicamente se alinea.
+    Tres pulsos cortos en vez de un desvanecimiento largo: se lee como un
+    "aquí está" deliberado y no como algo que se apaga solo.
+  */
+  article.bloque:target {
+    animation: aterrizar 0.9s var(--ease-suave) 3;
+  }
+
+  @keyframes aterrizar {
+    0%,
+    45% {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 30%, transparent);
+    }
+    100% {
+      border-color: var(--color-line);
+      box-shadow: 0 0 0 3px transparent;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    article.bloque:target {
+      animation: none;
+      border-color: var(--color-accent);
+    }
+  }
+
+  /* Atajo al índice. A la izquierda: la derecha es del botón de WhatsApp. */
+  .volver-indice {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-line-strong);
+    background: #fff;
+    padding: 0.75rem 1.125rem;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--color-brand);
+    box-shadow: 0 10px 26px rgb(0 90 140 / 0.16);
+    transition:
+      opacity 0.25s var(--ease-suave),
+      transform 0.25s var(--ease-suave);
+  }
+
+  .volver-indice[hidden] {
+    display: none;
+  }
+
+  /* Aparece desvanecido y sube al entrar; el script quita `data-oculto`. */
+  .volver-indice[data-oculto='true'] {
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  .volver-indice:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent-dark);
+  }
+
+  /*
+    Resalte de lo que invalida la muestra si se pasa por alto. Se distingue del
+    texto corrido por peso y por color, no solo por peso: sobre gris medio, la
+    negrita sola apenas se nota en pantallas pequeñas.
+  */
+  .clave {
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  /* Membrete de impresión: invisible en pantalla. */
+  .solo-imprimir {
+    display: none;
+  }
+
+  .pista {
+    display: flex;
+    gap: 0.625rem;
+    width: max-content;
+    padding-inline: 1.5rem;
+  }
+
+  /*
+    Sin JavaScript o con animaciones desactivadas, la franja vuelve a ser una
+    fila deslizable normal: el contenido no puede quedar inaccesible.
+  */
+  .carrusel:not([data-iniciado='true']) {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .carrusel:not([data-iniciado='true'])::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carrusel {
+      overflow-x: auto;
+      mask-image: none;
+      touch-action: auto;
+      cursor: auto;
+    }
+  }
+
+  /*
+    El laboratorio imprime esta misma página como manual en papel: se ocultan
+    los elementos que solo sirven en pantalla y se pasa a tinta sobre blanco.
+  */
+  @media print {
+    :global(.sin-imprimir),
+    :global(.cabecera),
+    :global(footer),
+    :global(.wa-float),
+    :global(#banner-cookies) {
+      display: none !important;
+    }
+
+    article {
+      break-inside: avoid;
+      border-color: #ccc !important;
+    }
+
+    /* En papel no hay scroll: la cabecera vuelve a su sitio. */
+    .cabecera-bloque {
+      position: static;
+      border-color: #ccc;
+    }
+
+    .solo-imprimir {
+      display: block;
+      margin-bottom: 1rem;
+      font-size: 11pt;
+      line-height: 1.5;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Carrusel infinito de accesos directos.
+   *
+   * Se mueve con `transform: translate3d` sobre la pista.
+   *
+   * La primera versión empujaba el `scrollLeft` del contenedor para aprovechar
+   * el desplazamiento nativo, pero se veía a tirones: a 34 px/s toca avanzar
+   * 0,57 px por fotograma y el scroll se redondea a píxeles enteros, así que
+   * el movimiento salía a saltos de 1 px cada dos fotogramas. `transform`
+   * acepta fracciones y se compone en la GPU, así que va fluido.
+   *
+   * A cambio hay que implementar el arrastre a mano, que es lo que hace el
+   * bloque de eventos de puntero: cubre ratón y dedo con el mismo código.
+   *
+   * El bucle es real: se clona la lista hasta llenar la pantalla y el
+   * desplazamiento se envuelve con módulo sobre el ancho de una copia. El
+   * salto es invisible porque el contenido de ese punto es idéntico.
+   */
+
+  /** Píxeles por segundo. Lento a propósito: es un índice, no un anuncio. */
+  const VELOCIDAD = 34;
+  /** Tiempo sin tocar nada antes de retomar el movimiento. */
+  const ESPERA_TRAS_TOCAR = 1600;
+  /** Píxeles de margen antes de considerar que es un arrastre y no un clic. */
+  const UMBRAL_ARRASTRE = 5;
+
+  const initCarrusel = () => {
+    for (const carrusel of document.querySelectorAll<HTMLElement>('[data-carrusel]')) {
+      // `astro:page-load` corre también en la carga inicial.
+      if (carrusel.dataset.iniciado === 'true') continue;
+      carrusel.dataset.iniciado = 'true';
+
+      const pista = carrusel.querySelector<HTMLElement>('[data-pista]');
+      if (!pista) continue;
+
+      // Con movimiento reducido se queda como una franja deslizable normal.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+
+      const originales = [...pista.children] as HTMLElement[];
+      const anchoAproximado = pista.scrollWidth;
+      if (anchoAproximado === 0) continue;
+
+      let copias = 1;
+
+      /*
+        Hacen falta las copias que quepan en la pantalla más una: el
+        desplazamiento nunca pasa del ancho de una copia, así que con eso el
+        hueco del final jamás llega a verse.
+      */
+      const asegurarCopias = (medida: number) => {
+        const necesarias = Math.max(3, Math.ceil(carrusel.clientWidth / medida) + 2);
+        for (let i = copias; i < necesarias; i++) {
+          for (const original of originales) {
+            const clon = original.cloneNode(true) as HTMLElement;
+            // Los clones son decorativos: el lector de pantalla y el tabulador
+            // solo deben encontrar una vez cada enlace.
+            clon.setAttribute('aria-hidden', 'true');
+            for (const enlace of clon.querySelectorAll('a')) enlace.tabIndex = -1;
+            pista.appendChild(clon);
+          }
+        }
+        copias = Math.max(copias, necesarias);
+      };
+
+      /*
+        Distancia tras la cual el contenido se repite: la que hay entre el
+        primer elemento y su primer clon.
+
+        Se mide con `getBoundingClientRect`, que devuelve fracciones de píxel.
+        Con `offsetLeft`, que redondea a enteros, el periodo salía 1539 en unos
+        elementos y 1540 en otros, y ese píxel de diferencia se acumula hasta
+        convertirse en un tirón visible.
+      */
+      const medirPeriodo = () => {
+        const primero = pista.children[0] as HTMLElement | undefined;
+        const primerClon = pista.children[originales.length] as HTMLElement | undefined;
+        if (!primero || !primerClon) return 0;
+        return primerClon.getBoundingClientRect().left - primero.getBoundingClientRect().left;
+      };
+
+      asegurarCopias(anchoAproximado);
+      let periodo = medirPeriodo();
+      if (periodo <= 0) continue;
+
+      /** Cuánto se ha desplazado la pista. Siempre dentro de [0, periodo). */
+      let desplazamiento = 0;
+
+      const envolver = () => {
+        desplazamiento = ((desplazamiento % periodo) + periodo) % periodo;
+      };
+
+      const aplicar = () => {
+        pista.style.transform = `translate3d(${-desplazamiento}px, 0, 0)`;
+      };
+
+      aplicar();
+
+      /*
+        Las tipografías llegan después del primer dibujado y cambian el ancho de
+        cada botón: hay que volver a medir o el salto del bucle queda desfasado.
+        Lo mismo al girar el teléfono o cambiar el tamaño de la ventana.
+      */
+      const recalibrar = () => {
+        // Se mide sin desplazamiento para que el transform no falsee las cajas.
+        const previo = desplazamiento;
+        desplazamiento = 0;
+        aplicar();
+
+        const medida = medirPeriodo();
+        if (medida > 0) {
+          asegurarCopias(medida);
+          periodo = medirPeriodo() || medida;
+        }
+
+        desplazamiento = previo;
+        envolver();
+        aplicar();
+      };
+
+      document.fonts?.ready.then(recalibrar).catch(() => {});
+
+      let esperaResize: number | undefined;
+      window.addEventListener('resize', () => {
+        window.clearTimeout(esperaResize);
+        esperaResize = window.setTimeout(recalibrar, 200);
+      });
+
+      let pausado = false;
+      let temporizador: number | undefined;
+
+      /** Pausa mientras el usuario toca, y un rato después de soltar. */
+      const interactuar = () => {
+        pausado = true;
+        window.clearTimeout(temporizador);
+        temporizador = window.setTimeout(() => {
+          pausado = false;
+        }, ESPERA_TRAS_TOCAR);
+      };
+
+      carrusel.addEventListener('keydown', interactuar, { passive: true });
+      carrusel.addEventListener('focusin', interactuar);
+
+      /*
+        Desplazamiento lateral con el trackpad. Solo se atiende el eje
+        horizontal: el vertical debe seguir moviendo la página.
+      */
+      carrusel.addEventListener(
+        'wheel',
+        (evento) => {
+          if (Math.abs(evento.deltaX) <= Math.abs(evento.deltaY)) return;
+          evento.preventDefault();
+          desplazamiento += evento.deltaX;
+          envolver();
+          aplicar();
+          interactuar();
+        },
+        { passive: false },
+      );
+
+      /*
+        Al llegar con el tabulador a un enlace que quedó fuera de vista, el
+        navegador intenta desplazar el contenedor aunque tenga `overflow:
+        hidden`. Ese desplazamiento se traslada al transform y se devuelve el
+        contenedor a cero, para que no queden dos desplazamientos superpuestos.
+      */
+      carrusel.addEventListener('scroll', () => {
+        if (carrusel.scrollLeft === 0) return;
+        desplazamiento += carrusel.scrollLeft;
+        carrusel.scrollLeft = 0;
+        envolver();
+        aplicar();
+      });
+
+      // En pantallas con ratón se detiene al pasar por encima: acertarle a un
+      // botón en movimiento es incómodo.
+      if (window.matchMedia('(hover: hover)').matches) {
+        carrusel.addEventListener('pointerenter', () => {
+          pausado = true;
+        });
+        carrusel.addEventListener('pointerleave', () => {
+          pausado = false;
+        });
+      }
+
+      /*
+        Arrastre, con el mismo código para ratón y dedo. En el móvil el gesto
+        lateral llega hasta aquí gracias a `touch-action: pan-y`.
+      */
+      let arrastrando = false;
+      let movido = false;
+      let inicioX = 0;
+      let inicioDesplazamiento = 0;
+      let capturado = false;
+
+      carrusel.addEventListener('pointerdown', (evento) => {
+        if (evento.pointerType === 'mouse' && evento.button !== 0) return;
+        arrastrando = true;
+        movido = false;
+        capturado = false;
+        inicioX = evento.clientX;
+        inicioDesplazamiento = desplazamiento;
+        interactuar();
+      });
+
+      carrusel.addEventListener('pointermove', (evento) => {
+        if (!arrastrando) return;
+        const recorrido = evento.clientX - inicioX;
+
+        if (!movido) {
+          if (Math.abs(recorrido) <= UMBRAL_ARRASTRE) return;
+          movido = true;
+          carrusel.dataset.arrastrando = 'true';
+          /*
+            La captura se pide aquí y no en el `pointerdown`: mientras el
+            puntero está capturado el navegador dispara el clic sobre el
+            contenedor en vez de sobre el enlace, y los botones dejaban de
+            funcionar. Capturando solo cuando ya es un arrastre de verdad, el
+            clic simple llega intacto a su enlace.
+          */
+          try {
+            carrusel.setPointerCapture(evento.pointerId);
+            capturado = true;
+          } catch {
+            /* sin captura: el arrastre funciona mientras el cursor no salga */
+          }
+        }
+
+        desplazamiento = inicioDesplazamiento - recorrido;
+        envolver();
+        aplicar();
+      });
+
+      const soltar = (evento: PointerEvent) => {
+        if (!arrastrando) return;
+        arrastrando = false;
+        delete carrusel.dataset.arrastrando;
+        if (capturado && carrusel.hasPointerCapture(evento.pointerId)) {
+          carrusel.releasePointerCapture(evento.pointerId);
+        }
+        capturado = false;
+        interactuar();
+      };
+      carrusel.addEventListener('pointerup', soltar);
+      carrusel.addEventListener('pointercancel', soltar);
+
+      // Tras arrastrar, el navegador dispara un clic en el enlace que quedó
+      // bajo el cursor. Se anula para no saltar a una sección sin querer.
+      carrusel.addEventListener(
+        'click',
+        (evento) => {
+          if (!movido) return;
+          evento.preventDefault();
+          evento.stopPropagation();
+          movido = false;
+        },
+        true,
+      );
+
+      let anterior = performance.now();
+      const paso = (ahora: number) => {
+        // Se limita el delta para que al volver de otra pestaña no dé un salto.
+        const delta = Math.min((ahora - anterior) / 1000, 0.05);
+        anterior = ahora;
+
+        if (!pausado && !arrastrando) {
+          desplazamiento += VELOCIDAD * delta;
+          envolver();
+          aplicar();
+        }
+
+        requestAnimationFrame(paso);
+      };
+      requestAnimationFrame(paso);
+    }
+  };
+
+  initCarrusel();
+  document.addEventListener('astro:page-load', initCarrusel);
+
+  /**
+   * Atajo al índice.
+   *
+   * Nace con `hidden` en el HTML para que sin JavaScript no aparezca un botón
+   * que siempre estaría flotando. Se revela al pasar la franja de accesos
+   * directos, que es cuando deja de estar a la vista.
+   */
+  const initVolver = () => {
+    const boton = document.querySelector<HTMLElement>('[data-volver]');
+    const indice = document.getElementById('tipos');
+    if (!boton || !indice) return;
+    if (boton.dataset.iniciado === 'true') return;
+    boton.dataset.iniciado = 'true';
+
+    boton.hidden = false;
+    boton.dataset.oculto = 'true';
+
+    const observador = new IntersectionObserver(
+      ([entrada]) => {
+        if (!entrada) return;
+        // Visible solo cuando el índice ya quedó por encima de la pantalla.
+        const fuera = !entrada.isIntersecting && entrada.boundingClientRect.bottom <= 0;
+        if (fuera) delete boton.dataset.oculto;
+        else boton.dataset.oculto = 'true';
+      },
+      { threshold: 0 },
+    );
+
+    observador.observe(indice);
+  };
+
+  initVolver();
+  document.addEventListener('astro:page-load', initVolver);
+</script>

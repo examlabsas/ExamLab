@@ -8,7 +8,7 @@
 import Icon from './Icon.astro';
 import Button from './Button.astro';
 import ExamCard from './ExamCard.astro';
-import { interpretarAyuno, esRemision, type Examen } from '@/lib/examenes';
+import { interpretarAyuno, esRemision, bloqueDePreparacion, type Examen } from '@/lib/examenes';
 import { whatsappExamen } from '@/lib/whatsapp';
 import type { IconName } from '@/lib/iconos';
 
@@ -25,6 +25,8 @@ const { examen, relacionados, basePath, catalogoLabel, tecnico = false } = Astro
 const waHref = whatsappExamen(examen.nombre, examen.codigo);
 const ayuno = interpretarAyuno(examen);
 const remision = esRemision(examen);
+// Se deduce del tipo de muestra; no hay que etiquetar examen por examen.
+const preparacion = bloqueDePreparacion(examen);
 const ficha = examen.tecnico;
 
 const datosPrincipales: { icono: IconName; etiqueta: string; valor: string }[] = [
@@ -233,17 +235,30 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
         <p class="mt-5 text-[14.5px] leading-relaxed text-neutral">{examen.condicionesClinicas}</p>
 
         <div class="mt-6 border-t border-line pt-5">
-          {
-            ayuno.requiere && (
-              <a
-                href="/soy-paciente#ayuno"
-                class="flex items-center gap-2 text-[13px] font-semibold text-accent transition-colors hover:text-brand"
-              >
-                <Icon name="reloj" size={16} />
-                Calcule su hora exacta de ayuno
-              </a>
-            )
-          }
+          <div class="flex flex-col gap-3">
+            {
+              preparacion && (
+                <a
+                  href={`/preparacion#${preparacion.id}`}
+                  class="flex items-center gap-2 text-[13px] font-semibold text-accent transition-colors hover:text-brand"
+                >
+                  <Icon name={preparacion.icono} size={16} />
+                  Cómo prepararse: {preparacion.titulo.toLowerCase()}
+                </a>
+              )
+            }
+            {
+              ayuno.requiere && (
+                <a
+                  href="/soy-paciente#ayuno"
+                  class="flex items-center gap-2 text-[13px] font-semibold text-accent transition-colors hover:text-brand"
+                >
+                  <Icon name="reloj" size={16} />
+                  Calcule su hora exacta de ayuno
+                </a>
+              )
+            }
+          </div>
           <Button href={waHref} icon="whatsapp-marca" size="sm" full class="mt-4">
             Consultar por WhatsApp
           </Button>

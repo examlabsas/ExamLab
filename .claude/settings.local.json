@@ -18,7 +18,16 @@
       "Bash(node -e ' *)",
       "Bash(npx astro *)",
       "Bash(sed -i \"s|import { examenes, getRelacionados } from '@/lib/examenes';|import { examenes, getRelacionados, resumenCorto } from '@/lib/examenes';|\" \"src/pages/catalogo/[slug].astro\")",
-      "Bash(sed -i \"s|import { examenesLaboratorios, getRelacionados } from '@/lib/examenes';|import { examenesLaboratorios, getRelacionados, resumenCorto } from '@/lib/examenes';|\" \"src/pages/laboratorios-asociados/catalogo/[slug].astro\")"
+      "Bash(sed -i \"s|import { examenesLaboratorios, getRelacionados } from '@/lib/examenes';|import { examenesLaboratorios, getRelacionados, resumenCorto } from '@/lib/examenes';|\" \"src/pages/laboratorios-asociados/catalogo/[slug].astro\")",
+      "PowerShell(npx astro check 2>&1)",
+      "PowerShell(Get-ChildItem -Path src -Recurse -File | Where-Object { $_.Extension -in '.astro','.ts','.json' } | Sort-Object LastWriteTime | Select-Object LastWriteTime, @{n='Ruta';e={$_.FullName.Replace\\(\"$PWD\\\\\",\"\"\\)}} | Format-Table -AutoSize)",
+      "PowerShell(npm install --save-dev qrcode 2>&1)",
+      "PowerShell(npm ls qrcode 2>&1)",
+      "PowerShell(npm audit --omit=dev 2>&1)",
+      "PowerShell(npm audit fix 2>&1)",
+      "PowerShell(node scripts/generar-qr.mjs; Get-ChildItem public\\\\descargas | Select-Object Name, @{n='KB';e={[math]::Round\\($_.Length/1KB,1\\)}} | Format-Table -AutoSize)",
+      "PowerShell(git log --format='%h | autor: %an <%ae> | %s' -5; \"`n── remotos ──\"; \\(git remote -v\\) -join \"`n\"; if \\(-not \\(git remote\\)\\) { \"\\(ninguno\\)\" }; \"`n── rama ──\"; git branch --show-current; \"`n── .gitignore ──\"; if \\(Test-Path .gitignore\\) { Get-Content .gitignore } else { \"NO EXISTE\" })",
+      "PowerShell(Get-ChildItem public\\\\images | Select-Object Name, @{n='KB';e={[math]::Round\\($_.Length/1KB,1\\)}} | Format-Table -AutoSize; \"`n── sin seguimiento en git ──\"; git status --short)"
     ]
   }
 }

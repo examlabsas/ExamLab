@@ -1,5 +1,6 @@
 import datos from '@/data/examenes.json';
 import datosLaboratorios from '@/data/examenes-laboratorios.json';
+import { bloquesPreparacion, type BloquePreparacion } from '@/data/preparacion';
 
 /**
  * Estructura de un examen.
@@ -116,6 +117,30 @@ export function interpretarAyuno(examen: Examen): {
 
   return { requiere: true, horas, texto };
 }
+
+/**
+ * Bloque del manual de preparación que le corresponde a un examen, deducido de
+ * su TIPO DE MUESTRA. Igual que el ayuno, se interpreta en vez de etiquetarse:
+ * los 400 exámenes reales quedan enlazados sin trabajo manual.
+ *
+ * Devuelve `undefined` cuando la muestra no encaja en ningún bloque (por
+ * ejemplo un examen que se toma en el propio laboratorio).
+ */
+export function bloqueDePreparacion(examen: Examen): BloquePreparacion | undefined {
+  const muestra = normalizar(examen.tipoMuestra ?? '');
+  if (!muestra) return undefined;
+
+  // De más específico a más general: "orina de 24 horas" debe ganarle a "orina".
+  const ordenados = [...bloquesPreparacion].sort(
+    (a, b) => longitudMayor(b.coincidencias) - longitudMayor(a.coincidencias),
+  );
+
+  return ordenados.find((bloque) =>
+    bloque.coincidencias.some((clave) => muestra.includes(normalizar(clave))),
+  );
+}
+
+const longitudMayor = (claves: string[]) => Math.max(0, ...claves.map((c) => c.length));
 
 /** `true` cuando el examen se deriva a un laboratorio de referencia. */
 export function esRemision(examen: Examen): boolean {

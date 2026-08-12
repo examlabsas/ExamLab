@@ -6,6 +6,7 @@ import Button from '@/components/Button.astro';
 import ServiceCard from '@/components/ServiceCard.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
 import CalculadoraAyuno from '@/components/CalculadoraAyuno.astro';
+import { bloquesPreparacion } from '@/data/preparacion';
 import FranjaLogos from '@/components/FranjaLogos.astro';
 import convenios from '@/data/convenios.json';
 import { examenes } from '@/lib/examenes';
@@ -223,8 +224,9 @@ const schema = [
         eyebrow="Preparación"
         titulo="Calcule su hora de ayuno"
         descripcion="La duda más frecuente del laboratorio, resuelta con una hora exacta en vez de un rango."
+        centrado
       />
-      <div class="mt-9 max-w-[720px]">
+      <div class="mx-auto mt-9 max-w-[720px]">
         <CalculadoraAyuno examenes={examenes} />
       </div>
     </div>
@@ -236,25 +238,33 @@ const schema = [
       <div>
         <SectionHeading
           eyebrow="Guía para pacientes"
-          titulo="Recomendaciones que evitan repetir la toma"
+          titulo="Prepararse bien evita repetir la toma"
         />
-        <ul class="mt-7 flex flex-col gap-4">
+        <p class="mt-5 max-w-[54ch] text-base leading-relaxed text-neutral">
+          Cada tipo de muestra tiene sus propias indicaciones. Busque la suya en el manual de
+          preparación: ahí están las instrucciones oficiales del laboratorio, tal como se las
+          entregamos en recepción.
+        </p>
+
+        <ul class="mt-7 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           {
-            [
-              'Respete las horas de ayuno indicadas para su examen.',
-              'Tome agua: la hidratación facilita la punción venosa.',
-              'Evite ejercicio intenso y alcohol el día previo.',
-              'Si suele marearse con las agujas, avísele al personal antes de sentarse.',
-              'Para muestras de orina, solicite el frasco estéril con anticipación.',
-              'Llegue con 10 minutos de anticipación si tiene cita agendada.',
-            ].map((item) => (
-              <li class="flex items-start gap-3 rounded-2xl bg-surface p-4 text-[14.5px] leading-relaxed text-neutral">
-                <Icon name="check" size={19} strokeWidth={2.2} class="mt-0.5 text-accent" />
-                {item}
+            bloquesPreparacion.map((bloque) => (
+              <li>
+                <a
+                  href={`/preparacion#${bloque.id}`}
+                  class="flex items-center gap-3 rounded-2xl border border-line bg-white px-4 py-3.5 text-[14px] font-semibold text-brand transition-colors hover:border-accent hover:bg-accent-soft/40"
+                >
+                  <Icon name={bloque.icono} size={19} class="flex-none text-accent-dark" />
+                  {bloque.titulo}
+                </a>
               </li>
             ))
           }
         </ul>
+
+        <Button href="/preparacion" class="mt-7" iconoFinal="flecha">
+          Ver el manual completo
+        </Button>
       </div>
 
       <div class="lg:pt-16">

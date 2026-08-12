@@ -54,6 +54,7 @@ export const iconos = {
   adn: '<path d="M7.5 3c0 5 9 6 9 9s-9 4-9 9"/><path d="M16.5 3c0 5-9 6-9 9s9 4 9 9"/><path d="M9.2 6h5.6M8 9.6h8M8 14.4h8M9.2 18h5.6"/>',
   'codigo-barras': '<path d="M4 5v14M7.2 5v14M10.4 5v9.5M13.6 5v14M16.8 5v9.5M20 5v14"/>',
   prohibido: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
+  bebe: '<circle cx="12" cy="7.2" r="4.2"/><path d="M10.2 6.6h.01M13.8 6.6h.01"/><path d="M10.4 9a2.4 2.4 0 0 0 3.2 0"/><path d="M6 20.5v-1.8a6 6 0 0 1 12 0v1.8"/>',
 
   /** Glifo oficial de la marca WhatsApp (relleno, no trazo). */
   'whatsapp-marca':

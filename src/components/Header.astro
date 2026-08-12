@@ -77,6 +77,28 @@ const esActivo = (href: string) => {
                 class="submenu-panel invisible absolute top-full left-1/2 z-10 w-[320px] -translate-x-1/2 pt-3 opacity-0 transition-all duration-150"
               >
                 <ul class="overflow-hidden rounded-xl border border-line bg-white p-2 shadow-lg">
+                  {/*
+                    El título del apartado es un <button> que solo despliega la
+                    lista, así que su propia página quedaría inalcanzable. Se
+                    añade aquí como primera entrada.
+                  */}
+                  <li class="mb-1 border-b border-line pb-1">
+                    <a
+                      href={item.href}
+                      aria-current={ruta === item.href ? 'page' : undefined}
+                      class="block rounded-lg px-4 py-2.5 transition-colors hover:bg-brand-soft/50"
+                    >
+                      <span class="flex items-center gap-1.5 text-sm font-bold text-brand">
+                        Ver {item.label}
+                        <Icon name="flecha" size={13} strokeWidth={2.4} class="text-accent" />
+                      </span>
+                      {item.descripcion && (
+                        <span class="mt-0.5 block text-xs leading-snug text-neutral">
+                          {item.descripcion}
+                        </span>
+                      )}
+                    </a>
+                  </li>
                   {item.hijos!.map((hijo) => (
                     <li>
                       <a
@@ -166,6 +188,17 @@ const esActivo = (href: string) => {
                 />
               </summary>
               <ul class="pb-2">
+                {/* Mismo motivo que en escritorio: el <summary> no navega. */}
+                <li>
+                  <a
+                    href={item.href}
+                    aria-current={ruta === item.href ? 'page' : undefined}
+                    class="flex items-center gap-1.5 py-2.5 pl-3 text-[15px] font-semibold text-brand transition-colors hover:text-accent"
+                  >
+                    Ver {item.label}
+                    <Icon name="flecha" size={14} strokeWidth={2.4} class="text-accent" />
+                  </a>
+                </li>
                 {item.hijos!.map((hijo) => (
                   <li>
                     <a

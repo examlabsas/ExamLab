@@ -5,25 +5,45 @@
  * subtipo adicional), declarado en todas las páginas desde BaseLayout.
  * Las páginas de detalle añaden su propio bloque (MedicalTest, Article…).
  */
-import { site, sedes, mapaEnlace, type Sede } from './site';
+import { site, sedes, mapaEnlace, type Sede, type HorarioSemanal } from './site';
 import type { Examen } from './examenes';
 
 const abs = (ruta: string) => new URL(ruta, site.url).toString();
 
-const horarioBase = [
-  {
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-    opens: '06:30',
-    closes: '19:00',
-  },
-  {
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Saturday'],
-    opens: '07:00',
-    closes: '13:00',
-  },
+/** Nombres de día que espera Schema.org. Índice 0 = domingo, igual que JS. */
+const DIAS_SCHEMA = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
 ];
+
+/**
+ * Traduce el horario de una sede al formato de Schema.org, agrupando los días
+ * que comparten franja.
+ *
+ * Antes estaba escrito a mano aquí, duplicando lo que ya vivía en site.ts. Al
+ * corregir los horarios reales, la ficha de Google habría seguido anunciando
+ * los antiguos: el laboratorio abierto según la página y cerrado según Google,
+ * o al revés.
+ */
+function horarioSchema(semana: HorarioSemanal) {
+  const porFranja = new Map<string, string[]>();
+
+  semana.forEach((franja, dia) => {
+    if (!franja) return; // día cerrado: Schema.org simplemente no lo lista
+    const clave = `${franja.abre}|${franja.cierra}`;
+    porFranja.set(clave, [...(porFranja.get(clave) ?? []), DIAS_SCHEMA[dia]!]);
+  });
+
+  return [...porFranja].map(([clave, dias]) => {
+    const [opens, closes] = clave.split('|');
+    return { '@type': 'OpeningHoursSpecification', dayOfWeek: dias, opens, closes };
+  });
+}
 
 function sucursal(sede: Sede) {
   return {
@@ -44,7 +64,7 @@ function sucursal(sede: Sede) {
       longitude: sede.geo.lng,
     },
     telephone: sede.telefonoE164,
-    openingHoursSpecification: horarioBase,
+    openingHoursSpecification: horarioSchema(sede.horarioSemanal),
     hasMap: mapaEnlace(sede),
   };
 }
@@ -84,7 +104,7 @@ export function medicalBusinessSchema() {
       longitude: matriz.geo.lng,
     },
     hasMap: mapaEnlace(matriz),
-    openingHoursSpecification: horarioBase,
+    openingHoursSpecification: horarioSchema(matriz.horarioSemanal),
     areaServed: [
       { '@type': 'City', name: 'Ambato' },
       { '@type': 'City', name: 'Pelileo' },
