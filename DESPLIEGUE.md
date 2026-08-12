@@ -62,90 +62,166 @@ Saliente   mail.korreoweb.com   SMTP 587 TLS
 npm run build
 ```
 
-Genera `dist/`. En el panel de Cloudflare, arrastrar **la carpeta `dist`** (no
-la del proyecto) a *Ship something new*. Nombre del proyecto: `examlabsas`.
+Genera `dist/`. El despliegue se hace por repositorio: cada `git push` a `main`
+compila y publica solo.
 
-`examlab` no sirve: ese subdominio de `pages.dev` pertenece a un tercero.
+Configuración del proyecto en Cloudflare:
+
+| Campo | Valor |
+|---|---|
+| Project name | `examlabsas` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| `NODE_VERSION` (variable) | `22.12.0` |
+
+`examlab` no sirve como nombre: ese subdominio pertenece a un tercero.
 
 ---
 
 ## 3. Conectar el dominio
 
-1. Verificar que el sitio funciona en `examlabsas.pages.dev`
-2. Pages → **Custom domains** → agregar `examlabsas.com` y `www.examlabsas.com`
-3. En CW, cambiar **solo el registro A** por lo que indique Cloudflare
-4. Esperar la propagación
-5. **Enviar un correo de prueba a `administracion@examlabsas.com` y confirmar
+> **La zona DNS tiene que estar en la MISMA cuenta de Cloudflare que el
+> proyecto.** Los Workers solo aceptan dominios propios de su cuenta, así que
+> el cambio de nameservers no es opcional. Por eso conviene hacerlo
+> directamente en la cuenta del laboratorio y no en una personal: mover una
+> zona entre cuentas obliga a repetir todo el procedimiento.
+
+> Un dominio **no puede estar en dos cuentas a la vez**. Si quedó agregado en
+> otra cuenta, quitarlo primero: *Overview → Advanced Actions → Remove Site*.
+> Mientras no se hayan apuntado los nameservers, borrarlo no tiene efecto.
+
+### 3.1 Agregar el dominio
+
+*Domains → Overview → Add domain → **Connect a domain*** → `examlabsas.com` →
+plan **Free**.
+
+En la pantalla previa, dejar **Search: Allow** — son los rastreadores de Google
+y bloquearlos tumbaría el SEO local. Apagar *«Block training in robots.txt»*:
+el sitio ya sirve su propio `robots.txt` desde el repositorio y no conviene que
+dos sitios distintos editen el mismo archivo.
+
+### 3.2 Revisar lo que importó el escaneo
+
+**Comprobado en un ensayo del 11 de agosto de 2026:**
+
+✅ **Los tres registros de correo se importan bien** — MX, SPF y la
+verificación de Google. Era la preocupación principal y está resuelta.
+
+❌ **Los registros A y AAAA se importan mal.** El escaneo consulta el DNS
+público, y como el dominio ya está tras el proxy de Cloudflare, lo que
+encuentra son **las IP del propio Cloudflare**, no las del servidor real:
+
+```
+A     examlabsas.com   104.21.21.169     ← Cloudflare, no el origen
+A     examlabsas.com   172.67.199.163    ← Cloudflare, no el origen
+A     www              104.21.21.169
+A     www              172.67.199.163
+AAAA  (cuatro más, 2606:4700:303…)
+```
+
+Activar así deja el dominio apuntándose a sí mismo (error 1000 de Cloudflare).
+Además, el `CNAME www` original se pierde: el escaneo lo ve ya resuelto a IP.
+
+**Qué hacer:** borrar los ocho registros A y AAAA, y dejar solo un registro A
+del dominio raíz apuntando al origen real `18.159.234.214`. Así el sitio
+antiguo sigue en pie durante el cambio de nameservers y no hay ventana de
+caída. En el paso 3.5 se reemplaza por el sitio nuevo.
+
+### 3.3 Cambiar los nameservers
+
+Anotar el par que asigne Cloudflare —serán distintos de `matteo` y `virginia`,
+cada cuenta tiene los suyos— y ponerlos en CW → Domains → Manage → **Update
+nameservers**.
+
+**Este es el punto de cambio real.** Todo lo anterior es preparación y no
+afecta a nada.
+
+### 3.4 Esperar
+
+Cloudflare marca el dominio como **Active**. Normalmente entre 10 minutos y 2
+horas; el plazo formal es de hasta 24.
+
+### 3.5 Conectar el sitio
+
+Worker `examlabsas` → **Domains & Routes → Add → Custom domain** →
+`examlabsas.com`. Repetir con `www.examlabsas.com`. Cloudflare ajusta el
+registro y emite el certificado.
+
+### 3.6 Verificar
+
+1. `https://examlabsas.com` y `https://www.examlabsas.com` cargan con candado
+2. `https://examlabsas.com/preparacion` abre el manual
+3. **Enviar un correo de prueba a `administracion@examlabsas.com` y confirmar
    que llega.** Este paso no se omite.
 
-Si el dominio sin `www` no valida: la zona está en una cuenta de Cloudflare
-distinta a la del sitio, y esa combinación a veces falla. Plan B en la sección 5.
+### Marcha atrás
+
+Poner en CW los nameservers originales:
+
+```
+matteo.ns.cloudflare.com
+virginia.ns.cloudflare.com
+```
+
+Todo vuelve al estado actual, correo incluido.
 
 ---
 
 ## 4. Traspaso a la cuenta del laboratorio
 
-El sitio se publica primero en la cuenta personal del desarrollador. El traspaso
-posterior cuesta ~10 minutos **siempre que la zona DNS siga en Netlife**.
+El proyecto del sitio se mueve en unos 10 minutos: se crea en la otra cuenta,
+se conecta el mismo repositorio y se traslada el dominio propio. La zona DNS es
+lo caro de mover, así que **debe crearse ya en la cuenta definitiva**.
 
 1. Crear el buzón `sistemas@examlabsas.com` en CW → Mail → Add user
-2. Abrir una cuenta de Cloudflare con ese correo
-3. Crear ahí el proyecto de Pages y subir `dist`
-4. Comprobar que responde en su dirección `pages.dev`
-5. Quitar el dominio propio del proyecto viejo y agregarlo al nuevo
-6. Ajustar el registro A en CW si Cloudflare indica otro valor
-7. Verificar el sitio y **repetir la prueba de correo**
-8. Recién entonces, borrar el proyecto viejo
+2. Abrir la cuenta de Cloudflare con ese correo
+3. Conectar el repositorio y comprobar que responde en su dirección de pruebas
+4. Quitar el dominio propio del proyecto viejo y agregarlo al nuevo
+5. Verificar el sitio y **repetir la prueba de correo**
+6. Recién entonces, borrar el proyecto viejo
 
-El paso 5 implica unos minutos de caída: dos proyectos no pueden reclamar el
+El paso 4 implica unos minutos de caída: dos proyectos no pueden reclamar el
 mismo dominio a la vez. Hacerlo fuera del horario de atención.
 
 ---
 
-## 5. Plan B: mover los nameservers
-
-Solo si el paso 3 no valida. Deja toda la administración en un único panel, pero
-**la zona pasa a la cuenta de Cloudflare que la agregue**, y moverla después
-entre cuentas es engorroso. Hacerlo directamente en la cuenta del laboratorio.
-
-1. Agregar `examlabsas.com` en la cuenta de Cloudflare del laboratorio
-2. Cloudflare escanea la zona: **comparar registro por registro** contra la
-   tabla de la sección 1
-3. Anotar el par de nameservers que asigne Cloudflare
-4. CW → Domains → Manage → **Update nameservers**
-5. Verificar sitio y correo
-
----
-
-## 6. Códigos QR
+## 5. Códigos QR
 
 Generados por `scripts/generar-qr.mjs`, sin depender de ningún servicio externo
-que pudiera desaparecer.
+que pudiera desaparecer. Nivel de corrección H: se lee con hasta un 30 % del
+código dañado, que es lo adecuado para algo que se pega en frascos.
 
 ```bash
-npm run qr                                          # definitivo
-npm run qr https://examlabsas.pages.dev/preparacion # pruebas
+npm run qr                                                          # definitivo
+npm run qr https://examlabsas.juanp155441.workers.dev/preparacion   # pruebas
 ```
 
 | Archivo | Destino | Uso |
 |---|---|---|
 | `public/descargas/qr-preparacion.*` | `examlabsas.com/preparacion` | **Imprenta** |
-| `public/descargas/qr-preparacion-pruebas.*` | dirección `pages.dev` | Revisión |
+| `public/descargas/qr-preparacion-pruebas.*` | dirección de despliegue actual | Revisión |
 
 Cualquier dirección distinta a la definitiva genera archivos marcados como
 pruebas, para que un QR provisional no acabe impreso por confusión.
 
-> **No enviar a imprenta hasta haber completado el paso 5 de la sección 3.**
-> Un QR impreso no se corrige.
+> **No enviar a imprenta hasta haber completado el paso 3.6.** Un QR impreso no
+> se corrige.
+
+Pendiente de decidir: versión con el logo al centro para afiches (el nivel H lo
+permite), margen de 4 módulos en vez de 2 para impresión, y el hábito de
+imprimir la dirección en texto debajo del código.
 
 ---
 
-## 7. Pendientes
+## 6. Pendientes
 
 **Antes de publicar**
 
-- [ ] Borrar la página `/prueba-framer`
+- [x] ~~Borrar la página `/prueba-framer`~~ — hecho
 - [ ] `REPETIR = false` en `BaseLayout.astro` y en `Cifras.astro`
+- [ ] Valorar quitar la integración de React de `astro.config.mjs`: sin la
+      página de pruebas ya no hay ningún componente que la use, y sigue
+      emitiendo un archivo de 187 KB que ninguna página carga
 - [ ] Validar los códigos LOINC de `examenes-laboratorios.json`
 - [ ] Revisión legal de `/privacidad`, `/terminos` y `/cookies`
 - [ ] Respaldo del código fuera del equipo de desarrollo

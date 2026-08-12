@@ -27,7 +27,13 @@
       "PowerShell(npm audit fix 2>&1)",
       "PowerShell(node scripts/generar-qr.mjs; Get-ChildItem public\\\\descargas | Select-Object Name, @{n='KB';e={[math]::Round\\($_.Length/1KB,1\\)}} | Format-Table -AutoSize)",
       "PowerShell(git log --format='%h | autor: %an <%ae> | %s' -5; \"`n── remotos ──\"; \\(git remote -v\\) -join \"`n\"; if \\(-not \\(git remote\\)\\) { \"\\(ninguno\\)\" }; \"`n── rama ──\"; git branch --show-current; \"`n── .gitignore ──\"; if \\(Test-Path .gitignore\\) { Get-Content .gitignore } else { \"NO EXISTE\" })",
-      "PowerShell(Get-ChildItem public\\\\images | Select-Object Name, @{n='KB';e={[math]::Round\\($_.Length/1KB,1\\)}} | Format-Table -AutoSize; \"`n── sin seguimiento en git ──\"; git status --short)"
+      "PowerShell(Get-ChildItem public\\\\images | Select-Object Name, @{n='KB';e={[math]::Round\\($_.Length/1KB,1\\)}} | Format-Table -AutoSize; \"`n── sin seguimiento en git ──\"; git status --short)",
+      "PowerShell(node -e \"const sharp=require\\('sharp'\\);sharp\\('public/images/logo.png'\\).metadata\\(\\).then\\(m=>console.log\\(JSON.stringify\\({ancho:m.width,alto:m.height,canales:m.channels,alfa:m.hasAlpha,formato:m.format},null,2\\)\\)\\)\")",
+      "PowerShell(npm install --save-dev jsqr 2>&1)",
+      "PowerShell(npm ls jsqr sharp 2>&1)",
+      "PowerShell(node scripts/generar-qr.mjs https://examlabsas.edwin1969silva.workers.dev/preparacion)",
+      "PowerShell(\"�� Remoto ��\")",
+      "PowerShell(\"`n�� Rama y ultimo commit local ��\")"
     ]
   }
 }
