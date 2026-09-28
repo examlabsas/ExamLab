@@ -40,9 +40,9 @@ const esWhatsApp = !!ctaHref?.startsWith('https://wa.me');
       eyebrow && (
         <span
           class:list={[
-            'inline-flex items-center gap-2 rounded-lg px-3 py-1 text-xs font-semibold tracking-wide',
+            'inline-flex items-center gap-2 rounded-md px-3 py-1 text-xs font-semibold tracking-wide',
             oscuro 
-              ? 'bg-white/10 text-accent-light border border-white/15' 
+              ? 'bg-brand-dark text-accent-light border border-white/15' 
               : 'bg-brand-soft/60 text-brand border border-brand/10',
           ]}
         >
@@ -78,7 +78,7 @@ const esWhatsApp = !!ctaHref?.startsWith('https://wa.me');
       <a
         href={ctaHref}
         class:list={[
-          'inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-200 shadow-sm',
+          'inline-flex items-center gap-2 rounded-lg border px-5 py-3 text-sm font-semibold transition-colors duration-200',
           oscuro
             ? 'border-white/30 bg-white/10 text-white hover:border-white hover:bg-white hover:text-brand'
             : 'border-line-strong bg-white text-brand hover:border-brand hover:bg-brand-soft/40',
@@ -89,7 +89,7 @@ const esWhatsApp = !!ctaHref?.startsWith('https://wa.me');
           esWhatsApp ? (
             <Icon name="whatsapp-marca" size={15} class="text-whatsapp" />
           ) : (
-            <Icon name="flecha" size={15} strokeWidth={2.4} class="text-accent" />
+            <Icon name="flecha" size={15} strokeWidth={2.4} class="text-accent-dark" />
           )
         }
       </a>

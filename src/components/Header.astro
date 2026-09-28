@@ -10,6 +10,11 @@ const esActivo = (href: string) => {
   const base = href.split('#')[0]!.replace(/\/+$/, '') || '/';
   return base === '/' ? ruta === '/' : ruta === base || ruta.startsWith(`${base}/`);
 };
+
+// Texto que se ve sin JavaScript. Sale del mismo horario que usa el indicador
+// de apertura, así no puede quedar desactualizado cuando cambie el de la matriz.
+const matriz = sedes[0]!;
+const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.horas}`;
 ---
 
 <header
@@ -17,24 +22,24 @@ const esActivo = (href: string) => {
   class="cabecera sticky top-0 z-50 bg-white shadow-[0_1px_0_var(--color-line)]"
 >
   <!-- Barra de utilidades (solo escritorio) -->
-  <div class="hidden bg-brand text-[12.5px] font-medium text-white/80 menu:block">
+  <div class="hidden bg-brand text-xs font-medium text-white/80 menu:block">
     <div class="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5">
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
         <a
           href={`tel:${site.telefonoE164}`}
           class="flex items-center gap-2 text-white/80 transition-colors hover:text-white"
         >
-          <Icon name="telefono" size={13} class="text-accent" />
+          <Icon name="telefono" size={13} class="text-accent-light" />
           {site.telefono}
         </a>
         <span class="flex items-center gap-2">
-          <Icon name="reloj" size={13} class="text-accent" />
-          <EstadoApertura horario={sedes[0]!.horarioSemanal} respaldo={site.horarioResumen} oscuro />
+          <Icon name="reloj" size={13} class="text-accent-light" />
+          <EstadoApertura horario={matriz.horarioSemanal} respaldo={horarioResumen} oscuro />
         </span>
       </div>
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
         <a href="/sedes" class="flex items-center gap-2 text-white/80 transition-colors hover:text-white">
-          <Icon name="pin" size={13} class="text-accent" />
+          <Icon name="pin" size={13} class="text-accent-light" />
           Ambato y Pelileo
         </a>
         <a
@@ -50,7 +55,7 @@ const esActivo = (href: string) => {
   <!-- Barra principal -->
   <div class="barra-principal container-page flex items-center gap-2.5 py-3.5 menu:gap-5">
     <a href="/" class="flex-none" aria-label={`${site.nombre} · inicio`}>
-      <Logo box={54} bajada={false} />
+      <Logo box={54} bajada={false} soloEmblemaEnMovil />
     </a>
 
     <div class="flex-1"></div>
@@ -64,19 +69,19 @@ const esActivo = (href: string) => {
               <button
                 type="button"
                 class:list={[
-                  'flex items-center gap-1.5 py-2 text-sm transition-colors hover:text-accent',
+                  'flex items-center gap-1.5 py-2 text-sm transition-colors hover:text-accent-dark',
                   esActivo(item.href) ? 'font-semibold text-brand' : 'font-medium text-black',
                 ]}
                 aria-expanded="false"
                 aria-haspopup="true"
               >
                 {item.label}
-                <Icon name="flecha" size={13} strokeWidth={2.4} class="submenu-icono rotate-90 text-accent transition-transform duration-200" />
+                <Icon name="flecha" size={13} strokeWidth={2.4} class="submenu-icono rotate-90 text-accent-dark transition-transform duration-200" />
               </button>
               <div
-                class="submenu-panel invisible absolute top-full left-1/2 z-10 w-[320px] -translate-x-1/2 pt-3 opacity-0 transition-all duration-150"
+                class="submenu-panel invisible absolute top-full left-1/2 z-10 w-[320px] -translate-x-1/2 pt-3 opacity-0 transition-colors duration-150"
               >
-                <ul class="overflow-hidden rounded-xl border border-line bg-white p-2 shadow-lg">
+                <ul class="overflow-hidden rounded-lg border border-line bg-white p-2 shadow-lg">
                   {/*
                     El título del apartado es un <button> que solo despliega la
                     lista, así que su propia página quedaría inalcanzable. Se
@@ -86,11 +91,11 @@ const esActivo = (href: string) => {
                     <a
                       href={item.href}
                       aria-current={ruta === item.href ? 'page' : undefined}
-                      class="block rounded-lg px-4 py-2.5 transition-colors hover:bg-brand-soft/50"
+                      class="block rounded-md px-4 py-2.5 transition-colors hover:bg-brand-soft/50"
                     >
                       <span class="flex items-center gap-1.5 text-sm font-bold text-brand">
                         Ver {item.label}
-                        <Icon name="flecha" size={13} strokeWidth={2.4} class="text-accent" />
+                        <Icon name="flecha" size={13} strokeWidth={2.4} class="text-accent-dark" />
                       </span>
                       {item.descripcion && (
                         <span class="mt-0.5 block text-xs leading-snug text-neutral">
@@ -103,7 +108,7 @@ const esActivo = (href: string) => {
                     <li>
                       <a
                         href={hijo.href}
-                        class="block rounded-lg px-4 py-2.5 transition-colors hover:bg-brand-soft/50"
+                        class="block rounded-md px-4 py-2.5 transition-colors hover:bg-brand-soft/50"
                       >
                         <span class="block text-sm font-bold text-brand">{hijo.label}</span>
                         {hijo.descripcion && (
@@ -122,7 +127,7 @@ const esActivo = (href: string) => {
               href={item.href}
               aria-current={esActivo(item.href) ? 'page' : undefined}
               class:list={[
-                'py-2 text-sm transition-colors hover:text-accent',
+                'py-2 text-sm transition-colors hover:text-accent-dark',
                 esActivo(item.href) ? 'font-semibold text-brand' : 'font-medium text-black',
               ]}
             >
@@ -131,11 +136,13 @@ const esActivo = (href: string) => {
           ),
         )
       }
+      {/* El acceso más usado del sitio: va más grande que el resto del menú y
+          con un brillo que recorre el botón al pasar el cursor. */}
       <a
         href="/soy-paciente/resultados"
-        class="ml-2 flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-accent-dark"
+        class="boton-resultados ml-3 flex min-h-12 items-center gap-2.5 rounded-xl bg-accent-dark px-6 py-3 text-base font-bold text-white shadow-[0_6px_18px_rgb(0_126_153/0.35)] transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:bg-accent-deep hover:shadow-[0_10px_24px_rgb(0_126_153/0.45)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
       >
-        <Icon name="documento" size={16} />
+        <Icon name="documento" size={19} />
         Resultados
       </a>
     </nav>
@@ -144,10 +151,10 @@ const esActivo = (href: string) => {
     <div class="flex items-center gap-2.5 menu:hidden">
       <a
         href="/soy-paciente/resultados"
-        class="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[13px] font-bold text-white"
+        class="boton-resultados flex min-h-11 items-center gap-2 rounded-xl bg-accent-dark px-4 py-2.5 text-sm font-bold text-white shadow-[0_6px_18px_rgb(0_126_153/0.35)]"
       >
-        <Icon name="documento" size={15} />
-        <span class="hidden sm:inline">Resultados</span>
+        <Icon name="documento" size={17} />
+        Resultados
       </a>
       <button
         type="button"
@@ -155,7 +162,7 @@ const esActivo = (href: string) => {
         aria-label="Abrir menú"
         aria-expanded="false"
         aria-controls="menu-movil"
-        class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-line-strong bg-white text-brand"
+        class="flex h-11 w-11 flex-none items-center justify-center rounded-xl border border-line-strong bg-white text-brand"
       >
         <Icon name="menu" size={20} strokeWidth={2.2} />
       </button>
@@ -184,7 +191,7 @@ const esActivo = (href: string) => {
                 <Icon
                   name="mas"
                   size={18}
-                  class="text-accent transition-transform duration-200 group-open:rotate-45"
+                  class="text-accent-dark transition-transform duration-200 group-open:rotate-45"
                 />
               </summary>
               <ul class="pb-2">
@@ -193,17 +200,17 @@ const esActivo = (href: string) => {
                   <a
                     href={item.href}
                     aria-current={ruta === item.href ? 'page' : undefined}
-                    class="flex items-center gap-1.5 py-2.5 pl-3 text-[15px] font-semibold text-brand transition-colors hover:text-accent"
+                    class="flex items-center gap-1.5 py-2.5 pl-3 text-base font-semibold text-brand transition-colors hover:text-accent-dark"
                   >
                     Ver {item.label}
-                    <Icon name="flecha" size={14} strokeWidth={2.4} class="text-accent" />
+                    <Icon name="flecha" size={14} strokeWidth={2.4} class="text-accent-dark" />
                   </a>
                 </li>
                 {item.hijos!.map((hijo) => (
                   <li>
                     <a
                       href={hijo.href}
-                      class="block py-2.5 pl-3 text-[15px] font-medium text-neutral transition-colors hover:text-accent"
+                      class="block py-2.5 pl-3 text-base font-medium text-neutral transition-colors hover:text-accent-dark"
                     >
                       {hijo.label}
                     </a>
@@ -230,7 +237,7 @@ const esActivo = (href: string) => {
         href={whatsappLink('cita')}
         target="_blank"
         rel="noopener"
-        class="mt-4 flex items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-4 text-center text-[15px] font-bold text-white"
+        class="mt-4 flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-4 text-center text-base font-bold text-white"
       >
         <Icon name="whatsapp-marca" size={17} />
         Agendar cita por WhatsApp
@@ -240,6 +247,38 @@ const esActivo = (href: string) => {
 </header>
 
 <style>
+  /*
+    Brillo que cruza el botón de resultados al pasar el cursor. Es un
+    pseudoelemento con degradado que se desplaza de izquierda a derecha; sin
+    cursor (móvil) no pasa nada y el botón sigue siendo un botón.
+  */
+  .boton-resultados {
+    position: relative;
+    overflow: hidden;
+  }
+  .boton-resultados::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.28) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+  }
+  .boton-resultados:hover::after {
+    transform: translateX(100%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .boton-resultados::after {
+      display: none;
+    }
+  }
+
   /* La apertura la controla el script: solo un submenú abierto a la vez. */
   .submenu[data-abierto='true'] .submenu-panel {
     visibility: visible;

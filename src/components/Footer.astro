@@ -1,6 +1,8 @@
 ---
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import FondoGotas from './FondoGotas.astro';
+import PulsoEcg from './PulsoEcg.astro';
 import {
   site,
   sedes,
@@ -13,15 +15,20 @@ const matriz = sedes[0]!;
 const anio = new Date().getFullYear();
 
 const redes = [
-  { etiqueta: 'Facebook', abrev: 'fb', href: site.redes.facebook },
-  { etiqueta: 'Instagram', abrev: 'ig', href: site.redes.instagram },
-  { etiqueta: 'TikTok', abrev: 'tt', href: site.redes.tiktok },
+  { etiqueta: 'Facebook', icono: 'facebook-marca' as const, href: site.redes.facebook },
+  { etiqueta: 'Instagram', icono: 'instagram-marca' as const, href: site.redes.instagram },
+  { etiqueta: 'TikTok', icono: 'tiktok-marca' as const, href: site.redes.tiktok },
 ];
 ---
 
-<footer class="bg-brand text-white/70">
+<footer class="relative overflow-hidden bg-brand text-white/75">
+  <FondoGotas intensidad="suave" />
+  {/* El pulso va al pie del bloque de columnas, por encima de la franja legal. */}
+  <div class="pointer-events-none absolute inset-x-0 top-0 h-[calc(100%-4.5rem)]" aria-hidden="true">
+    <PulsoEcg class="h-20 text-white opacity-15" />
+  </div>
   <div
-    class="container-page grid grid-cols-1 gap-y-8 py-12 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-12 lg:py-16"
+    class="container-page relative grid grid-cols-1 gap-y-8 py-12 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-12 lg:py-16"
   >
     <div>
       <Logo box={50} variant="oscuro" razonSocial />
@@ -36,9 +43,9 @@ const redes = [
               target="_blank"
               rel="noopener"
               aria-label={red.etiqueta}
-              class="flex h-9.5 w-9.5 items-center justify-center rounded-full border border-white/25 text-[12.5px] font-bold text-white transition-colors hover:border-accent hover:bg-accent"
+              class="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 text-white transition-[background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent-light hover:bg-accent-deep motion-reduce:hover:translate-y-0"
             >
-              {red.abrev}
+              <Icon name={red.icono} size={19} />
             </a>
           ))
         }
@@ -54,7 +61,7 @@ const redes = [
           footerEnlaces.map((enlace) => (
             <a
               href={enlace.href}
-              class="text-[14.2px] text-white/70 transition-colors hover:text-accent-light"
+              class="-my-1.5 inline-block py-1.5 text-sm text-white/75 transition-colors hover:text-accent-light"
             >
               {enlace.label}
             </a>
@@ -72,7 +79,7 @@ const redes = [
               href={enlace.href}
               target={enlace.href.startsWith('http') ? '_blank' : undefined}
               rel={enlace.href.startsWith('http') ? 'noopener' : undefined}
-              class="text-[14.2px] text-white/70 transition-colors hover:text-accent-light"
+              class="-my-1.5 inline-block py-1.5 text-sm text-white/75 transition-colors hover:text-accent-light"
             >
               {enlace.label}
             </a>
@@ -84,34 +91,39 @@ const redes = [
     <div>
       <span class="block text-xs font-bold tracking-[1.6px] text-white uppercase">Contacto</span>
       <div class="mt-4 flex flex-col gap-3.5">
-        <span class="flex gap-2.5 text-[14.2px] leading-relaxed">
-          <Icon name="pin" size={17} class="mt-0.5 text-accent" />
+        <span class="flex gap-2.5 text-sm leading-relaxed">
+          <Icon name="pin" size={17} class="mt-0.5 text-accent-light" />
           <span>{matriz.direccion}<br />{site.ciudad}, {site.provincia}</span>
         </span>
         <a
           href={`tel:${site.telefonoE164}`}
-          class="text-base font-bold text-white transition-colors hover:text-accent-light"
+          class="-my-1.5 inline-block py-1.5 text-base font-bold text-white transition-colors hover:text-accent-light"
         >
           {site.telefono}
         </a>
         <a
           href={`mailto:${site.email}`}
-          class="text-[14.2px] text-white/70 transition-colors hover:text-accent-light"
+          class="-my-1.5 inline-block py-1.5 text-sm text-white/75 transition-colors hover:text-accent-light"
         >
           {site.email}
         </a>
-        <span class="text-[13.5px] leading-relaxed text-white/60">
-          {matriz.horarios[0]}<br />{matriz.horarios[1]}
+        <span class="text-sm leading-relaxed text-white/75">
+          {matriz.horarios.filter((h) => h.horas !== 'Cerrado').map((h) => (
+            <>
+              {h.dias} · {h.horas}
+              <br />
+            </>
+          ))}
         </span>
       </div>
     </div>
   </div>
 
-  <div class="border-t border-white/15">
+  <div class="relative border-t border-white/15">
     <div
       class="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-2.5 py-5 pb-6"
     >
-      <span class="text-[12.8px] text-white/55">
+      <span class="text-xs text-white/75">
         © {anio} {site.nombre} · Laboratorio clínico · {site.ciudad}, {site.pais}
       </span>
       <span class="flex flex-wrap gap-x-5 gap-y-2.5">
@@ -119,7 +131,7 @@ const redes = [
           footerLegales.map((enlace) => (
             <a
               href={enlace.href}
-              class="text-[12.8px] text-white/60 transition-colors hover:text-accent-light"
+              class="-my-1.5 inline-block py-1.5 text-xs text-white/75 transition-colors hover:text-accent-light"
             >
               {enlace.label}
             </a>

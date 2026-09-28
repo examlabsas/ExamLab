@@ -1,5 +1,5 @@
 /**
- * Genera los códigos QR de la página de preparación.
+ * Genera los códigos QR del sitio, con y sin el logo al centro.
  *
  * Se generan aquí, y no en un servicio web gratuito de los que crean QR, porque
  * esos servicios suelen intercalar un redireccionamiento propio: si mañana
@@ -7,15 +7,20 @@
  * funcionar. Estos apuntan directo al dominio del laboratorio.
  *
  * Uso:
- *   node scripts/generar-qr.mjs
- *   node scripts/generar-qr.mjs https://otro-dominio.com/preparacion
+ *   node scripts/generar-qr.mjs                              → la portada
+ *   node scripts/generar-qr.mjs https://examlabsas.com/preparacion
+ *   node scripts/generar-qr.mjs https://ejemplo.com/x  nombre-archivo
+ *
+ * El nombre del archivo sale de la ruta si no se indica otro. Cualquier
+ * dirección fuera del dominio del laboratorio queda marcada como de pruebas,
+ * para que un QR provisional no acabe en la imprenta por confusión de nombres.
  *
  * Cada ejecución verifica que el código resultante se decodifique de vuelta a
  * la URL correcta. El de marca lleva el logo encima, así que esa comprobación
  * deja de ser una formalidad.
  *
- * IMPORTANTE: no mandar a imprimir hasta que el dominio esté conectado y la
- * página responda. Un QR impreso no se puede corregir.
+ * IMPORTANTE: no mandar a imprimir hasta que la página responda. Un QR impreso
+ * no se puede corregir.
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
@@ -26,20 +31,29 @@ import jsQR from 'jsqr';
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const destino = resolve(raiz, 'public/descargas');
-const logo = resolve(raiz, 'public/images/logo.png');
-
-/** Dominio definitivo del laboratorio. Solo este genera QR para imprenta. */
-const URL_DEFINITIVA = 'https://examlabsas.com/preparacion';
-
-const url = process.argv[2] ?? URL_DEFINITIVA;
-
 /*
-  Cualquier dirección que no sea la definitiva produce archivos marcados como
-  de pruebas. Así un QR provisional nunca puede acabar en la imprenta por
-  confusión de nombres.
+  Se lee el original a 1024px, no la copia de `public/images/`. Esa se redujo a
+  192px porque en el sitio nunca se muestra a más de 54, y a esa resolución el
+  emblema saldría borroso en un QR impreso.
 */
-const esDefinitiva = url === URL_DEFINITIVA;
-const base = esDefinitiva ? 'qr-preparacion' : 'qr-preparacion-pruebas';
+const logo = resolve(raiz, 'src/assets/logo.png');
+
+/** Dominio del laboratorio. Solo este genera QR aptos para imprenta. */
+const DOMINIO = 'examlabsas.com';
+
+const url = process.argv[2] ?? `https://${DOMINIO}/`;
+const nombrePedido = process.argv[3];
+
+const direccion = new URL(url);
+const esDefinitiva = direccion.hostname === DOMINIO;
+
+/** «/» → inicio · «/preparacion» → preparacion · «/a/b» → a-b */
+const desdeLaRuta = () => {
+  const partes = direccion.pathname.split('/').filter(Boolean);
+  return partes.length ? partes.join('-').toLowerCase() : 'inicio';
+};
+
+const base = `qr-${nombrePedido ?? desdeLaRuta()}${esDefinitiva ? '' : '-pruebas'}`;
 
 const TAM = 2048;
 

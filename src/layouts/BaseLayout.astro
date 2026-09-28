@@ -4,8 +4,11 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import WhatsAppFloat from '@/components/WhatsAppFloat.astro';
 import CookieBanner from '@/components/CookieBanner.astro';
+import ListaExamenes from '@/components/ListaExamenes.astro';
+import SpriteIconos from '@/components/SpriteIconos.astro';
 import { ClientRouter } from 'astro:transitions';
 import { site } from '@/lib/site';
+import { fotoOg, FOTO_POR_DEFECTO } from '@/lib/fotos';
 import { medicalBusinessSchema, webSiteSchema } from '@/lib/schema';
 import type { SeccionWhatsApp } from '@/lib/whatsapp';
 
@@ -14,7 +17,10 @@ interface Props {
   descripcion?: string;
   /** Sección que define el mensaje precargado del botón flotante. */
   whatsapp?: SeccionWhatsApp;
-  /** Imagen para redes sociales, ruta absoluta desde /public. */
+  /**
+   * Imagen para la vista previa en WhatsApp y redes. Debe ser un JPG de
+   * 1200×630 de los que genera scripts/optimizar-imagenes.mjs (`fotoOg(...)`).
+   */
   imagen?: string;
   noindex?: boolean;
   /** Bloques JSON-LD adicionales de la página. */
@@ -25,14 +31,14 @@ const {
   titulo,
   descripcion = site.descripcion,
   whatsapp = 'general',
-  imagen = '/images/Fotolaboratorio.png',
+  imagen = fotoOg(FOTO_POR_DEFECTO),
   noindex = false,
   schema = [],
 } = Astro.props;
 
 const tituloCompleto = titulo.includes(site.nombre)
   ? titulo
-  : `${titulo} | ${site.nombre} · Laboratorio clínico en ${site.ciudad}`;
+  : `${titulo} | ${site.nombre} · Laboratorio clínico de alta complejidad en ${site.ciudad}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).toString();
 const imagenAbsoluta = new URL(imagen, Astro.site ?? site.url).toString();
 
@@ -63,25 +69,48 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
     <meta property="og:description" content={descripcion} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={imagenAbsoluta} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={tituloCompleto} />
     <meta name="twitter:description" content={descripcion} />
     <meta name="twitter:image" content={imagenAbsoluta} />
 
-    <!-- Tipografías de marca (Montserrat - web equivalent Gotham Book) -->
+    <!--
+      Tipografías de marca (Montserrat - web equivalent Gotham Book).
+      Solo los cuatro pesos que el sitio usa: se cargaban seis más la itálica,
+      y ni el 800 ni la cursiva aparecían en ninguna página.
+    -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
     />
 
     <!--
       Marca que hay JS antes del primer pintado. Todas las animaciones dependen
       de la clase `js`, así que si el script falla el contenido se ve igual.
+
+      Hay que reponerla en cada navegación: el router de Astro copia los
+      atributos del <html> del documento nuevo, y ese documento llega del
+      servidor sin la clase, porque la pone este script en el navegador. Sin
+      reponerla, las animaciones funcionaban en la primera carga y dejaban de
+      salir al moverse por el sitio hasta recargar.
+
+      `astro:after-swap` es el momento correcto: el DOM nuevo ya está puesto,
+      pero todavía no se ha pintado.
     -->
     <script is:inline>
       document.documentElement.classList.add('js');
+
+      // Idempotente: si el router vuelve a ejecutar este script, no duplica el oyente.
+      if (!window.__examlabClaseJs) {
+        window.__examlabClaseJs = true;
+        document.addEventListener('astro:after-swap', () => {
+          document.documentElement.classList.add('js');
+        });
+      }
     </script>
 
     <!-- Transiciones suaves entre páginas (nativo de Astro, sin dependencias) -->
@@ -97,9 +126,11 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
     <slot name="head" />
   </head>
   <body class="overflow-x-hidden">
+    {/* Biblioteca de iconos: se define una vez y `Icon` la referencia con `<use>`. */}
+    <SpriteIconos />
     <a
       href="#contenido"
-      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:rounded-xl focus:bg-brand focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-white"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:rounded-lg focus:bg-brand focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-white"
     >
       Saltar al contenido
     </a>
@@ -112,6 +143,9 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
 
     <Footer />
     <WhatsAppFloat seccion={whatsapp} />
+    {/* Va en el layout para que la lista siga visible al entrar en una ficha
+        del catálogo y volver. */}
+    <ListaExamenes />
     <CookieBanner />
 
     <script>

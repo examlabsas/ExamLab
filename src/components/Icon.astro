@@ -1,7 +1,16 @@
 ---
 /**
- * Icono SVG inline del set de marca. Se pinta con `currentColor`,
- * así que el color se controla con utilidades `text-*`.
+ * Icono SVG del set de marca. Se pinta con `currentColor`, así que el color
+ * se controla con utilidades `text-*`.
+ *
+ * Por defecto referencia el sprite que `SpriteIconos` deja una vez por página
+ * (`<use href="#i-nombre">`): el trazo se define una sola vez y cada uso pesa
+ * unos 80 bytes en vez de 250. En el catálogo, con 2236 iconos, eso es más de
+ * un megabyte de diferencia.
+ *
+ * Con `dibujo` el trazo se imprime completo, porque la animación de dibujado
+ * necesita alcanzar cada `path` desde el CSS y lo que hay dentro de un `<use>`
+ * vive en un árbol aparte, fuera del alcance de los selectores.
  */
 import { iconos, iconosRellenos, type IconName } from '@/lib/iconos';
 
@@ -9,24 +18,55 @@ interface Props {
   name: IconName;
   size?: number | string;
   strokeWidth?: number;
+  /**
+   * El icono se dibuja trazo a trazo cuando su tarjeta aparece en pantalla
+   * (ver `.icono-dibujo` en global.css). Solo tiene sentido dentro de un
+   * `.reveal-stagger`; fuera de él se ve como un icono normal.
+   */
+  dibujo?: boolean;
   class?: string;
 }
 
-const { name, size = 20, strokeWidth = 2, class: className } = Astro.props;
+const { name, size = 20, strokeWidth = 2, dibujo = false, class: className } = Astro.props;
 const relleno = iconosRellenos.has(name);
+
+/*
+  `pathLength="1"` normaliza la longitud de cada trazo a 1, así el CSS puede
+  animar `stroke-dashoffset` de 1 a 0 sin conocer la longitud real de cada
+  forma. Solo aplica a iconos de trazo.
+*/
+const trazos =
+  dibujo && !relleno
+    ? iconos[name].replace(/<(path|circle|rect|line|polyline)(?=[\s>])/g, '<$1 pathLength="1"')
+    : iconos[name];
 ---
 
-<svg
-  width={size}
-  height={size}
-  viewBox="0 0 24 24"
-  fill={relleno ? 'currentColor' : 'none'}
-  stroke={relleno ? undefined : 'currentColor'}
-  stroke-width={relleno ? undefined : strokeWidth}
-  stroke-linecap={relleno ? undefined : 'round'}
-  stroke-linejoin={relleno ? undefined : 'round'}
-  aria-hidden="true"
-  focusable="false"
-  class:list={['shrink-0', className]}
-  set:html={iconos[name]}
-/>
+{
+  dibujo && !relleno ? (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width={strokeWidth}
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      class:list={['shrink-0 icono-dibujo', className]}
+      set:html={trazos}
+    />
+  ) : (
+    <svg
+      width={size}
+      height={size}
+      aria-hidden="true"
+      focusable="false"
+      stroke-width={relleno ? undefined : strokeWidth}
+      class:list={['shrink-0', className]}
+    >
+      <use href={`#i-${name}`} />
+    </svg>
+  )
+}

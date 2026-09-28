@@ -26,6 +26,7 @@ const ciudades = [...new Set(sedes.map((s) => s.ciudad))].join(' y ');
   schema={schema}
 >
   <PageHero
+    foto="matriz-ficoa-fachada"
     eyebrow="Puntos de atención"
     titulo={`Nuestras sedes en ${ciudades}`}
     descripcion="Horarios extendidos de lunes a sábado y toma de muestra a domicilio con agendamiento previo."
@@ -44,7 +45,7 @@ const ciudades = [...new Set(sedes.map((s) => s.ciudad))].join(' y ');
 
   <section class="bg-surface py-section">
     <div class="container-page">
-      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div class="reveal-stagger grid grid-cols-1 gap-5 md:grid-cols-2">
         {sedes.map((sede) => <SedeCard sede={sede} conWhatsApp />)}
       </div>
     </div>
@@ -62,57 +63,57 @@ const ciudades = [...new Set(sedes.map((s) => s.ciudad))].join(' y ');
         <div class="mt-7 flex flex-col gap-4">
           <a
             href={`tel:${site.telefonoE164}`}
-            class="flex items-center gap-4 rounded-2xl border border-line bg-white p-5 transition-colors hover:border-accent"
+            class="flex items-center gap-4 rounded-xl border border-line bg-white p-5 transition-colors hover:border-accent"
           >
-            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
+            <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent-soft text-accent-dark">
               <Icon name="telefono" size={20} />
             </span>
             <span>
-              <span class="block text-[12px] font-bold tracking-[0.6px] text-neutral uppercase">
+              <span class="block text-xs font-bold tracking-[0.6px] text-neutral uppercase">
                 Central telefónica
               </span>
-              <span class="mt-0.5 block text-[17px] font-bold text-brand">{site.telefono}</span>
+              <span class="mt-0.5 block text-lg font-bold text-brand">{site.telefono}</span>
             </span>
           </a>
           <a
             href={`tel:${site.emergenciasE164}`}
-            class="flex items-center gap-4 rounded-2xl border border-line bg-white p-5 transition-colors hover:border-accent"
+            class="flex items-center gap-4 rounded-xl border border-line bg-white p-5 transition-colors hover:border-accent"
           >
-            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-alert-soft text-alert-dark">
+            <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-alert-soft text-alert-dark">
               <Icon name="mas" size={20} />
             </span>
             <span>
-              <span class="block text-[12px] font-bold tracking-[0.6px] text-neutral uppercase">
+              <span class="block text-xs font-bold tracking-[0.6px] text-neutral uppercase">
                 Urgencias y domicilio
               </span>
-              <span class="mt-0.5 block text-[17px] font-bold text-brand">{site.emergencias}</span>
+              <span class="mt-0.5 block text-lg font-bold text-brand">{site.emergencias}</span>
             </span>
           </a>
           <a
             href={`mailto:${site.email}`}
-            class="flex items-center gap-4 rounded-2xl border border-line bg-white p-5 transition-colors hover:border-accent"
+            class="flex items-center gap-4 rounded-xl border border-line bg-white p-5 transition-colors hover:border-accent"
           >
-            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
+            <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-accent-soft text-accent-dark">
               <Icon name="correo" size={20} />
             </span>
             <span>
-              <span class="block text-[12px] font-bold tracking-[0.6px] text-neutral uppercase">
+              <span class="block text-xs font-bold tracking-[0.6px] text-neutral uppercase">
                 Correo
               </span>
-              <span class="mt-0.5 block text-[17px] font-bold text-brand">{site.email}</span>
+              <span class="mt-0.5 block text-lg font-bold text-brand">{site.email}</span>
             </span>
           </a>
         </div>
       </div>
 
-      <div class="rounded-3xl bg-surface p-7 lg:p-9">
+      <div class="rounded-xl bg-surface p-7 lg:p-9">
         <h2 class="text-h3 font-bold text-brand">Horario de atención</h2>
         <div class="mt-6 flex flex-col divide-y divide-line">
           {
             sedes.map((sede) => (
               <div class="flex flex-wrap items-start justify-between gap-3 py-4 first:pt-0">
-                <span class="text-[15px] font-bold text-brand">{sede.nombre}</span>
-                <span class="text-right text-[14px] leading-relaxed text-neutral">
+                <span class="text-base font-bold text-brand">{sede.nombre}</span>
+                <span class="text-right text-sm leading-relaxed text-neutral">
                   {sede.horarios.map((h) => (
                     <>
                       {h.dias} {h.horas}
@@ -124,7 +125,7 @@ const ciudades = [...new Set(sedes.map((s) => s.ciudad))].join(' y ');
             ))
           }
         </div>
-        <p class="mt-6 rounded-2xl bg-white p-4 text-[13.5px] leading-relaxed text-neutral">
+        <p class="mt-6 rounded-xl bg-white p-4 text-sm leading-relaxed text-neutral">
           La toma de muestra a domicilio se agenda hasta las 17:00 del día anterior. En feriados
           atendemos únicamente urgencias coordinadas por teléfono.
         </p>

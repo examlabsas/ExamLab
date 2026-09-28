@@ -1,0 +1,56 @@
+---
+/**
+ * Trazo de electrocardiograma que se dibuja en bucle, como decoración de la
+ * tarjeta de urgencias. Es un SVG de una sola línea: `pathLength="1"` deja que
+ * el CSS lo recorra con `stroke-dashoffset` sin conocer su longitud real.
+ *
+ * Va detrás del contenido (posición absoluta, sin eventos) y con
+ * `prefers-reduced-motion` se muestra completo y quieto.
+ */
+interface Props {
+  /** Color, opacidad y altura (por defecto `h-16`). */
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+const alto = /(?:^| )h-\d/.test(className) ? '' : 'h-16';
+---
+
+<svg
+  viewBox="0 0 600 80"
+  preserveAspectRatio="none"
+  class:list={['pulso-ecg pointer-events-none absolute inset-x-0 bottom-0 w-full', alto, className]}
+  aria-hidden="true"
+  focusable="false"
+>
+  <path
+    pathLength="1"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    d="M0 48 H150 l14 0 6-14 8 28 8-42 8 54 8-32 6 6 H330 l14 0 6-14 8 28 8-42 8 54 8-32 6 6 H510 l14 0 6-12 8 24 8-36 8 44 8-26 6 6 H600"
+  ></path>
+</svg>
+
+<style>
+  .pulso-ecg path {
+    stroke-dasharray: 0.34 0.66;
+    stroke-dashoffset: 1;
+    animation: ecg-recorre 3.6s linear infinite;
+  }
+
+  @keyframes ecg-recorre {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulso-ecg path {
+      stroke-dasharray: none;
+      animation: none;
+    }
+  }
+</style>

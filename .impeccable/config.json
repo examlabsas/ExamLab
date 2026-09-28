@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/styles/global.css"
+        ],
+        "createdAt": "2026-08-14T03:25:45.806Z",
+        "reason": "Es un blockquote del cuerpo de articulos, no una tarjeta: la barra al margen de una cita es convencion tipografica"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.28, 0.64, 1)",
+        "createdAt": "2026-08-14T03:25:55.882Z",
+        "reason": "Rebote leve en la entrada escalonada de tarjetas, aprobado por el cliente"
+      }
+    ]
+  }
+}

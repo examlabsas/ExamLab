@@ -25,8 +25,8 @@ import { site } from '@/lib/site';
   <h2>1. Responsable del tratamiento</h2>
   <p>
     {site.razonSocial}, con domicilio en {site.ciudad}, {site.provincia}, {site.pais}. Para
-    consultas sobre el tratamiento de sus datos puede escribir a <a href={`mailto:${site.email}`}
-      >{site.email}</a
+    consultas sobre el tratamiento de sus datos puede escribir a <a href={`mailto:${site.emails.administracion}`}
+      >{site.emails.administracion}</a
     > o llamar al {site.telefono}.
   </p>
 
@@ -95,7 +95,7 @@ import { site } from '@/lib/site';
   <p>
     Puede solicitar acceso, rectificación, actualización, eliminación, oposición, portabilidad y la
     suspensión del tratamiento de sus datos, así como no ser objeto de decisiones automatizadas.
-    Para ejercerlos, escriba a <a href={`mailto:${site.email}`}>{site.email}</a> adjuntando copia de
+    Para ejercerlos, escriba a <a href={`mailto:${site.emails.administracion}`}>{site.emails.administracion}</a> adjuntando copia de
     su documento de identidad. Responderemos dentro de los plazos legales. Si considera que su
     solicitud no fue atendida, puede acudir a la Autoridad de Protección de Datos Personales.
   </p>

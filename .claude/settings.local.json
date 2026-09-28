@@ -33,7 +33,41 @@
       "PowerShell(npm ls jsqr sharp 2>&1)",
       "PowerShell(node scripts/generar-qr.mjs https://examlabsas.edwin1969silva.workers.dev/preparacion)",
       "PowerShell(\"�� Remoto ��\")",
-      "PowerShell(\"`n�� Rama y ultimo commit local ��\")"
+      "PowerShell(\"`n�� Rama y ultimo commit local ��\")",
+      "Skill(impeccable)",
+      "Skill(impeccable:*)",
+      "PowerShell(node .claude/skills/impeccable/scripts/context.mjs)",
+      "PowerShell(node .claude/skills/impeccable/scripts/detector/cli/main.mjs --help 2>&1)",
+      "Bash(node -e \"require\\('./src/data/especialidades.json'\\).forEach\\(e=>console.log\\('  '+e.nombre\\)\\)\")",
+      "Bash(node -e \"const c=require\\('./src/data/catalogo-asociados.json'\\);[...new Set\\(c.pruebas.map\\(p=>p.especialidad\\)\\)].forEach\\(e=>console.log\\('  '+e\\)\\)\")"
     ]
-  }
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\" ] || node \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\"",
+            "timeout": 5,
+            "statusMessage": "Checking UI changes"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\" ] || node \"${CLAUDE_PROJECT_DIR}/.claude/skills/impeccable/scripts/hook.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Design deep pass"
+          }
+        ]
+      }
+    ]
+  },
+  "description": "Impeccable design detector: immediate-tier checks after Edit/Write/MultiEdit on UI files, full-rule deep pass on Stop."
 }

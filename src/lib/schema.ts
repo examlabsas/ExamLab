@@ -5,8 +5,9 @@
  * subtipo adicional), declarado en todas las páginas desde BaseLayout.
  * Las páginas de detalle añaden su propio bloque (MedicalTest, Article…).
  */
-import { site, sedes, mapaEnlace, type Sede, type HorarioSemanal } from './site';
+import { site, sedes, mapaEnlace, type Sede, type HorarioSemanal, type Tramo } from './site';
 import type { Examen } from './examenes';
+import { fotoOg, FOTO_POR_DEFECTO } from './fotos';
 
 const abs = (ruta: string) => new URL(ruta, site.url).toString();
 
@@ -31,18 +32,27 @@ const DIAS_SCHEMA = [
  * o al revés.
  */
 function horarioSchema(semana: HorarioSemanal) {
-  const porFranja = new Map<string, string[]>();
+  // Se agrupa por la lista completa de tramos del día (no solo uno), porque
+  // un día con pausa de mediodía tiene dos tramos que deben viajar juntos.
+  const porFranja = new Map<string, { dias: string[]; tramos: Tramo[] }>();
 
   semana.forEach((franja, dia) => {
     if (!franja) return; // día cerrado: Schema.org simplemente no lo lista
-    const clave = `${franja.abre}|${franja.cierra}`;
-    porFranja.set(clave, [...(porFranja.get(clave) ?? []), DIAS_SCHEMA[dia]!]);
+    const clave = franja.map((t) => `${t.abre}|${t.cierra}`).join(',');
+    const entrada = porFranja.get(clave);
+    if (entrada) entrada.dias.push(DIAS_SCHEMA[dia]!);
+    else porFranja.set(clave, { dias: [DIAS_SCHEMA[dia]!], tramos: franja });
   });
 
-  return [...porFranja].map(([clave, dias]) => {
-    const [opens, closes] = clave.split('|');
-    return { '@type': 'OpeningHoursSpecification', dayOfWeek: dias, opens, closes };
-  });
+  // Un OpeningHoursSpecification por tramo, compartiendo los mismos días.
+  return [...porFranja.values()].flatMap(({ dias, tramos }) =>
+    tramos.map((t) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: dias,
+      opens: t.abre,
+      closes: t.cierra,
+    })),
+  );
 }
 
 function sucursal(sede: Sede) {
@@ -66,6 +76,7 @@ function sucursal(sede: Sede) {
     telephone: sede.telefonoE164,
     openingHoursSpecification: horarioSchema(sede.horarioSemanal),
     hasMap: mapaEnlace(sede),
+    ...(sede.foto && { image: abs(fotoOg(sede.foto)) }),
   };
 }
 
@@ -83,7 +94,7 @@ export function medicalBusinessSchema() {
     slogan: site.claim,
     url: site.url,
     logo: abs('/images/logo.png'),
-    image: [abs('/images/Fotolaboratorio.png'), abs('/images/Fotoequipo.png')],
+    image: [abs(fotoOg('matriz-ficoa-fachada')), abs(fotoOg('laboratorio-equipo-trabajando'))],
     foundingDate: site.fundacion,
     medicalSpecialty: ['Pathology', 'PublicHealth'],
     priceRange: '$$',
@@ -213,7 +224,7 @@ export function articleSchema(post: {
     inLanguage: 'es-EC',
     author: { '@type': 'Organization', name: post.autor },
     publisher: { '@id': abs('/#organizacion') },
-    image: post.imagen ? abs(post.imagen) : abs('/images/Fotolaboratorio.png'),
+    image: abs(post.imagen ?? fotoOg(FOTO_POR_DEFECTO)),
     mainEntityOfPage: abs(`/noticias/${post.slug}`),
   };
 }

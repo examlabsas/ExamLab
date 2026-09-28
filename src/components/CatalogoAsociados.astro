@@ -1,0 +1,444 @@
+---
+/**
+ * Catálogo de derivación para laboratorios asociados.
+ *
+ * Sustituye al PDF que hoy se publica cada mes: mismo contenido, pero se puede
+ * buscar. Los datos salen de `catalogo-asociados.json`, que genera
+ * `scripts/importar-catalogo-asociados.mjs` a partir del Excel del laboratorio.
+ *
+ * Sobre el precio: es el tarifario mayorista. Cuando `mostrarPrecios` es falso
+ * la columna no se renderiza en absoluto — no se oculta con CSS ni se filtra en
+ * el navegador. El dato no sale del servidor, así que no está en el código
+ * fuente de la página ni al alcance de quien la inspeccione.
+ *
+ * Las 272 filas se pintan en el servidor y el script solo las muestra u oculta.
+ * Sin JavaScript el catálogo se ve entero: se pierde el filtro, no el contenido.
+ */
+import Icon from './Icon.astro';
+import catalogo from '@/data/catalogo-asociados.json';
+
+interface Props {
+  /** Tarifario mayorista. Solo con acceso restringido. */
+  mostrarPrecios?: boolean;
+}
+
+const { mostrarPrecios = false } = Astro.props;
+
+const { pruebas, notas, avisos } = catalogo;
+
+const especialidades = [...new Set(pruebas.map((p) => p.especialidad))];
+
+/** Índice de búsqueda sin tildes: «hematologia» encuentra «Hematología». */
+const sinTildes = (s: string) =>
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+const indice = (p: (typeof pruebas)[number]) =>
+  sinTildes([p.nombre, p.incluye, p.metodo, p.muestra, p.especialidad].filter(Boolean).join(' '));
+
+const dinero = (v: number | null) =>
+  v === null ? null : v.toLocaleString('es-EC', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+---
+
+<section class="bg-surface py-section">
+  <div class="container-page sin-reveal">
+    {/* ── Controles ─────────────────────────────────────────────── */}
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div class="flex flex-1 flex-col gap-4 sm:flex-row">
+        <label class="flex flex-1 flex-col gap-1.5">
+          <span class="text-[11px] font-bold tracking-wide text-neutral uppercase">
+            Buscar prueba
+          </span>
+          <span
+            class="flex items-center gap-2 rounded-lg border border-line-strong bg-white p-1.5 transition-colors focus-within:border-accent-dark"
+          >
+            <Icon name="lupa" size={18} class="ml-2 flex-none text-neutral" />
+            <input
+              type="search"
+              id="buscar-asociados"
+              autocomplete="off"
+              placeholder="Nombre, método o muestra…"
+              class="min-h-11 min-w-0 flex-1 bg-transparent text-sm text-black placeholder:text-neutral/70 focus:outline-none"
+            />
+          </span>
+        </label>
+
+        <label class="flex flex-col gap-1.5 sm:w-64">
+          <span class="text-[11px] font-bold tracking-wide text-neutral uppercase">
+            Especialidad
+          </span>
+          <select
+            id="filtro-especialidad"
+            class="min-h-11 rounded-lg border border-line-strong bg-white px-3 text-sm text-black transition-colors focus:border-accent-dark focus:outline-none"
+          >
+            <option value="">Todas ({pruebas.length})</option>
+            {
+              especialidades.map((e) => (
+                <option value={e}>
+                  {e} ({pruebas.filter((p) => p.especialidad === e).length})
+                </option>
+              ))
+            }
+          </select>
+        </label>
+      </div>
+
+      <p class="text-sm text-neutral" data-conteo aria-live="polite">
+        {pruebas.length} pruebas
+      </p>
+    </div>
+
+    {/* ── Tabla ─────────────────────────────────────────────────── */}
+    <div class="mt-6 overflow-x-auto rounded-lg border border-line bg-white">
+      <table class="w-full min-w-[52rem] border-collapse text-sm">
+        <thead>
+          <tr class="border-b border-line bg-surface">
+            <th class="px-4 py-3 text-left text-[11px] font-bold tracking-wide text-neutral uppercase">
+              Prueba
+            </th>
+            <th class="px-4 py-3 text-left text-[11px] font-bold tracking-wide text-neutral uppercase">
+              Método
+            </th>
+            <th class="px-4 py-3 text-left text-[11px] font-bold tracking-wide text-neutral uppercase">
+              Muestra
+            </th>
+            <th class="px-4 py-3 text-left text-[11px] font-bold tracking-wide text-neutral uppercase">
+              Entrega
+            </th>
+            {
+              mostrarPrecios && (
+                <th class="px-4 py-3 text-right text-[11px] font-bold tracking-wide text-neutral uppercase">
+                  Convenio
+                </th>
+              )
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            pruebas.map((p) => (
+              <tr
+                class="border-b border-line/70 transition-colors last:border-b-0 hover:bg-surface has-[button:focus-visible]:bg-surface"
+                data-prueba
+                data-especialidad={p.especialidad}
+                data-indice={indice(p)}
+                data-notas={p.notas.join(',')}
+              >
+                <td class="px-4 py-3 align-top">
+                  {/*
+                    El nombre es un botón real: así el teclado tiene una parada
+                    por prueba. El clic en cualquier punto de la fila lo activa,
+                    que es lo que la gente intenta hacer.
+                  */}
+                  {/*
+                    `line-clamp-2` porque cuatro pruebas traen la lista completa
+                    de organismos dentro del propio nombre —una llega a 724
+                    caracteres— y sin recorte esa fila arrasa con la tabla. En
+                    la ficha se muestra entero, así que no se pierde nada.
+                  */}
+                  <button
+                    type="button"
+                    data-abrir
+                    class="line-clamp-2 w-full text-left leading-snug font-semibold text-brand transition-colors hover:text-accent-dark focus-visible:text-accent-dark"
+                  >
+                    {p.nombre}
+                  </button>
+                  {p.incluye && (
+                    <span
+                      class="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral"
+                      data-col="incluye"
+                    >
+                      {p.incluye}
+                    </span>
+                  )}
+                  <span
+                    class="mt-1 block text-[11px] tracking-wide text-neutral uppercase"
+                    data-col="especialidad"
+                  >
+                    {p.especialidad}
+                  </span>
+                </td>
+                <td class="px-4 py-3 align-top text-neutral" data-col="metodo">{p.metodo ?? '—'}</td>
+                <td class="px-4 py-3 align-top text-neutral">
+                  <span data-col="muestra">{p.muestra ?? '—'}</span>
+                  {p.notas.length > 0 && (
+                    <span class="mt-1 flex flex-wrap gap-1">
+                      {p.notas.map((n) => (
+                        <a
+                          href={`#nota-${n}`}
+                          class="-my-1 inline-block rounded-md bg-accent-soft px-1.5 py-1.5 text-[11px] font-bold text-accent-deep transition-colors hover:bg-accent-dark hover:text-white"
+                        >
+                          Nota {n}
+                        </a>
+                      ))}
+                    </span>
+                  )}
+                </td>
+                <td class="px-4 py-3 align-top whitespace-nowrap text-neutral" data-col="entrega">
+                  {p.entrega ?? 'Consultar'}
+                </td>
+                {
+                  mostrarPrecios && (
+                    <td
+                      class="px-4 py-3 text-right align-top font-semibold tabular-nums text-brand whitespace-nowrap"
+                      data-col="precio"
+                    >
+                      {dinero(p.precio) ? `$ ${dinero(p.precio)}` : 'Consultar'}
+                    </td>
+                  )
+                }
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+
+      <p class="hidden px-4 py-10 text-center text-sm text-neutral" data-vacio>
+        Ninguna prueba coincide con la búsqueda.
+      </p>
+    </div>
+
+    {/*
+      Ficha de la prueba. Se usa <dialog> nativo: trae el foco atrapado, cierre
+      con Esc y devolución del foco al botón que la abrió, sin depender de nada.
+      El contenido se rellena desde la propia fila, así que no se duplica el
+      catálogo en el HTML ni viaja el precio cuando está desactivado.
+    */}
+    {/*
+      `m-auto` es imprescindible: el navegador centra un <dialog> modal con
+      `margin: auto` sobre `inset: 0`, y el reset de Tailwind pone `margin: 0`
+      en todo, así que sin esto la ficha se va a la esquina superior izquierda.
+    */}
+    <dialog
+      data-ficha
+      class="m-auto w-[min(34rem,calc(100vw-2rem))] rounded-lg border border-line bg-white p-0 text-brand backdrop:bg-brand/40"
+      aria-labelledby="ficha-titulo"
+    >
+      <div class="flex items-start justify-between gap-4 border-b border-line px-6 py-5">
+        <div>
+          <span
+            class="block text-[11px] font-bold tracking-wide text-accent-dark uppercase"
+            data-ficha-especialidad></span>
+          <h2 class="mt-1 text-lg leading-snug font-bold text-brand" id="ficha-titulo"></h2>
+          <p class="mt-1.5 text-xs leading-relaxed text-neutral" data-ficha-incluye hidden></p>
+        </div>
+        <button
+          type="button"
+          data-cerrar
+          aria-label="Cerrar"
+          class="-m-2 flex h-11 w-11 flex-none items-center justify-center rounded-md text-neutral transition-colors hover:bg-surface hover:text-brand"
+        >
+          <Icon name="mas" size={22} class="rotate-45" />
+        </button>
+      </div>
+
+      <div class="px-6 py-5">
+        <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-[11px] font-bold tracking-wide text-neutral uppercase">Método</dt>
+            <dd class="mt-1 text-sm leading-relaxed" data-ficha-metodo></dd>
+          </div>
+          <div>
+            <dt class="text-[11px] font-bold tracking-wide text-neutral uppercase">Entrega</dt>
+            <dd class="mt-1 text-sm leading-relaxed" data-ficha-entrega></dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-[11px] font-bold tracking-wide text-neutral uppercase">Muestra</dt>
+            <dd class="mt-1 text-sm leading-relaxed" data-ficha-muestra></dd>
+          </div>
+          <div data-ficha-bloque-precio hidden>
+            <dt class="text-[11px] font-bold tracking-wide text-neutral uppercase">Convenio</dt>
+            <dd class="mt-1 text-sm font-bold tabular-nums" data-ficha-precio></dd>
+          </div>
+        </dl>
+
+        {/* El texto de la nota se trae aquí para no mandar al pie de página. */}
+        <div class="mt-5 border-t border-line pt-5" data-ficha-notas hidden>
+          <span class="text-[11px] font-bold tracking-wide text-neutral uppercase">
+            Condiciones de la muestra
+          </span>
+          <ul class="mt-2.5 flex flex-col gap-2" data-ficha-notas-lista></ul>
+        </div>
+      </div>
+    </dialog>
+
+    {
+      !mostrarPrecios && (
+        <p class="mt-4 flex items-start gap-2 text-sm text-neutral">
+          <Icon name="alerta" size={16} class="mt-0.5 flex-none text-accent-dark" />
+          El tarifario de convenio no se muestra en esta vista. Solicítelo al laboratorio.
+        </p>
+      )
+    }
+
+    {/* ── Condiciones generales ─────────────────────────────────── */}
+    <div class="mt-9 grid grid-cols-1 gap-x-9 gap-y-8 lg:grid-cols-2">
+      <div>
+        <h2 class="text-lg font-bold text-brand">Condiciones de recepción</h2>
+        <ul class="mt-4 flex flex-col gap-2.5">
+          {
+            avisos.map((a) => (
+              <li class="flex items-start gap-2 text-sm leading-relaxed text-neutral">
+                <Icon name="check" size={15} strokeWidth={2.2} class="mt-1 flex-none text-accent-dark" />
+                {a}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold text-brand">Notas de muestra</h2>
+        <p class="mt-2 text-sm text-neutral">
+          Condiciones especiales que citan las pruebas del listado.
+        </p>
+        <dl class="mt-4 flex flex-col gap-2.5">
+          {
+            notas.map((n, i) => {
+              const numero = i + 1;
+              const cuerpo = n.replace(/^Nota\s*\d+\s*:\s*/i, '');
+              return (
+                <div id={`nota-${numero}`} class="scroll-mt-28 flex items-start gap-2.5">
+                  <dt class="flex-none rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-bold text-accent-deep">
+                    {numero}
+                  </dt>
+                  <dd class="text-sm leading-relaxed text-neutral">{cuerpo}</dd>
+                </div>
+              );
+            })
+          }
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { coincide } from '@/lib/busqueda';
+
+  const iniciarCatalogoAsociados = () => {
+    const campo = document.querySelector<HTMLInputElement>('#buscar-asociados');
+    const selector = document.querySelector<HTMLSelectElement>('#filtro-especialidad');
+    if (!campo || !selector) return;
+
+    const filas = [...document.querySelectorAll<HTMLTableRowElement>('[data-prueba]')];
+    const conteo = document.querySelector<HTMLElement>('[data-conteo]');
+    const vacio = document.querySelector<HTMLElement>('[data-vacio]');
+    const tabla = filas[0]?.closest('table');
+
+    const filtrar = () => {
+      const texto = campo.value.trim();
+      const esp = selector.value;
+      let visibles = 0;
+
+      // Tolerante a plurales y erratas (ver src/lib/busqueda.ts). Cada
+      // palabra debe aparecer, en cualquier orden: «orina cultivo» encuentra
+      // el urocultivo aunque las dos estén en columnas distintas.
+      for (const fila of filas) {
+        const indice = fila.dataset.indice ?? '';
+        const visible =
+          (!esp || fila.dataset.especialidad === esp) && coincide(fila, indice, indice, texto).ok;
+        fila.hidden = !visible;
+        if (visible) visibles++;
+      }
+
+      if (conteo) {
+        conteo.textContent =
+          visibles === filas.length
+            ? `${filas.length} pruebas`
+            : `${visibles} de ${filas.length} pruebas`;
+      }
+      if (vacio) vacio.classList.toggle('hidden', visibles > 0);
+      if (tabla) tabla.classList.toggle('hidden', visibles === 0);
+    };
+
+    campo.addEventListener('input', filtrar);
+    selector.addEventListener('change', filtrar);
+
+    // ── Ficha de la prueba ────────────────────────────────────────────────
+    const ficha = document.querySelector<HTMLDialogElement>('[data-ficha]');
+
+    if (ficha) {
+      const pon = (sel: string, texto: string) => {
+        const nodo = ficha.querySelector<HTMLElement>(sel);
+        if (nodo) nodo.textContent = texto;
+      };
+      const leer = (fila: HTMLElement, col: string) =>
+        fila.querySelector<HTMLElement>(`[data-col="${col}"]`)?.textContent?.trim() ?? '';
+
+      // El texto completo de cada nota ya está al pie; se reutiliza.
+      const textoNota = (n: string) =>
+        document.querySelector(`#nota-${n} dd`)?.textContent?.trim() ?? '';
+
+      const abrir = (fila: HTMLElement) => {
+        pon('#ficha-titulo', fila.querySelector<HTMLElement>('[data-abrir]')?.textContent?.trim() ?? '');
+        pon('[data-ficha-especialidad]', leer(fila, 'especialidad'));
+        pon('[data-ficha-metodo]', leer(fila, 'metodo') || '—');
+        pon('[data-ficha-muestra]', leer(fila, 'muestra') || '—');
+        pon('[data-ficha-entrega]', leer(fila, 'entrega') || 'Consultar');
+
+        const incluye = ficha.querySelector<HTMLElement>('[data-ficha-incluye]');
+        const textoIncluye = leer(fila, 'incluye');
+        if (incluye) {
+          incluye.textContent = textoIncluye;
+          incluye.hidden = !textoIncluye;
+        }
+
+        // El precio solo existe si el servidor lo renderizó.
+        const bloquePrecio = ficha.querySelector<HTMLElement>('[data-ficha-bloque-precio]');
+        const precio = leer(fila, 'precio');
+        if (bloquePrecio) {
+          bloquePrecio.hidden = !precio;
+          pon('[data-ficha-precio]', precio);
+        }
+
+        const numeros = (fila.dataset.notas ?? '').split(',').filter(Boolean);
+        const caja = ficha.querySelector<HTMLElement>('[data-ficha-notas]');
+        const lista = ficha.querySelector<HTMLElement>('[data-ficha-notas-lista]');
+        if (caja && lista) {
+          lista.replaceChildren();
+          for (const n of numeros) {
+            const li = document.createElement('li');
+            li.className = 'flex items-start gap-2.5 text-sm leading-relaxed text-neutral';
+            const etiqueta = document.createElement('span');
+            etiqueta.className =
+              'flex-none rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-bold text-accent-deep';
+            etiqueta.textContent = n;
+            const cuerpo = document.createElement('span');
+            cuerpo.textContent = textoNota(n);
+            li.append(etiqueta, cuerpo);
+            lista.append(li);
+          }
+          caja.hidden = numeros.length === 0;
+        }
+
+        ficha.showModal();
+      };
+
+      for (const fila of filas) {
+        fila.addEventListener('click', (ev) => {
+          // Los chips de nota son enlaces propios: no deben abrir la ficha.
+          if ((ev.target as HTMLElement).closest('a')) return;
+          abrir(fila);
+        });
+      }
+
+      ficha.querySelector('[data-cerrar]')?.addEventListener('click', () => ficha.close());
+
+      // Pulsar el fondo cierra. El clic se registra sobre el propio <dialog>
+      // cuando cae fuera de su contenido.
+      ficha.addEventListener('click', (ev) => {
+        if (ev.target === ficha) ficha.close();
+      });
+    }
+
+    // Permite llegar con ?q= desde los buscadores del sitio.
+    const q = new URLSearchParams(location.search).get('q');
+    if (q) {
+      campo.value = q;
+      filtrar();
+    }
+  };
+
+  iniciarCatalogoAsociados();
+  document.addEventListener('astro:page-load', iniciarCatalogoAsociados);
+</script>

@@ -18,9 +18,9 @@ const schema = [
 
 const pasos = [
   {
-    titulo: 'Ingrese a Avalab',
+    titulo: `Ingrese a ${site.sistema.nombre}`,
     texto:
-      'Abra el sistema de resultados desde el botón de esta página o desde el menú superior del sitio.',
+      'Abra el sistema de resultados desde el botón de esta página o desde el botón «Resultados» del menú superior.',
     detalle: 'Puede hacerlo desde el celular, la tablet o la computadora.',
   },
   {
@@ -74,14 +74,15 @@ const problemas = [
 
 <BaseLayout
   titulo="Resultados en línea"
-  descripcion="Guía paso a paso para acceder a sus resultados de laboratorio en el sistema Avalab de ExamLab, con su cédula y código de orden."
+  descripcion={`Guía paso a paso para acceder a sus resultados de laboratorio en ${site.sistema.nombre}, el sistema de ExamLab, con su cédula y código de orden.`}
   whatsapp="resultados"
   schema={schema}
 >
   <PageHero
+    foto="revision-de-muestra"
     eyebrow="Resultados"
     titulo="Acceda a sus resultados en línea"
-    descripcion="Sus informes están disponibles 24/7 en Avalab, el sistema de resultados del laboratorio. Solo necesita su cédula y el código de orden."
+    descripcion={`Sus informes están disponibles las 24 horas en ${site.sistema.nombre}, el sistema de resultados del laboratorio. Solo necesita su cédula y el código de orden.`}
     migas={[
       { nombre: 'Inicio', href: '/' },
       { nombre: 'Soy paciente', href: '/soy-paciente' },
@@ -89,7 +90,7 @@ const problemas = [
     ]}
   >
     <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <Button href={site.avalab} icon="documento">Ingresar a Avalab</Button>
+      <Button href={site.sistema.url} icon="documento">Ver mis resultados</Button>
       <Button href={whatsappLink('resultados')} variant="sobreOscuro" icon="whatsapp-marca">
         Necesito ayuda
       </Button>
@@ -98,25 +99,25 @@ const problemas = [
 
   <!-- Qué necesita -->
   <section class="bg-white py-12 lg:py-16">
-    <div class="container-page grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div class="flex items-start gap-4 rounded-3xl border border-line bg-white p-6">
-        <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+    <div class="reveal-stagger container-page grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex items-start gap-4 rounded-xl border border-line bg-white p-6">
+        <span class="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
           <Icon name="usuario" size={21} />
         </span>
         <div>
-          <h2 class="text-[17px] font-bold text-brand">Su número de cédula</h2>
-          <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+          <h2 class="text-lg font-bold text-brand">Su número de cédula</h2>
+          <p class="mt-1.5 text-sm leading-relaxed text-neutral">
             El mismo con el que se registró al tomarse la muestra, sin guiones ni espacios.
           </p>
         </div>
       </div>
-      <div class="flex items-start gap-4 rounded-3xl border border-line bg-white p-6">
-        <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+      <div class="flex items-start gap-4 rounded-xl border border-line bg-white p-6">
+        <span class="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
           <Icon name="documento" size={21} />
         </span>
         <div>
-          <h2 class="text-[17px] font-bold text-brand">Su código de orden</h2>
-          <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+          <h2 class="text-lg font-bold text-brand">Su código de orden</h2>
+          <p class="mt-1.5 text-sm leading-relaxed text-neutral">
             Aparece impreso en el comprobante que se le entrega al momento del pago.
           </p>
         </div>
@@ -129,20 +130,20 @@ const problemas = [
     <div class="container-page">
       <SectionHeading
         eyebrow="Paso a paso"
-        titulo="Cómo descargar su informe en Avalab"
-        descripcion="Avalab es el sistema de resultados del laboratorio, administrado por su proveedor externo. Este sitio web no almacena resultados médicos."
+        titulo="Cómo descargar su informe"
+        descripcion={`${site.sistema.nombre} es el sistema de resultados del laboratorio, administrado por su proveedor externo. Este sitio web no almacena resultados médicos.`}
       />
-      <ol class="mt-9 flex flex-col gap-4">
+      <ol class="reveal-stagger mt-9 flex flex-col gap-4">
         {
           pasos.map((paso, i) => (
-            <li class="flex flex-col gap-4 rounded-3xl bg-white p-6 shadow-card sm:flex-row sm:items-start lg:p-7">
-              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-brand text-[19px] font-bold text-white">
+            <li class="flex flex-col gap-4 rounded-xl bg-white p-6 border border-line sm:flex-row sm:items-start lg:p-7">
+              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand text-lg font-bold text-white">
                 {i + 1}
               </span>
               <div>
-                <h3 class="text-[18px] font-bold text-brand">{paso.titulo}</h3>
-                <p class="mt-2 text-[15px] leading-relaxed text-neutral">{paso.texto}</p>
-                <p class="mt-2 flex items-start gap-2 text-[13.5px] leading-relaxed text-accent-dark">
+                <h3 class="text-lg font-bold text-brand">{paso.titulo}</h3>
+                <p class="mt-2 text-base leading-relaxed text-neutral">{paso.texto}</p>
+                <p class="mt-2 flex items-start gap-2 text-sm leading-relaxed text-accent-dark">
                   <Icon name="check" size={16} strokeWidth={2.2} class="mt-0.5" />
                   {paso.detalle}
                 </p>
@@ -153,7 +154,7 @@ const problemas = [
       </ol>
 
       <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <Button href={site.avalab} icon="documento">Ingresar a Avalab</Button>
+        <Button href={site.sistema.url} icon="documento">Ver mis resultados</Button>
         <Button href={whatsappLink('resultados')} variant="secondary" icon="whatsapp-marca">
           Escribirnos por WhatsApp
         </Button>
@@ -165,19 +166,19 @@ const problemas = [
   <section class="bg-white py-section">
     <div class="container-page">
       <SectionHeading eyebrow="Si algo no funciona" titulo="Problemas frecuentes al ingresar" />
-      <div class="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {
           problemas.map((item) => (
-            <details class="group rounded-3xl border border-line bg-white p-6 open:border-accent">
-              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[16.5px] font-bold text-brand">
+            <details class="group rounded-xl border border-line bg-white open:border-accent">
+              <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-6 text-base font-bold text-brand">
                 {item.pregunta}
                 <Icon
                   name="mas"
                   size={20}
-                  class="flex-none text-accent transition-transform duration-200 group-open:rotate-45"
+                  class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45"
                 />
               </summary>
-              <p class="mt-3.5 text-[14.5px] leading-relaxed text-neutral">{item.respuesta}</p>
+              <p class="px-6 pb-6 text-sm leading-relaxed text-neutral">{item.respuesta}</p>
             </details>
           ))
         }
@@ -188,16 +189,16 @@ const problemas = [
   <!-- Privacidad -->
   <section class="bg-surface pb-section">
     <div class="container-page">
-      <div class="flex flex-col gap-4 rounded-3xl bg-brand p-7 sm:flex-row lg:p-9">
-        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-white/12 text-accent-light">
+      <div class="flex flex-col gap-4 rounded-xl bg-brand p-7 sm:flex-row lg:p-9">
+        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-white/12 text-accent-light">
           <Icon name="escudo" size={24} />
         </span>
         <div>
           <h2 class="text-h3 font-bold text-white">Sus resultados son confidenciales</h2>
-          <p class="mt-3 max-w-[680px] text-[15px] leading-relaxed text-white/75">
+          <p class="mt-3 max-w-[680px] text-base leading-relaxed text-white/75">
             El acceso a los informes está protegido por su cédula y su código de orden. Este sitio
             web no almacena resultados ni datos clínicos: la información reside exclusivamente en
-            Avalab. Conozca más en nuestra
+            {site.sistema.nombre}. Conozca más en nuestra
             <a href="/privacidad" class="font-semibold text-accent-light underline underline-offset-2">
               política de privacidad</a
             >.

@@ -1,10 +1,23 @@
 ---
+/**
+ * Tarjeta de un examen en el catálogo.
+ *
+ * Las clases largas y repetidas viven en el `<style>` de abajo en vez de
+ * escribirse con utilidades en cada elemento. No es cuestión de gusto: el
+ * catálogo imprime 559 de estas tarjetas, así que cada byte del marcado se
+ * multiplica por 559. Solo mover las clases repetidas a CSS quita cientos de
+ * kilobytes de la página.
+ */
 import Icon from './Icon.astro';
+import BotonLista from './BotonLista.astro';
 import {
   indiceBusqueda,
   interpretarAyuno,
   esRemision,
   resumenCorto,
+  etiquetaEntrega,
+  etiquetaMuestra,
+  normalizar,
   type Examen,
 } from '@/lib/examenes';
 
@@ -23,72 +36,214 @@ const ficha = examen.tecnico;
 ---
 
 <article
-  class="group relative flex flex-col gap-3 rounded-3xl border border-line bg-white p-6 transition-all duration-200 hover:border-accent hover:shadow-[0_14px_30px_rgb(0_90_140/0.09)]"
+  class="tarjeta-examen"
   data-examen
   data-especialidad={examen.especialidad}
   data-indice={indiceBusqueda(examen)}
+  data-nombre={normalizar(examen.nombre)}
 >
-  <div class="flex flex-wrap items-center gap-2">
-    <span
-      class="rounded-lg bg-accent-soft px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-dark uppercase"
-    >
-      {examen.especialidad}
-    </span>
-    <span class="font-mono text-[11.5px] font-semibold text-neutral">{examen.codigo}</span>
-    {
-      ayuno.requiere && (
-        <span class="rounded-lg bg-alert-soft px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-alert-dark uppercase">
-          Ayuno
-        </span>
-      )
-    }
-    {
-      tecnico && remision && (
-        <span class="rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-brand uppercase">
-          Remisión
-        </span>
-      )
-    }
+  <div class="tarjeta-examen-etiquetas">
+    <span class="etiqueta etiqueta--especialidad">{examen.especialidad}</span>
+    {examen.codigo && <span class="tarjeta-examen-codigo">{examen.codigo}</span>}
+    {ayuno.requiere && <span class="etiqueta etiqueta--ayuno">Ayuno</span>}
+    {tecnico && remision && <span class="etiqueta etiqueta--remision">Remisión</span>}
   </div>
 
-  <h3 class="text-[17px] leading-snug font-bold text-brand">
-    <a href={`${basePath}/${examen.slug}`} class="after:absolute after:inset-0">
-      {examen.nombre}
-    </a>
+  {/*
+    El título es el enlace y su `::after` extiende el área pulsable a toda la
+    tarjeta. Con teclado se llega al título, que es lo correcto: hay un solo
+    destino, no dos.
+
+    `view-transition-name` empareja este título con el <h1> de la ficha: al
+    abrirla, el nombre se desplaza y crece en lugar de desaparecer y
+    reaparecer. Se escribe a mano y no con `transition:name` de Astro porque
+    esa directiva emite ~2,4 KB de CSS de animación POR ELEMENTO —con 559
+    tarjetas, 1,3 MB de estilos— y el catálogo tardaba en abrir. Así el
+    navegador usa su animación por defecto, que además conserva el
+    desplazamiento en vez de reemplazarlo por un fundido.
+  */}
+  <h3 class="tarjeta-examen-titulo" style={`view-transition-name: examen-${examen.slug}`}>
+    <a href={`${basePath}/${examen.slug}`}>{examen.nombre}</a>
   </h3>
 
-  <p class="text-[14px] leading-relaxed text-neutral">{resumenCorto(examen)}</p>
+  <p class="tarjeta-examen-resumen">{resumenCorto(examen)}</p>
 
-  <dl class="mt-1 flex flex-col gap-2 text-[13px] text-neutral">
-    <div class="flex items-start gap-2">
-      <Icon name="gota" size={15} class="mt-0.5 text-accent" />
-      <dt class="sr-only">Tipo de muestra</dt>
-      <dd>{examen.tipoMuestra}</dd>
+  <dl class="tarjeta-examen-datos">
+    <div>
+      <Icon name="gota" size={15} />
+      <dt>Tipo de muestra</dt>
+      <dd>{etiquetaMuestra(examen)}</dd>
     </div>
     {
       tecnico && ficha?.conservacion ? (
-        <div class="flex items-start gap-2">
-          <Icon name="nieve" size={15} class="mt-0.5 text-accent" />
-          <dt class="sr-only">Conservación</dt>
+        <div>
+          <Icon name="nieve" size={15} />
+          <dt>Conservación</dt>
           <dd>{ficha.conservacion}</dd>
         </div>
       ) : (
-        <div class="flex items-start gap-2">
-          <Icon name="reloj" size={15} class="mt-0.5 text-accent" />
-          <dt class="sr-only">Tiempo de entrega</dt>
-          <dd>{examen.tiempoEntrega}</dd>
+        <div>
+          <Icon name="reloj" size={15} />
+          <dt>Tiempo de entrega</dt>
+          <dd>{etiquetaEntrega(examen)}</dd>
         </div>
       )
     }
   </dl>
 
-  <span class="mt-auto flex items-center gap-1.5 pt-3 text-[13.5px] font-bold text-accent">
-    Ver detalle del examen
-    <Icon
-      name="flecha"
-      size={15}
-      strokeWidth={2.4}
-      class="transition-transform duration-200 group-hover:translate-x-1"
-    />
+  <span class="tarjeta-examen-pie">
+    <span class="tarjeta-examen-cta">
+      Ver detalle del examen
+      <Icon name="flecha" size={15} strokeWidth={2.4} />
+    </span>
+    <BotonLista examen={examen} />
   </span>
 </article>
+
+<style>
+  .tarjeta-examen {
+    /*
+      El navegador se salta el trazado y la maquetación de las tarjetas que
+      están fuera de la pantalla. Con 559 en el documento, eso es la
+      diferencia entre maquetar seis y maquetarlas todas.
+
+      `contain-intrinsic-size` le da el alto que debe suponer mientras no la
+      ha medido; sin ese dato la barra de desplazamiento daría saltos al
+      bajar. 21rem es el alto real de una tarjeta media, medido en pantalla.
+    */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 21rem;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: 0.5rem;   /* igual que rounded-lg */
+    border: 1px solid var(--color-line);
+    background: #fff;
+    padding: 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .tarjeta-examen:hover {
+    border-color: var(--color-accent-dark);
+  }
+
+  .tarjeta-examen-etiquetas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .etiqueta {
+    border-radius: 0.375rem; /* igual que rounded-md */
+    padding: 0.375rem 0.625rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .etiqueta--especialidad {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-deep);
+  }
+  .etiqueta--ayuno {
+    background: var(--color-alert-soft);
+    color: var(--color-alert-dark);
+  }
+  .etiqueta--remision {
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    color: var(--color-brand);
+  }
+
+  .tarjeta-examen-codigo {
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-neutral);
+  }
+
+  .tarjeta-examen-titulo {
+    font-size: 1.125rem;
+    line-height: 1.375;
+    font-weight: 700;
+    color: var(--color-brand);
+    transition: color 0.2s;
+  }
+  .tarjeta-examen:hover .tarjeta-examen-titulo {
+    color: var(--color-accent-dark);
+  }
+  /* El enlace del título cubre la tarjeta entera. */
+  .tarjeta-examen-titulo a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .tarjeta-examen-resumen {
+    font-size: 0.875rem;
+    line-height: 1.625;
+    color: var(--color-neutral);
+  }
+
+  .tarjeta-examen-datos {
+    margin-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-neutral);
+  }
+  .tarjeta-examen-datos > div {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .tarjeta-examen-datos svg {
+    margin-top: 0.125rem;
+    color: var(--color-accent-dark);
+  }
+  /* La etiqueta del dato la anuncia el lector de pantalla, no se dibuja. */
+  .tarjeta-examen-datos dt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .tarjeta-examen-datos dd {
+    margin: 0;
+  }
+
+  .tarjeta-examen-pie {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+  }
+
+  .tarjeta-examen-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-accent-dark);
+  }
+  .tarjeta-examen-cta svg {
+    transition: transform 0.2s;
+  }
+  .tarjeta-examen:hover .tarjeta-examen-cta svg {
+    transform: translateX(0.25rem);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tarjeta-examen-cta svg {
+      transition: none;
+    }
+  }
+</style>

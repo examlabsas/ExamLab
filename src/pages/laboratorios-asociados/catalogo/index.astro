@@ -1,10 +1,19 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/PageHero.astro';
-import CatalogoBuscador from '@/components/CatalogoBuscador.astro';
-import { examenesLaboratorios } from '@/lib/examenes';
+import CatalogoAsociados from '@/components/CatalogoAsociados.astro';
+import catalogo from '@/data/catalogo-asociados.json';
 import { breadcrumbSchema } from '@/lib/schema';
-import { whatsappLink } from '@/lib/whatsapp';
+
+/*
+  El tarifario de convenio es información comercial reservada. Mientras esta
+  página siga siendo de acceso abierto queda en `false`, y así el precio no se
+  renderiza: no viaja al navegador ni aparece en el código fuente.
+
+  Se pone en `true` únicamente cuando la ruta esté detrás de control de acceso,
+  como lo estaba en el sitio anterior con los usuarios de WordPress.
+*/
+const MOSTRAR_PRECIOS = false;
 
 const schema = [
   breadcrumbSchema([
@@ -17,15 +26,15 @@ const schema = [
 
 <BaseLayout
   titulo="Catálogo laboratorios"
-  descripcion="Cartera de pruebas de derivación para laboratorios asociados de ExamLab, con especialidad, tipo de muestra, contenedor y tiempo de entrega."
+  descripcion="Cartera de pruebas de derivación para laboratorios asociados de ExamLab, con método, tipo de muestra y tiempo de entrega."
   whatsapp="laboratorios"
   noindex
   schema={schema}
 >
   <PageHero
     eyebrow="Laboratorios asociados"
-    titulo="Catálogo para laboratorios"
-    descripcion="Cartera de pruebas de derivación con sus condiciones preanalíticas. Busque por código, nombre o especialidad."
+    titulo="Catálogo de derivación"
+    descripcion={`${catalogo.pruebas.length} pruebas con su método, tipo de muestra y tiempo de entrega. Busque por nombre, método o muestra.`}
     migas={[
       { nombre: 'Inicio', href: '/' },
       { nombre: 'Laboratorios asociados', href: '/laboratorios-asociados' },
@@ -33,11 +42,5 @@ const schema = [
     ]}
   />
 
-  <CatalogoBuscador
-    lista={examenesLaboratorios}
-    basePath="/laboratorios-asociados/catalogo"
-    tecnico
-    whatsappHref={whatsappLink('laboratorios')}
-    aviso="Este catálogo es de uso exclusivo de laboratorios asociados y sus condiciones aplican a muestras derivadas. Los tiempos de entrega se cuentan desde la recepción de la muestra en nuestra matriz. Para tarifario mayorista y logística de recolección, escríbanos por WhatsApp."
-  />
+  <CatalogoAsociados mostrarPrecios={MOSTRAR_PRECIOS} />
 </BaseLayout>

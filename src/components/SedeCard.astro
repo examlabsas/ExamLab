@@ -13,16 +13,19 @@ interface Props {
 const { sede, conWhatsApp = false } = Astro.props;
 ---
 
-<article class="flex flex-col gap-4 rounded-xl border border-line bg-white p-6 shadow-sm transition-all duration-200 hover:border-brand hover:shadow-md">
+<article class="flex flex-col gap-4 rounded-lg border border-line bg-white p-6 transition-colors duration-200 hover:border-accent-dark">
   <div class="flex flex-wrap items-center gap-2.5">
-    <h3 class="text-[19px] font-bold text-brand">
-      <a href={`/sedes/${sede.slug}`} class="transition-colors hover:text-accent">
+    <h3 style={`view-transition-name: sede-${sede.slug}`} class="text-lg font-bold text-brand">
+      <a
+        href={`/sedes/${sede.slug}`}
+        class="-my-1.5 inline-block py-1.5 transition-colors hover:text-accent-dark"
+      >
         {sede.nombre}
       </a>
     </h3>
     {
       sede.etiqueta && (
-        <span class="rounded-lg bg-accent-soft px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-dark uppercase">
+        <span class="rounded-md bg-accent-soft px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-deep uppercase">
           {sede.etiqueta}
         </span>
       )
@@ -30,16 +33,16 @@ const { sede, conWhatsApp = false } = Astro.props;
   </div>
 
   <div class="flex items-start gap-2.5">
-    <Icon name="pin" size={18} class="mt-0.5 text-accent" />
-    <span class="text-[14.2px] leading-relaxed text-neutral">
+    <Icon name="pin" size={18} class="mt-0.5 text-accent-dark" />
+    <span class="text-sm leading-relaxed text-neutral">
       {sede.direccion}
       {sede.referencia && <><br />{sede.referencia}</>}
     </span>
   </div>
 
   <div class="flex items-start gap-2.5">
-    <Icon name="reloj" size={18} class="mt-0.5 text-accent" />
-    <span class="text-[14.2px] leading-relaxed text-neutral">
+    <Icon name="reloj" size={18} class="mt-0.5 text-accent-dark" />
+    <span class="text-sm leading-relaxed text-neutral">
       {sede.horarios.map((h) => (<>{h.dias} {h.horas}<br /></>))}
     </span>
   </div>
@@ -47,13 +50,13 @@ const { sede, conWhatsApp = false } = Astro.props;
   <EstadoApertura
     horario={sede.horarioSemanal}
     respaldo={sede.horarios[0]!.horas}
-    class="text-[13px] font-semibold text-brand"
+    class="text-xs font-semibold text-brand"
   />
 
   <div class="mt-auto flex flex-wrap gap-2.5 pt-2">
     <a
       href={`/sedes/${sede.slug}`}
-      class="min-w-[130px] flex-1 rounded-xl bg-brand px-3.5 py-3.5 text-center text-[13.8px] font-bold text-white transition-colors hover:bg-accent"
+      class="min-w-[130px] flex-1 rounded-lg bg-brand px-3.5 py-3.5 text-center text-sm font-bold text-white transition-colors hover:bg-accent-dark"
     >
       Ver sede
     </a>
@@ -61,7 +64,7 @@ const { sede, conWhatsApp = false } = Astro.props;
       href={mapaEnlace(sede)}
       target="_blank"
       rel="noopener"
-      class="min-w-[110px] flex-1 rounded-xl border-[1.5px] border-line-strong bg-white px-3.5 py-3.5 text-center text-[13.8px] font-bold text-brand transition-colors hover:border-accent"
+      class="min-w-[110px] flex-1 rounded-lg border-[1.5px] border-line-strong bg-white px-3.5 py-3.5 text-center text-sm font-bold text-brand transition-colors hover:border-accent"
     >
       Cómo llegar
     </a>
@@ -71,7 +74,7 @@ const { sede, conWhatsApp = false } = Astro.props;
           href={whatsappSede(sede.nombre)}
           target="_blank"
           rel="noopener"
-          class="flex min-w-full items-center justify-center gap-2 rounded-xl border-[1.5px] border-accent bg-accent-soft px-3.5 py-3.5 text-center text-[13.8px] font-bold text-accent-dark transition-colors hover:bg-accent hover:text-white"
+          class="flex min-w-full items-center justify-center gap-2 rounded-lg border-[1.5px] border-accent bg-accent-soft px-3.5 py-3.5 text-center text-sm font-bold text-accent-deep transition-colors hover:bg-accent-dark hover:text-white"
         >
           <Icon name="whatsapp-marca" size={16} />
           Agendar por WhatsApp

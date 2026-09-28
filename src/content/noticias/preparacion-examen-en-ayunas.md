@@ -4,6 +4,7 @@ descripcion: Cuántas horas de ayuno necesita, qué puede tomar y qué evitar an
 categoria: Prevención
 fecha: 2026-07-12
 autor: Equipo ExamLab
+foto: revision-de-muestra
 destacado: true
 ---
 

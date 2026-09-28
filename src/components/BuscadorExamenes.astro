@@ -19,6 +19,12 @@ interface Props {
   oscuro?: boolean;
   /** Identificador único del campo, por si hay dos buscadores en una página. */
   id?: string;
+  /**
+   * Ejemplos que el campo «escribe» solo, uno tras otro, mientras está vacío
+   * y sin foco. Enseña qué se puede buscar sin ocupar espacio. Con
+   * prefers-reduced-motion se muestra el `placeholder` fijo.
+   */
+  ejemplos?: string[];
   class?: string;
 }
 
@@ -28,6 +34,7 @@ const {
   boton = 'Buscar',
   oscuro = false,
   id = 'buscar-examenes',
+  ejemplos,
   class: className,
 } = Astro.props;
 ---
@@ -37,7 +44,7 @@ const {
   method="get"
   role="search"
   class:list={[
-    'flex max-w-[540px] items-center gap-2 rounded-xl border p-1.5 transition-colors',
+    'flex max-w-[540px] items-center gap-2 rounded-lg border p-1.5 transition-colors',
     oscuro
       ? 'border-white/25 bg-white/10 focus-within:border-white/60'
       : 'border-line-strong bg-white focus-within:border-accent',
@@ -48,7 +55,7 @@ const {
   <Icon
     name="lupa"
     size={18}
-    class:list={['ml-2.5 flex-none', oscuro ? 'text-white/60' : 'text-neutral']}
+    class:list={['ml-2.5 flex-none', oscuro ? 'text-white/75' : 'text-neutral']}
   />
   <input
     type="search"
@@ -56,18 +63,95 @@ const {
     name="q"
     autocomplete="off"
     placeholder={placeholder}
+    data-ejemplos={ejemplos ? JSON.stringify(ejemplos) : undefined}
     class:list={[
-      'min-w-0 flex-1 bg-transparent py-2 text-[14px] focus:outline-none',
-      oscuro ? 'text-white placeholder:text-white/50' : 'text-black placeholder:text-neutral/70',
+      'min-w-0 flex-1 bg-transparent py-2 text-sm focus:outline-none',
+      oscuro ? 'text-white placeholder:text-white/75' : 'text-black placeholder:text-neutral/70',
     ]}
   />
   <button
     type="submit"
     class:list={[
-      'flex-none rounded-lg px-4 py-2 text-[13px] font-bold transition-colors',
-      oscuro ? 'bg-white text-brand hover:bg-accent-soft' : 'bg-brand text-white hover:bg-accent',
+      'min-h-11 flex-none rounded-md px-4 text-xs font-bold transition-colors',
+      oscuro
+        ? 'bg-white text-brand hover:bg-accent-soft'
+        : 'bg-brand text-white hover:bg-accent-dark',
     ]}
   >
     {boton}
   </button>
 </form>
+
+<script>
+  /*
+    Placeholder «mecanografiado»: escribe un ejemplo letra a letra, espera,
+    lo borra y pasa al siguiente. Se detiene en cuanto la persona escribe o
+    enfoca el campo, y no arranca si el sistema pide menos movimiento.
+  */
+  const initEjemplos = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    for (const campo of document.querySelectorAll<HTMLInputElement>('input[data-ejemplos]')) {
+      if (campo.dataset.ejemplosIniciado === 'true') continue;
+      campo.dataset.ejemplosIniciado = 'true';
+
+      let ejemplos: string[] = [];
+      try {
+        ejemplos = JSON.parse(campo.dataset.ejemplos ?? '[]');
+      } catch {
+        continue;
+      }
+      if (ejemplos.length === 0) continue;
+
+      const fijo = campo.placeholder;
+      const prefijo = 'Busque su examen: ';
+      let indice = 0;
+      let temporizador: number | undefined;
+
+      const activo = () => document.activeElement !== campo && campo.value === '';
+
+      const escribir = (texto: string, pos: number, luego: () => void) => {
+        if (!activo()) return detener();
+        campo.placeholder = prefijo + texto.slice(0, pos) + (pos < texto.length ? '|' : '');
+        if (pos < texto.length) {
+          temporizador = window.setTimeout(() => escribir(texto, pos + 1, luego), 55 + Math.random() * 45);
+        } else {
+          temporizador = window.setTimeout(luego, 1600);
+        }
+      };
+
+      const borrar = (texto: string, pos: number, luego: () => void) => {
+        if (!activo()) return detener();
+        campo.placeholder = prefijo + texto.slice(0, pos);
+        if (pos > 0) temporizador = window.setTimeout(() => borrar(texto, pos - 1, luego), 28);
+        else temporizador = window.setTimeout(luego, 350);
+      };
+
+      const ciclo = () => {
+        const texto = ejemplos[indice % ejemplos.length]!;
+        indice++;
+        escribir(texto, 0, () => borrar(texto, texto.length, ciclo));
+      };
+
+      const detener = () => {
+        if (temporizador !== undefined) window.clearTimeout(temporizador);
+        temporizador = undefined;
+        campo.placeholder = fijo;
+      };
+
+      const reanudar = () => {
+        if (temporizador === undefined && activo()) ciclo();
+      };
+
+      campo.addEventListener('focus', detener);
+      campo.addEventListener('blur', reanudar);
+      campo.addEventListener('input', () => (campo.value ? detener() : reanudar()));
+
+      // Empieza tras una pausa, cuando el resto de la portada ya asentó.
+      temporizador = window.setTimeout(ciclo, 1800);
+    }
+  };
+
+  initEjemplos();
+  document.addEventListener('astro:page-load', initEjemplos);
+</script>

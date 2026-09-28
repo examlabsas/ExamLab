@@ -8,7 +8,23 @@
 import Icon from './Icon.astro';
 import Button from './Button.astro';
 import ExamCard from './ExamCard.astro';
-import { interpretarAyuno, esRemision, bloqueDePreparacion, type Examen } from '@/lib/examenes';
+import FondoGotas from './FondoGotas.astro';
+import BotonLista from './BotonLista.astro';
+import AyunoFicha from './AyunoFicha.astro';
+import ProgresoLectura from './ProgresoLectura.astro';
+import PulsoEcg from './PulsoEcg.astro';
+import {
+  interpretarAyuno,
+  esRemision,
+  bloqueDePreparacion,
+  tieneDato,
+  etiquetaEntrega,
+  etiquetaMuestra,
+  fraseEntrega,
+  fraseMuestra,
+  fraseAyuno,
+  type Examen,
+} from '@/lib/examenes';
 import { whatsappExamen } from '@/lib/whatsapp';
 import type { IconName } from '@/lib/iconos';
 
@@ -29,11 +45,15 @@ const remision = esRemision(examen);
 const preparacion = bloqueDePreparacion(examen);
 const ficha = examen.tecnico;
 
+// La técnica es un dato para bioquímicos: al paciente solo se le muestra
+// cuando existe de verdad, nunca como «Consultar».
 const datosPrincipales: { icono: IconName; etiqueta: string; valor: string }[] = [
   { icono: 'maletin', etiqueta: 'Especialidad', valor: examen.especialidad },
-  { icono: 'gota', etiqueta: 'Tipo de muestra', valor: examen.tipoMuestra },
-  { icono: 'reloj', etiqueta: 'Tiempo de entrega', valor: examen.tiempoEntrega },
-  { icono: 'microscopio', etiqueta: 'Técnica', valor: examen.tecnica },
+  { icono: 'gota', etiqueta: 'Tipo de muestra', valor: etiquetaMuestra(examen) },
+  { icono: 'reloj', etiqueta: 'Tiempo de entrega', valor: etiquetaEntrega(examen) },
+  ...(tieneDato(examen.tecnica)
+    ? [{ icono: 'microscopio' as IconName, etiqueta: 'Técnica', valor: examen.tecnica }]
+    : []),
 ];
 
 const especificaciones: { icono: IconName; etiqueta: string; valor?: string }[] = [
@@ -47,17 +67,38 @@ const especificaciones: { icono: IconName; etiqueta: string; valor?: string }[] 
 ];
 
 const especificacionesVisibles = especificaciones.filter((e) => e.valor);
+
+/** La utilidad puede venir en varios párrafos, separados por una línea en blanco. */
+const parrafosUtilidad = examen.utilidad.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+
+/** Las determinaciones de un perfil vienen separadas por « · » desde el importador. */
+const partesIncluye = examen.incluye ? examen.incluye.split(' · ').filter(Boolean) : [];
 ---
 
+<ProgresoLectura />
+
 <!-- Cabecera del examen -->
-<section class="bg-brand">
-  <div class="container-page py-10 lg:py-14">
+<section class="relative overflow-hidden bg-brand">
+  <FondoGotas />
+  <PulsoEcg class="h-20 text-white opacity-25" />
+  <div class="container-page relative py-10 lg:py-14">
     <nav aria-label="Ruta de navegación" class="mb-6">
-      <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-white/60">
-        <li><a href="/" class="transition-colors hover:text-accent-light">Inicio</a></li>
+      <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/75">
+        <!-- Relleno vertical con margen negativo: área de toque de 24px sin
+             alterar la línea de la miga de pan. -->
+        <li>
+          <a href="/" class="-my-1.5 inline-block py-1.5 transition-colors hover:text-accent-light">
+            Inicio
+          </a>
+        </li>
         <li aria-hidden="true">/</li>
         <li>
-          <a href={basePath} class="transition-colors hover:text-accent-light">{catalogoLabel}</a>
+          <a
+            href={basePath}
+            class="-my-1.5 inline-block py-1.5 transition-colors hover:text-accent-light"
+          >
+            {catalogoLabel}
+          </a>
         </li>
         <li aria-hidden="true">/</li>
         <li class="text-white/85" aria-current="page">{examen.nombre}</li>
@@ -68,25 +109,38 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
       <div>
         <div class="flex flex-wrap items-center gap-2">
           <span
-            class="rounded-lg bg-white/12 px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-light uppercase"
+            class="rounded-md bg-brand-dark px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-light uppercase"
           >
             {examen.especialidad}
           </span>
-          <span class="font-mono text-[12.5px] font-semibold text-white/60">{examen.codigo}</span>
+          {/* El código real está en el sistema del laboratorio: mientras no llegue, no se deja el hueco. */}
+          {examen.codigo && (
+            <span class="font-mono text-xs font-semibold text-white/75">{examen.codigo}</span>
+          )}
           {
             remision && (
-              <span class="rounded-lg border border-white/25 px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-white/75 uppercase">
+              <span class="rounded-md border border-white/25 px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-white/75 uppercase">
                 Remisión
               </span>
             )
           }
         </div>
 
-        <h1 class="mt-4 text-h1 font-bold text-white">{examen.nombre}</h1>
+        <h1 style={`view-transition-name: examen-${examen.slug}`} class="mt-4 text-h1 font-bold text-white">
+          {examen.nombre}
+        </h1>
+
+        {
+          examen.resumen && (
+            <p class="mt-4 max-w-[52ch] text-lead leading-relaxed text-white/85">
+              {examen.resumen}
+            </p>
+          )
+        }
 
         {
           examen.sinonimos && examen.sinonimos.length > 0 && (
-            <p class="mt-3 text-[13.5px] text-white/60">
+            <p class="mt-4 text-sm text-white/75">
               También conocido como: {examen.sinonimos.join(' · ')}
             </p>
           )
@@ -94,26 +148,29 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
       </div>
 
       <!-- Tarjeta de acción -->
-      <aside class="rounded-3xl bg-white p-6 shadow-[0_16px_40px_rgb(0_0_0/0.18)]">
-        <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+      <aside class="rounded-xl bg-white p-6 shadow-[0_16px_40px_rgb(0_0_0/0.18)]">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
           <Icon name="calendario" size={21} />
         </span>
-        <h2 class="mt-4 text-[18px] leading-snug font-bold text-brand">
-          Agende este examen o consulte su valor
+        <h2 class="mt-4 text-lg leading-snug font-bold text-brand">
+          ¿Quiere agendar este examen o saber su valor?
         </h2>
-        <p class="mt-2.5 text-[13.5px] leading-relaxed text-neutral">
-          Le confirmamos disponibilidad, precio vigente y convenios por WhatsApp. También puede
-          acudir sin cita en horario de atención.
+        <p class="mt-2.5 text-sm leading-relaxed text-neutral">
+          Escríbanos por WhatsApp y le confirmamos el precio, la disponibilidad y si aplica algún
+          convenio. Si prefiere, también puede venir sin cita en horario de atención.
         </p>
         <div class="mt-5 flex flex-col gap-2.5">
           <Button href={waHref} icon="whatsapp-marca" full>Consultar por WhatsApp</Button>
+          {/* Para quien trae una orden con varios exámenes: los junta y los
+              manda en un solo mensaje. */}
+          <BotonLista examen={examen} variante="ancho" />
           {
             examen.ficha ? (
               <Button href={examen.ficha} variant="secondary" size="sm" icon="documento" full>
                 Descargar ficha en PDF
               </Button>
             ) : (
-              <span class="flex items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-line-strong px-5 py-3 text-[13px] font-semibold text-neutral">
+              <span class="flex items-center justify-center gap-2 rounded-xl border-[1.5px] border-dashed border-line-strong px-5 py-3 text-xs font-semibold text-neutral">
                 <Icon name="documento" size={16} />
                 Ficha en PDF próximamente
               </span>
@@ -127,15 +184,15 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
 
 <!-- Datos principales -->
 <section class="bg-surface py-10">
-  <div class="container-page grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="reveal-stagger container-page grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
     {
       datosPrincipales.map((dato) => (
-        <div class="flex items-start gap-3.5 rounded-2xl bg-white p-5 shadow-card">
-          <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
-            <Icon name={dato.icono} size={19} />
+        <div class="flex items-start gap-3.5 rounded-xl bg-white p-5 border border-line">
+          <span class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-accent-soft text-accent-dark">
+            <Icon name={dato.icono} size={19} dibujo />
           </span>
           <div>
-            <span class="block text-[11.5px] font-bold tracking-[0.6px] text-neutral uppercase">
+            <span class="block text-[11px] font-bold tracking-[0.6px] text-neutral uppercase">
               {dato.etiqueta}
             </span>
             <span class="mt-1 block text-sm leading-snug font-semibold text-brand">
@@ -152,29 +209,79 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
 <section class="bg-white py-section">
   <div class="container-page grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px] lg:gap-14">
     <div>
-      <h2 class="text-h2 font-bold text-brand">Utilidad</h2>
-      <p class="mt-4 text-base leading-relaxed text-neutral">{examen.utilidad}</p>
+      <h2 class="text-h2 font-bold text-brand">Para qué sirve</h2>
+      {parrafosUtilidad.map((parrafo) => (
+        <p class="mt-4 text-base leading-relaxed text-neutral">{parrafo}</p>
+      ))}
+
+      {
+        partesIncluye.length > 0 && (
+          <>
+            <h2 class="mt-10 text-h2 font-bold text-brand">Qué incluye</h2>
+            <ul class="mt-4 flex flex-col gap-2">
+              {partesIncluye.map((parte) => (
+                <li class="flex items-start gap-2.5 text-base leading-relaxed text-neutral">
+                  <Icon name="check" size={16} strokeWidth={2.2} class="mt-1.5 flex-none text-accent-dark" />
+                  {parte}
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+
+      {/*
+        Preguntas frecuentes armadas con los datos que ya tiene la ficha. No es
+        relleno: son las tres cosas que el paciente pregunta en recepción, y las
+        respuestas salen del mismo dato que muestran los recuadros de arriba.
+      */}
+      <h2 class="mt-10 text-h2 font-bold text-brand">Preguntas frecuentes</h2>
+      <div class="mt-4 flex flex-col gap-3">
+        <details class="group rounded-lg border border-line bg-white open:border-accent-dark">
+          <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-5 text-base font-bold text-brand">
+            ¿Tengo que venir en ayunas?
+            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45" />
+          </summary>
+          <p class="px-5 pb-5 text-base leading-relaxed text-neutral">{fraseAyuno(examen)}</p>
+        </details>
+
+        <details class="group rounded-lg border border-line bg-white open:border-accent-dark">
+          <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-5 text-base font-bold text-brand">
+            ¿Cuándo tengo el resultado?
+            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45" />
+          </summary>
+          <p class="px-5 pb-5 text-base leading-relaxed text-neutral">{fraseEntrega(examen)}</p>
+        </details>
+
+        <details class="group rounded-lg border border-line bg-white open:border-accent-dark">
+          <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-5 text-base font-bold text-brand">
+            ¿Qué muestra se toma?
+            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45" />
+          </summary>
+          <p class="px-5 pb-5 text-base leading-relaxed text-neutral">{fraseMuestra(examen)}</p>
+        </details>
+      </div>
 
       {
         tecnico && especificacionesVisibles.length > 0 && (
           <>
             <h2 class="mt-10 text-h2 font-bold text-brand">Especificaciones de laboratorio</h2>
-            <p class="mt-3 text-[14px] leading-relaxed text-neutral">
+            <p class="mt-3 text-sm leading-relaxed text-neutral">
               Datos preanalíticos y de procesamiento para el bioquímico responsable de la muestra.
             </p>
             <dl class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {especificacionesVisibles.map((dato) => (
-                <div class="flex items-start gap-3 rounded-2xl border border-line bg-surface p-4">
-                  <span class="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-white text-brand">
+                <div class="flex items-start gap-3 rounded-xl border border-line bg-surface p-4">
+                  <span class="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-white text-brand">
                     <Icon name={dato.icono} size={19} />
                   </span>
                   <div>
-                    <dt class="text-[11.5px] font-bold tracking-[0.6px] text-neutral uppercase">
+                    <dt class="text-[11px] font-bold tracking-[0.6px] text-neutral uppercase">
                       {dato.etiqueta}
                     </dt>
                     <dd
                       class:list={[
-                        'mt-1 text-[14px] leading-snug font-semibold text-brand',
+                        'mt-1 text-sm leading-snug font-semibold text-brand',
                         dato.etiqueta === 'Código LOINC' && 'font-mono tracking-wide',
                       ]}
                     >
@@ -192,13 +299,13 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
         tecnico && ficha?.criteriosRechazo && ficha.criteriosRechazo.length > 0 && (
           <>
             <h2 class="mt-10 text-h2 font-bold text-brand">Criterios de rechazo</h2>
-            <p class="mt-3 text-[14px] leading-relaxed text-neutral">
+            <p class="mt-3 text-sm leading-relaxed text-neutral">
               La muestra se rechaza y se solicita una nueva toma si se presenta cualquiera de estas
               condiciones. El rechazo se notifica al laboratorio remitente el mismo día.
             </p>
             <ul class="mt-4 flex flex-col gap-2.5">
               {ficha.criteriosRechazo.map((item) => (
-                <li class="flex items-start gap-3 rounded-2xl border border-alert/25 bg-alert-soft/40 px-4 py-3.5 text-[14.5px] leading-relaxed text-neutral">
+                <li class="flex items-start gap-3 rounded-xl border border-alert/25 bg-alert-soft/40 px-4 py-3.5 text-sm leading-relaxed text-neutral">
                   <Icon name="prohibido" size={18} class="mt-0.5 flex-none text-alert" />
                   {item}
                 </li>
@@ -213,26 +320,29 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
     <aside class="lg:sticky lg:top-28">
       <div
         class:list={[
-          'rounded-3xl border p-6',
+          'rounded-xl border p-6',
           ayuno.requiere ? 'border-alert/25 bg-alert-soft/50' : 'border-line bg-surface',
         ]}
       >
         <div class="flex items-center gap-3">
           <span
             class:list={[
-              'flex h-10 w-10 flex-none items-center justify-center rounded-xl',
+              'flex h-10 w-10 flex-none items-center justify-center rounded-lg',
               ayuno.requiere ? 'bg-alert text-white' : 'bg-accent-soft text-accent-dark',
             ]}
           >
             <Icon name={ayuno.requiere ? 'alerta' : 'check'} size={20} />
           </span>
           <div>
-            <h2 class="text-[19px] leading-tight font-bold text-brand">Condiciones clínicas</h2>
-            <span class="text-[12.5px] font-semibold text-neutral">{ayuno.texto}</span>
+            <h2 class="text-lg leading-tight font-bold text-brand">Condiciones clínicas</h2>
+            <span class="text-xs font-semibold text-neutral">{ayuno.texto}</span>
           </div>
         </div>
 
-        <p class="mt-5 text-[14.5px] leading-relaxed text-neutral">{examen.condicionesClinicas}</p>
+        <p class="mt-5 text-sm leading-relaxed text-neutral">{examen.condicionesClinicas}</p>
+
+        {/* La pregunta se responde aquí mismo, donde se acaba de leer el ayuno. */}
+        <AyunoFicha examen={examen} />
 
         <div class="mt-6 border-t border-line pt-5">
           <div class="flex flex-col gap-3">
@@ -240,21 +350,10 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
               preparacion && (
                 <a
                   href={`/preparacion#${preparacion.id}`}
-                  class="flex items-center gap-2 text-[13px] font-semibold text-accent transition-colors hover:text-brand"
+                  class="flex items-center gap-2 text-xs font-semibold text-accent-dark transition-colors hover:text-brand"
                 >
                   <Icon name={preparacion.icono} size={16} />
                   Cómo prepararse: {preparacion.titulo.toLowerCase()}
-                </a>
-              )
-            }
-            {
-              ayuno.requiere && (
-                <a
-                  href="/soy-paciente#ayuno"
-                  class="flex items-center gap-2 text-[13px] font-semibold text-accent transition-colors hover:text-brand"
-                >
-                  <Icon name="reloj" size={16} />
-                  Calcule su hora exacta de ayuno
                 </a>
               )
             }
@@ -274,7 +373,7 @@ const especificacionesVisibles = especificaciones.filter((e) => e.valor);
     <section class="bg-surface py-section">
       <div class="container-page">
         <h2 class="text-h2 font-bold text-brand">Otros exámenes de la misma especialidad</h2>
-        <div class="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div class="reveal-stagger mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {relacionados.map((otro) => (
             <ExamCard examen={otro} basePath={basePath} tecnico={tecnico} />
           ))}

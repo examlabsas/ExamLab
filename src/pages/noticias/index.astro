@@ -9,6 +9,7 @@ import { breadcrumbSchema } from '@/lib/schema';
 import { whatsappLink } from '@/lib/whatsapp';
 import { formatoFecha } from '@/lib/fechas';
 import { site } from '@/lib/site';
+import { foto, SIZES_MEDIA_COLUMNA } from '@/lib/fotos';
 
 const notas = (await getCollection('noticias', ({ data }) => !data.borrador)).sort(
   (a, b) => b.data.fecha.getTime() - a.data.fecha.getTime(),
@@ -54,37 +55,33 @@ const schema = [
         <div class="container-page">
           <a
             href={`/noticias/${destacada.id}`}
-            class="group grid grid-cols-1 gap-6 overflow-hidden rounded-[28px] border border-line bg-white transition-all duration-200 hover:border-accent hover:shadow-card-hover lg:grid-cols-2 lg:gap-0"
+            class="group grid grid-cols-1 gap-6 overflow-hidden rounded-xl border border-line bg-white transition-colors duration-200 hover:border-accent lg:grid-cols-2 lg:gap-0"
           >
-            {destacada.data.imagen ? (
+            {destacada.data.foto ? (
               <img
-                src={destacada.data.imagen}
-                alt={destacada.data.imagenAlt ?? ''}
-                width="1024"
-                height="768"
+                {...foto(destacada.data.foto)}
+                alt=""
+                sizes={SIZES_MEDIA_COLUMNA}
                 loading="lazy"
                 decoding="async"
                 class="h-56 w-full object-cover lg:h-full"
               />
             ) : (
-              <span class="flex h-56 items-center justify-center bg-[repeating-linear-gradient(45deg,#F0F1F3_0_9px,#E4E6E9_9px_18px)] lg:h-full">
-                <span class="rounded-md bg-white/85 px-2.5 py-1.5 font-mono text-[11.5px] text-[#9A9B9E]">
-                  imagen destacada · 16:9
-                </span>
-              </span>
+              <span class="block h-56 bg-surface lg:h-full" />
             )}
             <div class="p-6 lg:p-10">
               <span class="flex flex-wrap items-center gap-2.5 text-xs font-bold text-accent-dark">
-                <span class="rounded-lg bg-accent-soft px-2.5 py-1.5 uppercase">
+                {/* accent-deep, no accent-dark: sobre accent-soft este solo da 4,23:1. */}
+                <span class="rounded-md bg-accent-soft px-2.5 py-1.5 text-accent-deep uppercase">
                   {destacada.data.categoria}
                 </span>
-                <span class="text-[#9A9B9E]">{formatoFecha(destacada.data.fecha)}</span>
+                <span class="text-neutral">{formatoFecha(destacada.data.fecha)}</span>
               </span>
               <h2 class="mt-4 text-h3 font-bold text-brand">{destacada.data.titulo}</h2>
-              <p class="mt-3 text-[15px] leading-relaxed text-neutral">
+              <p class="mt-3 text-base leading-relaxed text-neutral">
                 {destacada.data.descripcion}
               </p>
-              <span class="mt-5 flex items-center gap-2 text-[14px] font-bold text-accent">
+              <span class="mt-5 flex items-center gap-2 text-sm font-bold text-accent-dark">
                 Leer artículo
                 <Icon
                   name="flecha"
@@ -106,16 +103,15 @@ const schema = [
 
       {
         resto.length > 0 ? (
-          <div class="mt-8 grid grid-cols-1 gap-5.5 md:grid-cols-2 lg:grid-cols-3">
-            {resto.map((nota, i) => (
+          <div class="reveal-stagger mt-8 grid grid-cols-1 gap-5.5 md:grid-cols-2 lg:grid-cols-3">
+            {resto.map((nota) => (
               <NewsCard
                 slug={nota.id}
                 titulo={nota.data.titulo}
                 descripcion={nota.data.descripcion}
                 categoria={nota.data.categoria}
                 fecha={nota.data.fecha}
-                imagen={nota.data.imagen}
-                indice={i + 1}
+                foto={nota.data.foto}
               />
             ))}
           </div>
@@ -124,10 +120,10 @@ const schema = [
         )
       }
 
-      <div class="mt-10 flex flex-col gap-4 rounded-3xl bg-brand p-7 sm:flex-row sm:items-center sm:justify-between lg:p-9">
+      <div class="mt-10 flex flex-col gap-4 rounded-xl bg-brand p-7 sm:flex-row sm:items-center sm:justify-between lg:p-9">
         <div>
           <h2 class="text-h3 font-bold text-white">¿Tiene una duda sobre su examen?</h2>
-          <p class="mt-2 max-w-[520px] text-[15px] leading-relaxed text-white/75">
+          <p class="mt-2 max-w-[520px] text-base leading-relaxed text-white/75">
             Nuestro equipo responde consultas sobre preparación, tiempos de entrega y disponibilidad.
           </p>
         </div>

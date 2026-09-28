@@ -22,8 +22,10 @@ const href = mensaje ? whatsappUrl(mensaje) : whatsappLink(seccion);
   target="_blank"
   rel="noopener"
   aria-label="Escríbenos por WhatsApp"
-  class="wa-float fixed right-5 bottom-5 z-40 flex items-center gap-2.5 rounded-full bg-whatsapp px-4 py-3.5 text-[14.5px] font-bold text-white shadow-[0_12px_30px_rgb(37_211_102/0.38)] transition-all duration-200 hover:bg-whatsapp-dark menu:px-4.5"
+  class="wa-float fixed right-5 bottom-5 z-40 flex items-center gap-2.5 rounded-full bg-whatsapp-boton px-4 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgb(15_125_111/0.38)] transition-colors duration-200 hover:bg-whatsapp-dark menu:px-4.5"
 >
+  {/* Anillo que se expande y desvanece cada pocos segundos (ver `.wa-anillo`). */}
+  <span class="wa-anillo" aria-hidden="true"></span>
   <Icon name="whatsapp-marca" size={22} />
   <span class="hidden menu:inline">{etiqueta}</span>
 </a>

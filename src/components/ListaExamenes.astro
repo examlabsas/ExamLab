@@ -1,0 +1,351 @@
+---
+/**
+ * Barra flotante con la lista de exámenes que el paciente fue marcando.
+ *
+ * Aparece solo cuando hay algo en la lista, resume la preparación combinada
+ * —el ayuno mayor manda— y manda todo en un único mensaje de WhatsApp. Hoy
+ * quien llega con una orden de cinco exámenes los escribe uno por uno.
+ *
+ * Se puede desplegar para revisar y quitar exámenes antes de enviar.
+ *
+ * Va en el layout, así que la lista sigue visible al entrar en una ficha y
+ * volver al catálogo.
+ */
+import Icon from './Icon.astro';
+import { WHATSAPP_NUMERO } from '@/lib/whatsapp';
+---
+
+<aside
+  id="lista-examenes"
+  hidden
+  class="lista-barra fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white shadow-[0_-8px_30px_rgb(0_0_0/0.12)]"
+  aria-label="Exámenes seleccionados"
+  data-lista-barra
+  data-numero={WHATSAPP_NUMERO}
+>
+  {/*
+    Detalle desplegable: qué exámenes hay y cómo quitarlos.
+
+    Tres capas porque no se puede animar `height: auto`. La de fuera es una
+    cuadrícula cuya única fila pasa de `0fr` a `1fr` —eso sí se interpola—, la
+    del medio recorta lo que sobra mientras crece, y la de dentro es la que
+    tiene el alto real y su propio desplazamiento si la lista es larga.
+  */}
+  <div id="lista-detalle" class="lista-detalle" data-abierto="false">
+    <div class="lista-detalle-recorte">
+      <div class="container-page max-h-[40vh] overflow-y-auto border-b border-line py-4">
+        <ul class="flex flex-col gap-1.5" data-lista-items></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-page flex flex-wrap items-center gap-x-5 gap-y-3 py-3.5" data-lista-fila>
+    <button
+      type="button"
+      data-lista-desplegar
+      aria-expanded="false"
+      aria-controls="lista-detalle"
+      class="flex min-h-11 flex-1 items-center gap-3 text-left"
+    >
+      <span
+        class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-accent-dark text-sm font-bold text-white"
+        data-lista-conteo>0</span
+      >
+      <span class="min-w-0">
+        <span class="block text-sm font-bold text-brand" data-lista-titulo>
+          0 exámenes en su lista
+        </span>
+        <span class="block truncate text-xs text-neutral" data-lista-resumen></span>
+      </span>
+      <Icon
+        name="mas"
+        size={18}
+        class="ml-1 flex-none text-accent-dark transition-transform duration-200"
+        data-lista-flecha
+      />
+    </button>
+
+    <div class="flex flex-none items-center gap-2.5">
+      <button
+        type="button"
+        data-lista-vaciar
+        class="min-h-11 rounded-lg px-3 text-sm font-semibold text-neutral transition-colors hover:text-alert-dark"
+      >
+        Vaciar
+      </button>
+      <a
+        href="#"
+        target="_blank"
+        rel="noopener"
+        data-lista-whatsapp
+        class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-whatsapp-boton px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-whatsapp-dark"
+      >
+        <Icon name="whatsapp-marca" size={17} />
+        Enviar por WhatsApp
+      </a>
+    </div>
+  </div>
+</aside>
+
+<style>
+  /*
+    La animación de entrada va en una clase aparte, no en `.lista-barra`.
+    El componente vive en el layout, así que con las transiciones de página
+    el elemento se vuelve a crear en cada navegación: con la animación fija,
+    la barra se deslizaba otra vez cada vez que se cambiaba de página. Ahora
+    solo se anima cuando la lista pasa de vacía a tener algo.
+  */
+  .lista-barra--entra {
+    animation: lista-entra 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes lista-entra {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* Salida: baja y se desvanece antes de ocultarse del todo. */
+  .lista-barra--sale {
+    animation: lista-sale 0.28s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+  }
+
+  @keyframes lista-sale {
+    from {
+      transform: none;
+      opacity: 1;
+    }
+    to {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  /*
+    Desplegable. `grid-template-rows` de `0fr` a `1fr` es la única forma
+    fiable de animar una altura que no se conoce de antemano.
+  */
+  .lista-detalle {
+    display: grid;
+    grid-template-rows: 0fr;
+    background: var(--color-surface);
+    transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .lista-detalle[data-abierto='true'] {
+    grid-template-rows: 1fr;
+  }
+  .lista-detalle-recorte {
+    overflow: hidden;
+  }
+
+  /* Los exámenes entran escalonados al abrir, como las tarjetas del sitio. */
+  .lista-detalle[data-abierto='true'] [data-lista-items] > li {
+    animation: lista-item 0.3s var(--ease-suave) backwards;
+  }
+  .lista-detalle[data-abierto='true'] [data-lista-items] > li:nth-child(1) { animation-delay: 0.06s; }
+  .lista-detalle[data-abierto='true'] [data-lista-items] > li:nth-child(2) { animation-delay: 0.1s; }
+  .lista-detalle[data-abierto='true'] [data-lista-items] > li:nth-child(3) { animation-delay: 0.14s; }
+  .lista-detalle[data-abierto='true'] [data-lista-items] > li:nth-child(4) { animation-delay: 0.18s; }
+  .lista-detalle[data-abierto='true'] [data-lista-items] > li:nth-child(n + 5) { animation-delay: 0.22s; }
+
+  @keyframes lista-item {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+  }
+
+  /* Con la barra abajo, el botón de WhatsApp flotante estorbaría. */
+  :global(body:has(#lista-examenes:not([hidden])) .wa-float) {
+    display: none;
+  }
+
+  [data-lista-desplegar][aria-expanded='true'] [data-lista-flecha] {
+    transform: rotate(45deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lista-barra--entra,
+    .lista-barra--sale,
+    .lista-detalle[data-abierto='true'] [data-lista-items] > li {
+      animation: none;
+    }
+    .lista-detalle,
+    [data-lista-flecha] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import {
+    leerLista,
+    quitar,
+    vaciar,
+    resumen,
+    mensajeWhatsApp,
+    EVENTO,
+    type ExamenEnLista,
+  } from '@/lib/lista-examenes';
+
+  const initLista = () => {
+    const barra = document.querySelector<HTMLElement>('[data-lista-barra]');
+    if (!barra || barra.dataset.iniciado === 'true') return;
+    barra.dataset.iniciado = 'true';
+
+    const numero = barra.dataset.numero ?? '';
+    const conteo = barra.querySelector<HTMLElement>('[data-lista-conteo]');
+    const titulo = barra.querySelector<HTMLElement>('[data-lista-titulo]');
+    const resumenEl = barra.querySelector<HTMLElement>('[data-lista-resumen]');
+    const items = barra.querySelector<HTMLElement>('[data-lista-items]');
+    const whatsapp = barra.querySelector<HTMLAnchorElement>('[data-lista-whatsapp]');
+    const detalle = document.getElementById('lista-detalle');
+    const desplegar = barra.querySelector<HTMLButtonElement>('[data-lista-desplegar]');
+    const fila = barra.querySelector<HTMLElement>('[data-lista-fila]');
+
+    /*
+      El hueco que se reserva al final de la página es el de la fila principal,
+      no el de la barra entera: el desplegable es temporal y se cierra, y hacer
+      crecer y encoger el documento al abrirlo movía todo lo de arriba.
+    */
+    const reservarHueco = () => {
+      document.body.style.paddingBottom = `${fila?.offsetHeight ?? 0}px`;
+    };
+
+    const sinMovimiento = () =>
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const abrirDetalle = (abierto: boolean) => {
+      detalle?.setAttribute('data-abierto', String(abierto));
+      desplegar?.setAttribute('aria-expanded', String(abierto));
+    };
+
+    /** Espera a que termine la animación de salida antes de ocultar del todo. */
+    let saliendo: number | undefined;
+
+    const esconder = (animar: boolean) => {
+      abrirDetalle(false);
+
+      const terminar = () => {
+        barra.hidden = true;
+        barra.classList.remove('lista-barra--sale');
+        document.body.style.removeProperty('padding-bottom');
+        saliendo = undefined;
+      };
+
+      if (!animar || sinMovimiento() || barra.hidden) {
+        terminar();
+        return;
+      }
+
+      barra.classList.add('lista-barra--sale');
+      // `setTimeout` y no `animationend`: si la pestaña pasa a segundo plano
+      // el evento puede no llegar nunca y la barra se quedaría a medio salir.
+      saliendo = window.setTimeout(terminar, 300);
+    };
+
+    /*
+      `animar` solo llega en `true` desde un cambio real de la lista. Al cargar
+      una página con la lista ya llena, la barra aparece sin deslizarse: lo que
+      acaba de pasar es una navegación, no un examen añadido.
+    */
+    const pintar = (lista: ExamenEnLista[], animar = false) => {
+      const estabaOculta = barra.hidden;
+
+      if (lista.length === 0) {
+        esconder(animar);
+        return;
+      }
+
+      // Si se estaba yendo y vuelven a marcar algo, se cancela la salida.
+      if (saliendo !== undefined) {
+        window.clearTimeout(saliendo);
+        saliendo = undefined;
+      }
+      barra.classList.remove('lista-barra--sale');
+      barra.hidden = false;
+
+      if (animar && estabaOculta) {
+        barra.classList.add('lista-barra--entra');
+        barra.addEventListener(
+          'animationend',
+          () => barra.classList.remove('lista-barra--entra'),
+          { once: true },
+        );
+      }
+
+      if (conteo) conteo.textContent = String(lista.length);
+      if (titulo) {
+        titulo.textContent =
+          lista.length === 1 ? '1 examen en su lista' : `${lista.length} exámenes en su lista`;
+      }
+
+      const { horas, muestras } = resumen(lista);
+      if (resumenEl) {
+        const partes = [
+          horas > 0 ? `Ayuno de ${horas} horas` : 'Sin ayuno',
+          muestras.length > 0 ? muestras.join(' · ') : '',
+        ].filter(Boolean);
+        resumenEl.textContent = partes.join(' — ');
+      }
+
+      if (whatsapp) {
+        whatsapp.href = `https://wa.me/${numero}?text=${encodeURIComponent(mensajeWhatsApp(lista))}`;
+      }
+
+      if (items) {
+        items.replaceChildren(
+          ...lista.map((examen) => {
+            const li = document.createElement('li');
+            li.className =
+              'flex items-center justify-between gap-3 rounded-lg bg-white px-3.5 py-2.5 border border-line';
+
+            const nombre = document.createElement('span');
+            nombre.className = 'text-sm font-semibold text-brand';
+            nombre.textContent = examen.nombre;
+
+            const boton = document.createElement('button');
+            boton.type = 'button';
+            boton.className =
+              'min-h-9 rounded-md px-2.5 text-xs font-bold text-neutral transition-colors hover:text-alert-dark';
+            boton.textContent = 'Quitar';
+            boton.setAttribute('aria-label', `Quitar ${examen.nombre} de la lista`);
+            boton.addEventListener('click', () => quitar(examen.slug));
+
+            li.append(nombre, boton);
+            return li;
+          }),
+        );
+      }
+
+      // La barra tapa el final de la página: se compensa con relleno.
+      reservarHueco();
+    };
+
+    desplegar?.addEventListener('click', () => {
+      if (!detalle) return;
+      const abierto = detalle.dataset.abierto !== 'true';
+      abrirDetalle(abierto);
+
+    });
+
+    barra.querySelector('[data-lista-vaciar]')?.addEventListener('click', () => vaciar());
+
+    document.addEventListener(EVENTO, (evento) => {
+      pintar((evento as CustomEvent<ExamenEnLista[]>).detail ?? leerLista(), true);
+    });
+
+    // Otra pestaña del mismo sitio puede haber cambiado la lista.
+    window.addEventListener('storage', (evento) => {
+      if (evento.key === 'examlab:lista') pintar(leerLista());
+    });
+
+    pintar(leerLista());
+  };
+
+  initLista();
+  document.addEventListener('astro:page-load', initLista);
+</script>

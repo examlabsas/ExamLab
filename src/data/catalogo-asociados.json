@@ -1,0 +1,2796 @@
+{
+ "fuente": "Plantilla Asociados · cartera de pruebas para laboratorios (sin tarifario)",
+ "generado": "2026-08-29",
+ "avisos": [
+  "El tiempo de entrega de los resultados SE CONSIDERA A PARTIR DE LA HORA DE LLEGADA DE LA MUESTRA AL LABORATORIO MATRIZ",
+  "Horario de atencion en matriz Lunes a Viernes de 06:30 a 20:00 (sin cerrar a medio día) - Sábado de 7:30 a 17:00",
+  "En caso de entrega de muestras cerca a la finalizacion de la jornada laboral coordinar con el laboratorio la entrega de resultados.",
+  "RETIRO DE MUESTRAS. El retiro de muestras inicia de 8am a 6pm, tomar en cuenta que recibimos solicitudes dentro del horario laboral y las",
+  "mismas serán solventadas en el orden de agendamiento y ubicacion del personal de logistica por lo que el tiempo de retiro es estimado."
+ ],
+ "notas": [
+  "Nota 1: Se requiere 1ml en caso de varias determinaciones (APLICA A TODOS LOS ANALISIS EN SUERO)",
+  "Nota 2: Enviar una alícuota (5-10ml) y registrar el volumen recolectado en 24 horas",
+  "Nota 3: Enviar todo el esperma recolectado en recipiente estéril dentro de la primera hora y anotada la hora de recolección y días de abstinencia.",
+  "Nota 4: Enviar placas fijadas en alcohol o spray (para coloración pap) y una o dos placas sin fijación secadas al aire",
+  "Nota 5: Transportar la muestra en hielo y un tubo plástico",
+  "Nota 6: El precio incluye una reconfirmación de casos positivos con otro método, esto mejora la especifidad en el diagnóstico",
+  "Nota 7: Solicitar instrucciones a EXAMLAB SAS",
+  "Nota 8: Las pruebas cuyo tiempo de entrega es a partir de las 6pm, la recepción de muestras en el laboratorio de procesamiento es de",
+  "Nota 9: Se emitirán los resultados el mismo día de las siguientes pruebas: ANA, ANTI DNA, (STORCH), Epstein Barr y pruebas con metodologia ELISSA siempre y cuando las muestras hayan sido receptadas en el Laboratorio hasta las 3:30 pm de lunes a viernes.",
+  "Nota 10: Se emitirá el resultado de la prueba de IGF1 el mismo día si la muestra llega al laboratorio matriz de LUNES A SABADO hasta 1pm.",
+  "Nota 11: En caso de requerir algun examen que no consta en el listado por favor comuníquese con nosotros. EXAMLAB cuenta con equipos automatizados y personal calificado que garantiza la realización de exámenes de laboratorio clínico, además cuenta con contactos nacionales e internacionales",
+  "Nota 12: ESPERMATOGRAMAS agendar el retiro con 1 día de anticipacion y de acuerdo al horario de recolección establecido, en caso de que la"
+ ],
+ "pruebas": [
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "BIOMETRIA HEMATICA",
+   "metodo": "CBC IMI",
+   "muestra": "Sangre Total + EDTA 2ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "FROTIS DE SANGRE PERIFERICA (BH + FROTIS)",
+   "metodo": "Microscopía",
+   "muestra": "Sangre total EDTA- tubo primario",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "COOMBS INDIRECTO",
+   "metodo": "Aglutinación en tubo",
+   "muestra": "Suero 1ml",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "COOMBS DIRECTO",
+   "metodo": "Aglutinación en tubo",
+   "muestra": "Sangre total EDTA- tubo primario",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "RETICULOCITOS",
+   "metodo": "Contaje en placa",
+   "muestra": "Sangre total EDTA- tubo primario",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "INDICE RETICULOCITARIO",
+   "metodo": "CBC IMI + Contaje en placa",
+   "muestra": "Sangre total EDTA- tubo principal",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "GRUPO Y FACTOR (TIPIFICACIÓN)",
+   "metodo": "Aglutinación en tubo",
+   "muestra": "Sangre total EDTA- tubo principal",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "HEMOPARASITOS FROTIS (HEMATOZOARIO)",
+   "metodo": "Microscopia Simple",
+   "muestra": "Sangre total EDTA- tubo principal",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "CELULAS LE",
+   "metodo": "Observación en Placa",
+   "muestra": "Sangre total tubo sin gel ni coagulante",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "HEMATOLOGIA",
+   "nombre": "CONTAJE MANUAL DE PLAQUETAS",
+   "metodo": "Placa o dilución",
+   "muestra": "Sangre total EDTA o citrato 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "GLUCOSA BASAL",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "GLUCOSA AL AZAR",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "HEMOGLOBINA GLICOSILADA (HBA1C)",
+   "metodo": "Electroforesis Capilar",
+   "muestra": "Sangre Total + EDTA (tubo)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "ACIDO URICO",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "UREA / BUN",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "CREATININA SERICA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero o Plasma 1ml (nota1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "CISTATINA C (INCLUTE CREATININA + IFG)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "PROTEINAS TOTALES",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "ALBUMINA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "GLOBULINA EN SUERO",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "GLOBULINA TRANSPORTADORA DE HORMONA SEXUAL",
+   "metodo": "Quimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "INDICE ALBUMINA/ GLOBULINA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "INDICE ATEROGENICO",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "PLASMA RICO EN PLAQUETAS",
+   "metodo": "Centrifugacion",
+   "muestra": "Plasma citratado",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "BILIRRUBINAS TOTAL DIRECTA E INDIRECTA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero o Plasma 1mL (nota1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "TGO/AST",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "TGP/ALT",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "GAMMA GLUTAMIL TRANSPEPTIDASA (GGT)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "FOSFATASA ALCALINA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "FOSFATASA ACIDA TOTAL",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "FOSFATASA ACIDA PROSTATICA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1 ml (nota1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "DESHIDROGENASA LACTICA (LDH)",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero o Plasma 1ml (nota1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "LIPASA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "AMILASA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "COLESTEROL TOTAL",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "HDL COLESTEROL",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "LDL COLESTEROL MEDIDO",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "LDL COLESTEROL CALCULADO",
+   "incluye": "(INCLUYE COLESTEROL TOTAL - TRIGLICERIDOS - HDL )",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "VLDL (INCLUYE COL, TG, HDL, LDL, VLDL, I. ATEROGENICO, NO HDL)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "TRIGLICERIDOS",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "LIPIDOS TOTALES",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "APOLIPOPROTEINA A 1",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "APOLIPOPROTEINA B",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "OSMOLARIDAD SERICA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 3ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "LACTATO",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Sangre total heparinizada (solicitar tubo)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "BICARBONATO",
+   "metodo": "Ion selectivo",
+   "muestra": "Sangre total heparinizada (solicitar tubo)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "TEST DE O´SULLIVAN (CARGA DE GLUCOSA DE 50MG)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero muestra basal y 1 hora despues",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOQUIMICA SANGUINEA",
+   "nombre": "COLINESTERASA SERICA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "HIERRO SERICO",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "CAPACIDAD DE FIJACION DEL HIERRO (UIBC)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "PERFIL DE HIERRO (Incluye: Fe, capacidad total de fijacion,transferrina, índice de saturacion de transferrina)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 2 ml (nota1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "FERRITINA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "TRANSFERRINA",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "INDICE SATURACION DE TRANSFERRINA (FE + UIBC)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "VITAMINA B12",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "VITAMINA D 25 HIDROXI (D2/D3)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "METABOLISMO FERRICO Y VITAMINAS",
+   "nombre": "VITAMINA B9 O ACIDO FOLICO (FOLATOS)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)- CONGELADO",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "TSH",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "FT4",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "FT3",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "T4 TOTAL",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "T3 TOTAL",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "INSULINA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "INDICE HOMA (INCLUYE GLUCOSA E INSULINA)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "CURVA DE INSULINA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1) / TOMA",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "PEPTIDO C",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1) + FUM",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "BHCG CUANTITATIVA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1) + FUM",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "BHCG CUALITATIVA SUERO",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero 1ml (nota 1) + FUM",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "PROGESTERONA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "17 OH PROGESTERONA",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "HORMONA FOLICULO ESTIMULANTE (FSH)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "HORMONA LUTEINIZANTE (LH)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "PROLACTINA (PRL)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "ESTRADIOL E2 (17 BETA ESTRADIOL))",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "DEHIDROEPIANDROSTERONA-SULFATO (DHEA-SO4)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "TESTOSTERONA TOTAL",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "TESTOSTERONA LIBRE MEDIDA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "TESTOSTERONA BIODISPONIBLE INCLUYE:",
+   "incluye": "albumina, globulina transportadora de hormona sexual · testosterona total, testosterona libre calculada.",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "INDICE ANDROGENICO LIBRE",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "HORMONA DE CRECIMIENTO (HGH)",
+   "metodo": "Inmunoensayo Heterogéneo",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "IGF- 1 Factor de Crecimiento Similar a la Insulina 1 - Somatomedina C",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1ml (nota 1) NOTA10",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1,
+    10
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "CORTISOL AM",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "CORTISOL PM",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "PARATOHORMONA INTACTA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "HORMONAS",
+   "nombre": "HORMONA ANTI MULLERIANA",
+   "metodo": "Quimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "TIROGLUBULINA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "ANTI TIROGLOBULINA (ATG)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "ANTICUERPOS ANT TPO (MICROSOMALES)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "ALFA FETO PROTEINA (AFP)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "ANTIGENO CARCINO EMBRIONARIO (CEA)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "ANTIGENO PROSTATICO ESPECIFICO (PSA TOTAL)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "ANTIGENO PROSTATICO LIBRE (PSA LIBRE)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "CA 125 (CARCINOMA OVARICO)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "CA 15-3 (CARCINOMA MAMARIO)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "CA 19-9 (CARCINOMA GASTRICO)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "HE4",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES TUMORALES",
+   "nombre": "INDICE ROMA (INCLUYE CA 125 Y HE4)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "SODIO, POTASIO, CLORO, CALCIO IONICO Na, K, Cl, Ca i",
+   "metodo": "ISE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "SODIO, POTASIO, CALCIO IONICO, CLORO, LITIO, Ph",
+   "metodo": "ISE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "CALCIO TOTAL",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "CORRECCION DEL CALCIO TOTAL",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "FOSFORO EN SUERO",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "MAGNESIO EN SUERO",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "ELECTROLITOS EN ORINA (Na, K, Cl)",
+   "metodo": "ISE",
+   "muestra": "Orina 10 ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "ELECTROLITOS",
+   "nombre": "ELECTROLITOS EN ORINA 24 H (Na, K, Cl)",
+   "metodo": "ISE",
+   "muestra": "Orina 10 ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS DE COAGULACION",
+   "nombre": "TIEMPO DE PROTROMBINA (TP)",
+   "metodo": "Coagulometría",
+   "muestra": "Plasma Citratado 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS DE COAGULACION",
+   "nombre": "TIEMPO DE TROMBOPLASTINA (TTP)",
+   "metodo": "Coagulometría",
+   "muestra": "Plasma Citratado 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS DE COAGULACION",
+   "nombre": "TIEMPO DE TROMBINA (TT)",
+   "metodo": "Coagulometría",
+   "muestra": "Plasma Citratado 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS DE COAGULACION",
+   "nombre": "FIBRINOGENO",
+   "metodo": "Coagulometría",
+   "muestra": "Plasma Citratado 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS DE COAGULACION",
+   "nombre": "DIMERO D",
+   "metodo": "Inmunofluorescencia",
+   "muestra": "Plasma Citratado 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS DE COAGULACION",
+   "nombre": "PLAQUETAS",
+   "metodo": "Manual/CBC IMI",
+   "muestra": "Sangre total (EDTA o Citrato sodico) tubo primario",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES CARDIOVASCULARES",
+   "nombre": "CREATIN KINASA TOTAL CPK",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "MARCADORES CARDIOVASCULARES",
+   "nombre": "CK MB",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "MARCADORES CARDIOVASCULARES",
+   "nombre": "TROPONINA I",
+   "metodo": "Inmunofluorescencia",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES CARDIOVASCULARES",
+   "nombre": "TROPONINA T",
+   "metodo": "Quimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MARCADORES CARDIOVASCULARES",
+   "nombre": "PEPTIDO NATRIURETICO (BnP)",
+   "metodo": "Quimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "PPD (TUBERCULINA)",
+   "metodo": "Manual (solicitar jeringuilla)",
+   "muestra": "Inoculación Directa",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "AC. ANTI ANTINUCLEARES (ANA)",
+   "metodo": "Inmunoensayo Heterogéneo",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "Anti DNA Anticuerpo (Doble Cadena)",
+   "metodo": "Inmunoensayo Heterogéneo",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "ANTI CCP (ANTI PEPTIDO CITRULINADO)",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "ANTI VIMENTINA CITRULINADA",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "FACTOR REUMATOIDE CUANTITATIVO (FR LATEX)",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "ASTO CUANTITATIVO",
+   "metodo": "Turbidimetría Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "PROTEINA C REACTIVA CUANTITATIVA PCR",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "PCR ULTRASENSIBLE",
+   "metodo": "Fotometría Automatizada ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "PROCALCITONINA",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "INTERLEUKINA (IL-6)",
+   "metodo": "Quimioluminiscencia",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "AGLUTINACIONES FEBRILES",
+   "metodo": "Aglutinación de Partículas",
+   "muestra": "Suero (1ml)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "C3 (TURBIDIMETRIA)",
+   "metodo": "Inmunoturbidimetrico ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "C4 (TURBIDIMETRIA)",
+   "metodo": "Inmunoturbidimetrico ROCHE",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "INMUNOGLOBULINA A (IgA)",
+   "metodo": "Ensayo Inmunoturbidimétrico",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "INMUNOGLOBULINA E (IgE)",
+   "metodo": "Quimioluminiscencia",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "INMUNOGLOBULINA G (IgG)",
+   "metodo": "Ensayo Inmunoturbidimétrico",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "INMUNOLOGIA",
+   "nombre": "INMUNOGLOBULINA M (IgM)",
+   "metodo": "Ensayo Inmunoturbidimétrico",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HIV 1+2 (4ta Generación)",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero (nota1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HIV 1+2 (3ra Generación)",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero (nota1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "INVESTIGACION SARS-CoV-2 ANTIGENO",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Hisopado nasofaringeo",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "INFLUENZA A+B RAPID TEST",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Hisopado Nasiofaringeo",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "VIRUS SINCITIAL RESPIORATORIO",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Hisopado Nasiofaringeo",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "SARS-CoV-2 : IgG, IgM PRUEBA RAPIDA",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "ANTICUERPOS SARS-CoV-2 : IgG, IgM CUANTITATIVO",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "COVID+INFLUENZA",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Hisopado Nasiofaringeo",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "COVID - INFLUENZA A/B - VSR",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Hisopado Nasiofaringeo",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "PANEL VIRAL COMPLETO",
+   "incluye": "INFLUENZA A Y B - VIRUS SINCITIAL RESPIRATORIO - METAPNEUMOVIRUS · PARAINFLUENZA - ADENOVIRUS RESPIRATORIO - COVID",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Hisopado Nasiofaringeo",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "QUANTIFERON Interferon Gamma",
+   "metodo": "TB-SPOT metodología del IGRa",
+   "muestra": "8ml sangre con heparina de litio",
+   "entrega": "3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HELICOBACTER PYLORI IgG CUANT.",
+   "metodo": "Inmunoensayo Heterogéneo",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HELICOBACTER PYLORI IgM CUANT.",
+   "metodo": "Quimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "TOXOPLASMA ANTI IgG",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "TOXOPLASMA ANTI IgM",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "CITOMEGALOVIRUS IgG",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "CITOMEGALOVIRUS IgM",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "RUBEOLA ANTI IgG",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "RUBEOLA ANTI IgM",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HERPES 1 IgG",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HERPES 1 IgM",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HERPES 2 IgG",
+   "metodo": "Quimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HERPES 2 IgM",
+   "metodo": "Quimioluminiscencia Automatizada",
+   "muestra": "Suero 1ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "TORCH IGG / IGM",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 2ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "TORCH IGM",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 2ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "TORCH IGG",
+   "metodo": "Electroquimioluminiscencia Automatizada",
+   "muestra": "Suero 2ml (nota 1 y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "EPSTEIN BARR VCA IGG",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1mL",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "EPSTEIN BARR VCA IGM",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1mL",
+   "entrega": "A partir de las 18:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "CHAGAS ANTICUERPOS IGG",
+   "metodo": "Inmunocromatografia",
+   "muestra": "Suero 1mL",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "SIFILIS PRUEBA RAPIDA",
+   "metodo": "Inmunocromatografia",
+   "muestra": "Suero 1mL",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "VDRL",
+   "metodo": "Aglutinación de Partículas",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "CHLAMYDIA TRACHOMATIS IgG",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "CHLAMYDIA TRACHOMATIS IgM",
+   "metodo": "Enzimoinmunoensayo (EIA)",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "CHLAMYDIA TRACHOMATIS ANTIGENO EN ORINA (HOMBRES)",
+   "metodo": "Inmunocromatografia",
+   "muestra": "Orina 10ml frasco primario",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "CLAMYDIA TRACHOMATIS ANTIGENO ENDOCERVIX",
+   "metodo": "Inmunocromatografia",
+   "muestra": "Hisopado endocervical (solicitar material)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "DENGUE ANTICUERPOS + NS1 - ANTIGENO",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero 1ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HEPATITIS A ANTI HAV IgG",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HEPATITIS A ANTI HAV IgM",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "HEPATITIS B HBAg (ANTIGENO AUSTRALIA)",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero 1ml (nota 1)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS INFECCIOSAS",
+   "nombre": "ANTI HCV (HEPATITIS C)",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Suero (nota1y 6)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    1
+   ]
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "HPV DE ALTO RIESGO GENOTIPOS 16 Y 18",
+   "incluye": "MAS POOL DE OTROS 13 GENOTIPOS (31, 33, 35, 39, 41, · 45, 52,53, 56, 58, 59, 66, 68)",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "CITOLOGIA UTERINA / URETRAL",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "HPV 40 GENOTIPOS",
+   "incluye": "Alto Riesgo: 16, 18, 31, 33, 35, 39, 45, 51, 52, 56, 58, 59, 68, 82 · Riesgo Intermedio: 26, 34, 40, 53, 54, 55, 57, 61, 66, 67, 69, 70 · 71, 72,73, 83, 84 · Bajo Riesgo: 6, 11, 42, 43, 44, 62, 81, 89, 90",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "Base líquida/Biopsia/Orina ORINA: PRIMERA DE LA MAÑANA RECOGIDA DEL CHORRO COMPLETO, SIN PREVIO ASEO DE LOS GENITALES ABSTINENCIA SEXUAL DE 3-5 DÍAS",
+   "entrega": "3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "PANEL CORTO DE ITS NEISSERIA GONORRHOEAE (NG) CHLAMYDIA TRACHOMATIS (CT) MYCOPLASMA GENITALIUM (MG) TRICHOMONAS VAGINALIS (TV) UREAPLASMA PARVUM (UP) UREAPLASMA UREALYTICUM (UU) MYCOPLASMA HOMINIS (MH) HERPES SIMPLEX 1 (HSV1) HERPES SIMPLEX 2 (HSV2) TREPONEMA PALLIDUM (TP)",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "CITOLOGIA CERVIX URETRAL / ORINA",
+   "entrega": "3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "PANEL AMPLIADO DE ITS Neisseria Gonorrhoeae (Ng), Chlamydia Trachomatis (Ct), Mycoplasma Genitalium (Mg), Trichomonas Vaginalis (Tv),Ureaplasma Parvum (Up),Ureaplasma Urealyticum (Uu),Mycoplasma Hominis (Mh) Gardnerella Vaginalis (Gv), Treponema Pallidum (Tp), Haemophilus Ducreyi (Hd), Streptococcus Agalactiae (Sa) Herpes Simplex 1 (Hsv1), Herpes Simplex 2 (Hsv2)",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "CITOLOGIA CERVIX URETRAL / ORINA",
+   "entrega": "3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "ESTUDIO DE MICROBIOTA VAGINAL,cuantificación de: Herpes simplex virus 1, Mycoplasma genitalium Herpes simplex virus 2 Chlamydia trachomatis Neisseria gonorrhoeae Mobiluncus curtisii Treponema pallidum Trichomonas vaginalis Ureaplasma urealyticum Fannyhessea vaginae Mycoplasma hominis Haemophilus ducreyi Mobiluncus mulieris Gardnerella vaginalis Candida glabrata Enterococcus faecalis Streptococcus agalactiae Candida tropicalis Candida albicans Bacterial Vaginosis Associated Bacteria-2 (BVAB- 2) Staphylococcus aureus Escherichia coli Megasphaera phylotype 1 (MP1) Megasphaera phylotype 2 (MP2) Candida parapsilosis Prevotella bivia Lactobacillus crispatus Lactobacillus jensenii Lactobacillus gasseri Lactobacillus iners",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "CITOLOGIA",
+   "entrega": "3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "(PANEL DE INFECCIONES A LAS VIAS URINARIAS",
+   "incluye": "AMPLIADO ITU) MAS RESISTENCIA ANTIBIOTICA · Gram+ Bacteria: Staphylococcus aureus, Staphylococcus · saprophyticus, Aerococcus urinae, Enterococcus faecium, · Streptococcus agalactiae, Enterococcus faecalis, · Corynebacterium urealyticum · Gram- Bacteria: Acinetobacter baumannii, Klebsiella pneumoniae, · Morganella morganii, Pseudomonas aeruginosa, Providencia · stuartii, Ureaplasma urealyticum, Ureaplasma parvum, Proteus · vulgaris, Proteus mirabilis, Escherichia coli, Serratia marcescens, · Klebsiella oxytoca, Klebsiella aerogenes, Enterobacter cloacae, · Citrobacter freundii, Treponema pallidum · Fungi: Candida parapsilosis, C.albicans, C.glabrata, C.tropicalis, · C.krusei, C.auris",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "ORINA PRIMERA DE LA MAÑANA RECOGIDA DEL CHORRO COMPLETO, SIN PREVIO ASEO DE LOS GENITALES ANEXAR CLINICA DEL PACIENTE",
+   "entrega": "3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "INVESTIGACION SARS-CoV-2",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "HISOPADO NASOFARNGEO SOLICITAR MATERIAL",
+   "entrega": "1 día 18:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "DETECCION DE MYCOBACTERIUM TUBERCULOSIS",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "ESPUTO",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "PANEL DE 108 INTOLERANCIAS ALIMENTARIAS",
+   "metodo": "INMUNOBLOT",
+   "muestra": "SUERO 1ML",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "PANEL DE MICROBIOTA INTESTINAL",
+   "incluye": "Detección y cuantificación: Bacteroides Prevotella Ruminococcus · Lachnospiraceae Akkermansia muciniphila · Faecalibacterium prausnitzil Bifidobacterium Eubacterium rectile",
+   "metodo": "PCR TIEMPO REAL",
+   "muestra": "HECES REFRIGERADAS",
+   "entrega": "3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BIOLOGIA MOLECULAR",
+   "nombre": "PANEL DE 54 ALERGENOS",
+   "incluye": "1 Dermatophagoides pterronyssinus, 2 Dermatophagoides farinae · 3. Blomia tropicalis, 4 Polvo doméstico, 5 Mosquito · 6. Cucaracha americana, 7 Penicillum notatum (penicilina) · 8. Cladosporium herbarum, 9 Aspergillus fumigatus (hongo) · 10 Candida albicans (hongo), 11 Alternaria alternata (hongo) · 12 Grama comun, 13 Hierba timotea (llano), 14 Abedul · 15. Mezcla árboles, 16. Malezas, 17 Gato, 18 Perro · 19 Caballo, 20 Harina de trigo, 21 Harina de cebada, · 22 Harina de avena, 23 Arroz, 24 Quinoa, 25 Clara de huevo · 26 yema de huevo, 27 bacalao, 28 atun, 29salmon, · 30 leche vaca, 31 caseína (leche de vaca), 32 B lacto globulina, · 33 a lactalbúmina, 34 cangrejo, 35 camarón / langostino · 36 tomates, 37 zanahoria, 38papa, 39 aguacate, 40 semilla soja · 41 mania, 42 nuez, 43carne de cerdo, 44 carne de pollo · 45 carne de vacuno, 46 naranja, 47 fresa, 48 manzana, 49 piña · 50 kiwi, 51 platano, 52 mango, 53 melocotón, 54 sandía",
+   "metodo": "INMUNOBLOT",
+   "muestra": "SUERO 1ML",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS TOXICOLOGICAS",
+   "nombre": "PANEL DE 16 DROGAS",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Orina",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS TOXICOLOGICAS",
+   "nombre": "PANEL DE 6 DROGAS + ALCOHOL EN ORINA",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Orina",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS TOXICOLOGICAS",
+   "nombre": "ALCOHOL ETILICO EN SALIVA",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Saliva 1ml (entregar en 15 minutos)",
+   "entrega": "45 minutos",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS TOXICOLOGICAS",
+   "nombre": "ESCOPOLAMINA EN ORINA",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Orina",
+   "entrega": "45 minutos",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "ELEMENTAL Y MICROSCOPICO (TINCION STERNHEIMER-MALBIN)",
+   "metodo": "Microscopia simple",
+   "muestra": "Orina",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "GOTA FRESCA",
+   "metodo": "Microscopia Simple",
+   "muestra": "Distintas Muestras",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "HEMATIES DISMORFICOS EN ORINA-MORFOLOGIA",
+   "metodo": "Microscopia Simple",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "PROTEINAS EN ORINA ESPONTENA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "PROTEINURIA 24 HORAS",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "MICROALBUMINURIA EN ORINA ESPONTANEA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "MICROALBUMINURIA 24H",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "INDICE ALBUMINA/ CREATININA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "INDICE PROTEINURIA / CREATINURIA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "INDICE CALCIO/CREATINURIA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "NITROGENO UREICO (BUN) EN ORINA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 5ml",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "GLUCOSA CUANTITATIVA EN ORINA DE 24H",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "GLUCOSA CUANTITATIVA EN ORINA ESPONTANEA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "UREA ORINA PARCIAL",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "UREA EN ORINA 24 HORAS",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "CREATININA EN ORINA PARCIAL",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "CREATININA EN ORINA DE 24HORAS",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "DEPURACION DE LA CREATININA EN 24H",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Suero 1ml y Orina (nota2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "ACIDO URICO EN ORINA ESPONTANEA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "ACIDO URICO EN ORINA 24 H",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "CALCIO EN ORINA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "CALCIO EN ORINA 24 H.",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "FOSFORO EN ORINA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "FOSFORO EN ORINA 24 H.",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "MAGNESIO EN ORINA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "MAGNESIO EN ORINA 24 H.",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina 24H (nota 2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "AMILASA EN ORINA EN ORINA 24 H.",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina (nota2)",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    2
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "AMILASA ORINA PARCIAL",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN ORINA",
+   "nombre": "OSMOLARIDAD ORINA",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Orina Espontánea",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "COPROPARASITARIO",
+   "metodo": "Microscopia Simple",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "COPROPARASITARIO X CONCENTRACION",
+   "metodo": "Microscopia Simple",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "INVESTIGACION POLIMORFONUCLEARES (PMN)",
+   "metodo": "Microscopia Simple",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "SANGRE OCULTA EN HECES",
+   "metodo": "Benzidina",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "PH EN HECES",
+   "metodo": "Cromatografia",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "ROTAVIRUS",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "ADENOVIRUS",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "NOROVIRUS",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "HELICOBACTER PYLORI EN HECES",
+   "metodo": "Inmunoturbidimetria",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "ANTIGENO GIARDIA",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "CLOSTRIDIUM DIFFICILE TOXINA A / B",
+   "metodo": "Inmunocromatografía",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "INVESTIGACION DE OXIUROS",
+   "metodo": "Test de Graham",
+   "muestra": "Cinta adhesiva en portaobjetos",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "AZUCARES REDUCTORES EN HECES",
+   "metodo": "Benedict",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "CALPROTECTINA",
+   "metodo": "Inmunoturbidimetría",
+   "muestra": "Heces Fecales",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "EOSINOFILOS EN HECES",
+   "metodo": "Microscopia",
+   "muestra": "Heces",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS EN HECES",
+   "nombre": "SUDAN III",
+   "metodo": "Microscopia",
+   "muestra": "Heces",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "COLORACION GRAM",
+   "metodo": "Microscopia Simple",
+   "muestra": "Distintas Muestras",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "COLORACION GRAM DE GOTA FRESCA GGF",
+   "metodo": "Miscroscopia Simple",
+   "muestra": "Distintas Muestras",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "COLORACION ZHIEL NIELSEN (BAAR TINCION)",
+   "metodo": "Coloración Ziehl Neelsen",
+   "muestra": "Distintas Muestras",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "UROCULTIVO",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "ORINA",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "CULTIVO DE LIQUIDO SEMINAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Líquido seminal",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "CULTIVO SECRECION VAGINAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Secreción vaginal",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "CULTIVO SEC. FARINGEA",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Secreción faringea",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "CULTIVO DE ESPUTO",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Esputo",
+   "entrega": "2 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "CULTIVO DE HERIDAS, ABSESOS, PIEL, MUCOSAS, ETC",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Heridas- medio Stuart",
+   "entrega": "2-3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "CULTIVO Y ANTIBIOGRAMA DE HECES",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Heces",
+   "entrega": "2-3 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "HEMOCULTIVO",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Sangre Total (Solicitar frasco)",
+   "entrega": "3-5 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "NICKERSON",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Varias muestras",
+   "entrega": "3 días",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "KOH INVESTIGACION DIRECTA DE HONGOS",
+   "metodo": "Microscopia Simple",
+   "muestra": "Diferentes muestras",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "pH VAGINAL",
+   "metodo": "Cromatografia",
+   "muestra": "Secreción vaginal",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICROBIOLOGIA",
+   "nombre": "TINTA CHINA",
+   "metodo": "Microscopia",
+   "muestra": "LCR",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO DE ORINA MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Orina frasco primario",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO DE LIQUIDO SEMINAL MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Líquido seminal",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO SECRECION VAGINAL MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Secreción vaginal",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO SECRECION FARINGEA MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Secreción faringea",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO DE ESPUTO MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Esputo",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO URETRAL (EXCLUYE Neisseria gonorrhoeae) MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Hisopado uretral",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO DE HERIDAS, ABSESOS, PIEL, MUCOSAS, ETC MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Diferentes muestras",
+   "entrega": "3-5 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "CULTIVO Y ANTIBIOGRAMA DE HECES MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Heces",
+   "entrega": "2-3 días",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "HEMOCULTIVO MANUAL",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Sangre Total (Solicitar frasco)",
+   "entrega": "3-5 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA MANUAL",
+   "nombre": "NICKERSON",
+   "metodo": "Cultivo Agar/ caldo",
+   "muestra": "Diferentes muestras",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "CULTIVO DE ORINA AUTOMATIZADO",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Orina frasco primario",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "CULTIVO DE LIQUIDO SEMINAL AUTOMATIZADO",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Líquido seminal",
+   "entrega": "2 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "CULTIVO DE HERIDAS / SECRECIONES AUTOMATIZADO",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Diferentes muestras",
+   "entrega": "3 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "CULTIVO DE LIQUIDOS BIOLÓGICOS AUTOMATIZADO",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Líquidos biológicos",
+   "entrega": "3 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "CULTIVO OCULAR Y OTICO AUTOMATIZADO",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Ocular - ótico",
+   "entrega": "3 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "CULTIVO MATERIAL OSEO Y TEJIDO AUTOMATIZADO",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Hueso - tejido",
+   "entrega": "3 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "HEMOCULTIVO AUTOMATIZADO",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Sangre Total (Solicitar frasco)",
+   "entrega": "3-5 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "BACTERIOLOGIA AUTOMATIZADA",
+   "nombre": "CEPA BACTERIANA",
+   "metodo": "CIM AUTOMATIZADO",
+   "muestra": "Cepa bacteriana",
+   "entrega": "1 día 18:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "MICOLOGIA",
+   "nombre": "FUNGIGRAMA PARA HONGOS LEVADURIFORME",
+   "metodo": "Cultivo Agar CIM AUTOMATIZADO",
+   "muestra": "Secreciones",
+   "entrega": "3 días 15:00",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "ESTUDIO DE SEC. VAGINAL (INCLUYE PH, KOH, AMINAS, GRAM, FRESCO)",
+   "metodo": "Microscopia",
+   "muestra": "Secreción vaginal",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "CITOQUIMICOS DE LIQUIDOS CORPORALES",
+   "metodo": "Fotometría Automatizada",
+   "muestra": "Distintas muestras",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "CRISTALOGRAFIA",
+   "metodo": "Microscopia",
+   "muestra": "Frotis vaginal",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "ESPERMATOGRAMA",
+   "metodo": "Microscopia",
+   "muestra": "Líquido seminal NOTA 12",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": [
+    12
+   ]
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "EOSINOFILOS MOCO NASAL",
+   "metodo": "Tincion",
+   "muestra": "Placa fosa derecha e izquierda",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "PAPANICOLAOU CITOLOGIA CERVICO VAGINAL PLACA",
+   "metodo": "Microscopía",
+   "muestra": "Frotis Fijado",
+   "entrega": "3-5 días",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "CITOLOGIA EN BASE LIQUIDA VAGINAL",
+   "metodo": "Citología en base líquida",
+   "muestra": "Cepillado de cervix y endocervix",
+   "entrega": "6 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "CITOLOGIA DE LIQUIDOS (ASCITICO, PLEURAL, ORINA)",
+   "metodo": "Microscopia",
+   "muestra": "Alicuota del líquido",
+   "entrega": "4 días hábiles",
+   "precio": null,
+   "notas": []
+  },
+  {
+   "especialidad": "PRUEBAS ESPECIALES",
+   "nombre": "GASOMETRIA ARTERIAL / VENOSA",
+   "metodo": "Gasometro",
+   "muestra": "Sangre total heparinizada",
+   "entrega": "El mismo día",
+   "precio": null,
+   "notas": []
+  }
+ ]
+}

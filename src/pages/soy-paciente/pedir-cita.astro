@@ -46,6 +46,7 @@ const pasos = [
   schema={schema}
 >
   <PageHero
+    foto="recepcion-de-muestras"
     eyebrow="Pedir cita"
     titulo="Agende su examen por WhatsApp"
     descripcion="Sin formularios ni llamadas en espera. Nos escribe, elegimos juntos el horario y le enviamos las indicaciones de preparación."
@@ -67,15 +68,15 @@ const pasos = [
   <section class="bg-white py-section">
     <div class="container-page">
       <SectionHeading eyebrow="Cómo agendar" titulo="Cuatro pasos por WhatsApp" />
-      <ol class="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <ol class="reveal-stagger mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {
           pasos.map((paso, i) => (
-            <li class="rounded-3xl bg-surface p-6">
-              <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-[17px] font-bold text-white">
+            <li class="rounded-xl bg-surface p-6">
+              <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-lg font-bold text-white">
                 {i + 1}
               </span>
-              <h3 class="mt-4 text-[17px] font-bold text-brand">{paso.titulo}</h3>
-              <p class="mt-2 text-[14px] leading-relaxed text-neutral">{paso.texto}</p>
+              <h3 class="mt-4 text-lg font-bold text-brand">{paso.titulo}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-neutral">{paso.texto}</p>
             </li>
           ))
         }
@@ -91,15 +92,15 @@ const pasos = [
         titulo="Elija la sede o pida la toma a domicilio"
         descripcion="Cada botón abre el chat con el mensaje ya preparado para esa opción."
       />
-      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {
           sedes.map((sede) => (
-            <div class="flex flex-col gap-3 rounded-3xl bg-white p-6 shadow-card">
-              <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+            <div class="flex flex-col gap-3 rounded-xl bg-white p-6 border border-line">
+              <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
                 <Icon name="pin" size={23} />
               </span>
-              <h3 class="text-[17px] font-bold text-brand">{sede.nombre}</h3>
-              <p class="text-[13.8px] leading-relaxed text-neutral">
+              <h3 class="text-lg font-bold text-brand">{sede.nombre}</h3>
+              <p class="text-sm leading-relaxed text-neutral">
                 {sede.direccion}
                 <br />
                 {sede.ciudad}, {sede.provincia}
@@ -112,12 +113,12 @@ const pasos = [
             </div>
           ))
         }
-        <div class="flex flex-col gap-3 rounded-3xl bg-brand p-6">
-          <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-accent-light">
+        <div class="flex flex-col gap-3 rounded-xl bg-brand p-6">
+          <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/12 text-accent-light">
             <Icon name="casa" size={23} />
           </span>
-          <h3 class="text-[17px] font-bold text-white">Toma a domicilio</h3>
-          <p class="text-[13.8px] leading-relaxed text-white/75">
+          <h3 class="text-lg font-bold text-white">Toma a domicilio</h3>
+          <p class="text-sm leading-relaxed text-white/75">
             Un profesional acude a su casa u oficina. Se agenda hasta las 17:00 del día anterior y
             tiene un valor adicional por desplazamiento.
           </p>
@@ -145,8 +146,8 @@ const pasos = [
               'Llegue 10 minutos antes de la hora acordada.',
               'Si necesita cancelar o reprogramar, avísenos por el mismo chat.',
             ].map((item) => (
-              <li class="flex items-start gap-3 text-[15px] leading-relaxed text-neutral">
-                <Icon name="check" size={19} strokeWidth={2.2} class="mt-0.5 text-accent" />
+              <li class="flex items-start gap-3 text-base leading-relaxed text-neutral">
+                <Icon name="check" size={19} strokeWidth={2.2} class="mt-0.5 text-accent-dark" />
                 {item}
               </li>
             ))
@@ -154,12 +155,12 @@ const pasos = [
         </ul>
       </div>
 
-      <aside class="rounded-3xl bg-surface p-6 lg:p-7">
-        <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-alert-soft text-alert-dark">
+      <aside class="rounded-xl bg-surface p-6 lg:p-7">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-alert-soft text-alert-dark">
           <Icon name="mas" size={21} />
         </span>
-        <h2 class="mt-4 text-[18px] font-bold text-brand">¿Es un examen urgente?</h2>
-        <p class="mt-2.5 text-[14px] leading-relaxed text-neutral">
+        <h2 class="mt-4 text-lg font-bold text-brand">¿Es un examen urgente?</h2>
+        <p class="mt-2.5 text-sm leading-relaxed text-neutral">
           Procesamos con prioridad los exámenes con indicación de urgencia y entregamos el mismo
           día. Llame directamente para coordinar.
         </p>

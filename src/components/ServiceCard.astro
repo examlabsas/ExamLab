@@ -1,5 +1,20 @@
 ---
-/** Tarjeta de acceso rápido (fila bajo el hero). */
+/**
+ * Acceso rápido a un destino del sitio.
+ *
+ * No es una tarjeta. Antes lo era —caja redondeada, borde, sombra al pasar el
+ * mouse y una barrita de color arriba— y ese contenedor no hacía nada: fondo
+ * blanco sobre fondo blanco.
+ *
+ * El filete superior no es decoración repartida por igual: en este sitio marca
+ * exactamente una cosa, «aquí hay algo que pulsar». Las secuencias numeradas y
+ * las listas de afirmaciones no lo llevan, precisamente para que signifique
+ * algo cuando aparece.
+ *
+ * Al pasar el mouse —o al llegar con el tabulador— se dibuja una segunda línea
+ * sobre la gris, de izquierda a derecha. Es la única animación de estado del
+ * sitio y va donde hay un destino real.
+ */
 import Icon from './Icon.astro';
 import type { IconName } from '@/lib/iconos';
 
@@ -7,6 +22,7 @@ interface Props {
   icono: IconName;
   titulo: string;
   descripcion: string;
+  /** Nombra la acción concreta: «Agendar», «Buscar», «Ver mapa». */
   cta: string;
   href: string;
   external?: boolean;
@@ -20,27 +36,36 @@ const esExterna = external ?? href.startsWith('http');
   href={href}
   target={esExterna ? '_blank' : undefined}
   rel={esExterna ? 'noopener' : undefined}
-  class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-line bg-white p-6 transition-all duration-200 hover:border-brand hover:shadow-md"
+  class="group relative flex flex-col pt-5"
 >
-  <div class="absolute top-0 left-0 h-1 w-full bg-line-strong transition-colors duration-200 group-hover:bg-accent"></div>
-  
-  <div>
-    <div class="flex items-center justify-between">
-      <span class="inline-flex items-center justify-center text-brand transition-colors duration-200 group-hover:text-accent">
-        <Icon name={icono} size={24} strokeWidth={2} />
-      </span>
-    </div>
-    <span class="mt-4 block text-lg font-bold text-brand">{titulo}</span>
-    <span class="mt-2 block text-sm leading-relaxed text-neutral">{descripcion}</span>
-  </div>
+  <span class="absolute inset-x-0 top-0 h-0.5 bg-line" aria-hidden="true"></span>
+  {/*
+    Se anima el ancho y no una transformación: la línea está fuera del flujo, así
+    que no arrastra a nada al crecer, y el estado se puede medir directamente.
+  */}
+  <span
+    class="absolute top-0 left-0 h-0.5 w-0 bg-accent-dark transition-[width] duration-300 ease-out group-hover:w-full group-focus-visible:w-full motion-reduce:transition-none"
+    aria-hidden="true"></span>
 
-  <div class="mt-5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-brand uppercase transition-colors duration-200 group-hover:text-accent">
+  <Icon name={icono} size={23} strokeWidth={2} dibujo class="text-accent-dark" />
+
+  <span
+    class="mt-4 block text-lg leading-snug font-bold text-brand transition-colors duration-200 group-hover:text-accent-dark"
+  >
+    {titulo}
+  </span>
+
+  <span class="mt-2 block text-sm leading-relaxed text-neutral">{descripcion}</span>
+
+  <span
+    class="mt-5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-accent-dark uppercase"
+  >
     {cta}
     <Icon
       name="flecha"
       size={14}
       strokeWidth={2.4}
-      class="text-accent transition-transform duration-200 group-hover:translate-x-1"
+      class="transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none"
     />
-  </div>
+  </span>
 </a>

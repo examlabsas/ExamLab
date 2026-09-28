@@ -33,10 +33,15 @@ const schema = [
   whatsapp="catalogo"
   schema={schema}
 >
+  {/*
+    Cabecera compacta: esta página es una herramienta, no un texto. Con el
+    titular a tamaño completo el buscador quedaba fuera de la primera pantalla,
+    justo lo que la gente viene a usar.
+  */}
   <PageHero
-    eyebrow="Catálogo de exámenes"
-    titulo="Busque por código, nombre o especialidad"
-    descripcion="Herramienta de consulta para pacientes y profesionales de la salud. Cada examen indica su especialidad, tipo de muestra, tiempo de entrega y las condiciones del estudio y del paciente."
+    compacto
+    titulo={`Catálogo de ${examenes.length} exámenes`}
+    descripcion="Busque por nombre, especialidad o cómo lo llama la gente."
     migas={[
       { nombre: 'Inicio', href: '/' },
       { nombre: 'Catálogo de exámenes', href: '/catalogo' },
@@ -47,6 +52,6 @@ const schema = [
     lista={examenes}
     basePath="/catalogo"
     whatsappHref={whatsappLink('catalogo')}
-    aviso="Las condiciones indicadas aplican al procedimiento estándar del laboratorio. Si su médico le entregó indicaciones distintas, siga las de su médico. Para conocer valores y convenios vigentes, escríbanos por WhatsApp antes de acudir a la toma de muestra."
+    aviso="Las indicaciones de cada examen son las que usamos habitualmente en el laboratorio. Si su médico le dio otras, siga las de su médico. Y si quiere saber el valor de un examen o si aplica su convenio, escríbanos por WhatsApp antes de venir: con gusto le ayudamos."
   />
 </BaseLayout>

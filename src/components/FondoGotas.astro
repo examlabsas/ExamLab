@@ -1,0 +1,108 @@
+---
+/**
+ * Fondo decorativo para las secciones azules: unas pocas gotas translúcidas
+ * (el emblema de la marca es una gota) que flotan muy despacio, como si se
+ * mirara a través de una lupa. Se dibuja detrás del contenido y no se puede
+ * pulsar ni leer con lector de pantalla.
+ *
+ * La sección que lo use debe ser `relative` y `overflow-hidden`; el contenido
+ * va en un hermano con `relative` para quedar por encima.
+ *
+ * Es solo CSS: tres formas con `animation` de 18–30 s. Con
+ * `prefers-reduced-motion` quedan quietas (siguen decorando, no se mueven).
+ */
+interface Props {
+  /** `suave` para fondos donde el contenido tiene poco contraste de sobra. */
+  intensidad?: 'normal' | 'suave';
+  /** `claro` para secciones blancas: las gotas van en azul de marca en vez de blanco. */
+  tono?: 'oscuro' | 'claro';
+}
+
+const { intensidad = 'normal', tono = 'oscuro' } = Astro.props;
+---
+
+<div
+  class:list={[
+    'fondo-gotas pointer-events-none absolute inset-0',
+    intensidad === 'suave' && 'fondo-gotas--suave',
+    tono === 'claro' && 'fondo-gotas--claro',
+  ]}
+  aria-hidden="true"
+>
+  <span class="gota gota-1"></span>
+  <span class="gota gota-2"></span>
+  <span class="gota gota-3"></span>
+</div>
+
+<style>
+  .fondo-gotas {
+    --gota-opacidad: 0.09;
+    overflow: hidden;
+  }
+  .fondo-gotas--suave {
+    --gota-opacidad: 0.05;
+  }
+  /* Sobre blanco, azul de marca muy diluido: se ve la forma, no una mancha. */
+  .fondo-gotas--claro {
+    --gota-color: var(--color-brand);
+    --gota-opacidad: 0.1;
+  }
+
+  /*
+    Silueta de gota: un círculo con una esquina en punta (border-radius con
+    una esquina a 0 y girado 45°). Blur ligero para que se lea como forma de
+    fondo y no como icono.
+  */
+  .gota {
+    position: absolute;
+    display: block;
+    border-radius: 50% 50% 50% 0;
+    background: var(--gota-color, white);
+    opacity: var(--gota-opacidad);
+    filter: blur(1px);
+    will-change: transform;
+    animation: gota-flota var(--duracion, 24s) ease-in-out infinite alternate;
+  }
+
+  .gota-1 {
+    width: 22rem;
+    height: 22rem;
+    right: -6rem;
+    top: -8rem;
+    transform: rotate(-45deg);
+    --duracion: 26s;
+  }
+  .gota-2 {
+    width: 12rem;
+    height: 12rem;
+    right: 28%;
+    bottom: -5rem;
+    transform: rotate(-45deg);
+    --duracion: 19s;
+    animation-delay: -7s;
+  }
+  .gota-3 {
+    width: 7rem;
+    height: 7rem;
+    left: 6%;
+    bottom: 12%;
+    transform: rotate(-45deg);
+    --duracion: 31s;
+    animation-delay: -13s;
+  }
+
+  @keyframes gota-flota {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: -1.5rem 2rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gota {
+      animation: none;
+    }
+  }
+</style>

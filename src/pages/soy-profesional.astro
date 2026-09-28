@@ -6,6 +6,7 @@ import Button from '@/components/Button.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
 import BuscadorExamenes from '@/components/BuscadorExamenes.astro';
 import { site } from '@/lib/site';
+import { foto, SIZES_MEDIA_COLUMNA } from '@/lib/fotos';
 import { whatsappLink } from '@/lib/whatsapp';
 import { breadcrumbSchema } from '@/lib/schema';
 import type { IconName } from '@/lib/iconos';
@@ -83,8 +84,9 @@ const schema = [
   schema={schema}
 >
   <PageHero
+    foto="analizador-automatizado"
     eyebrow="Para profesionales de la salud"
-    titulo="Un laboratorio que trabaja con usted, no solo para usted"
+    titulo="Trabajamos con médicos, clínicas e instituciones"
     descripcion="Resultados trazables, comunicación de valores críticos y un equipo técnico disponible para resolver sus consultas."
     migas={[
       { nombre: 'Inicio', href: '/' },
@@ -92,7 +94,7 @@ const schema = [
     ]}
   >
     <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <Button href={site.portalProfesional} icon="monitor">Portal profesional</Button>
+      <Button href={site.sistema.url} icon="monitor">Portal profesional</Button>
       <Button href={whatsappLink('profesional')} variant="sobreOscuro" icon="whatsapp-marca">
         Hablar con el equipo
       </Button>
@@ -114,15 +116,17 @@ const schema = [
         eyebrow="Qué le ofrecemos"
         titulo="Soporte real en cada etapa del proceso"
       />
-      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-x-9 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
         {
+          /*
+            Sin filete ni caja: no se pulsa nada aquí, son afirmaciones. Separa
+            el aire, que es suficiente cuando cada bloque abre con su icono.
+          */
           beneficios.map((item) => (
-            <article class="rounded-3xl border border-line bg-white p-7 transition-shadow duration-200 hover:shadow-card-hover">
-              <span class="flex h-13 w-13 items-center justify-center rounded-2xl bg-brand text-accent">
-                <Icon name={item.icono} size={25} strokeWidth={1.9} />
-              </span>
-              <h2 class="mt-4.5 text-[18px] font-bold text-brand">{item.titulo}</h2>
-              <p class="mt-2.5 text-[14.2px] leading-relaxed text-neutral">{item.texto}</p>
+            <article>
+              <Icon name={item.icono} size={23} strokeWidth={2} dibujo class="text-accent-dark" />
+              <h2 class="mt-4 text-lg leading-snug font-bold text-brand">{item.titulo}</h2>
+              <p class="mt-2 text-sm leading-relaxed text-neutral">{item.texto}</p>
             </article>
           ))
         }
@@ -133,15 +137,18 @@ const schema = [
   <!-- Fase preanalítica -->
   <section class="bg-surface py-section">
     <div class="container-page grid grid-cols-1 gap-9 lg:grid-cols-2 lg:gap-14">
-      <div class="relative">
+      {/*
+        En escritorio la foto se estira a la altura de la lista de la derecha:
+        el contenedor ocupa toda la celda de la cuadrícula y la imagen, en
+        posición absoluta, lo llena. En móvil vuelve a tener altura propia.
+      */}
+      <div class="relative overflow-hidden rounded-xl lg:self-stretch">
         <img
-          src="/images/Fotolaboratorio.png"
-          alt="Equipo técnico de ExamLab procesando muestras"
-          width="1024"
-          height="768"
+          {...foto('recepcion-de-muestras')}
+          sizes={SIZES_MEDIA_COLUMNA}
           loading="lazy"
           decoding="async"
-          class="h-[clamp(280px,34vw,440px)] w-full rounded-[28px] object-cover"
+          class="h-[clamp(17.5rem,34vw,27.5rem)] w-full object-cover lg:absolute lg:inset-0 lg:h-full"
         />
       </div>
       <div>
@@ -153,13 +160,13 @@ const schema = [
         <ol class="mt-7 flex flex-col gap-4">
           {
             preanalitico.map((paso, i) => (
-              <li class="flex items-start gap-4 rounded-2xl bg-white p-5 shadow-card">
-                <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-brand text-[13px] font-bold text-white">
+              <li class="flex items-start gap-4 rounded-xl bg-white p-5 border border-line">
+                <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
                   {i + 1}
                 </span>
                 <div>
-                  <h3 class="text-[16px] font-bold text-brand">{paso.titulo}</h3>
-                  <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">{paso.texto}</p>
+                  <h3 class="text-base font-bold text-brand">{paso.titulo}</h3>
+                  <p class="mt-1.5 text-sm leading-relaxed text-neutral">{paso.texto}</p>
                 </div>
               </li>
             ))
@@ -178,7 +185,7 @@ const schema = [
         descripcion="Un acuerdo simple, sin volumen mínimo, pensado para el médico de consulta privada."
       />
 
-      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-x-9 gap-y-10 md:grid-cols-2 lg:grid-cols-4">
         {
           [
             {
@@ -202,12 +209,10 @@ const schema = [
               texto: 'Coordinamos el retiro de muestras tomadas en su consultorio, con cadena de frío.',
             },
           ].map((item) => (
-            <article class="flex flex-col gap-3 rounded-3xl border border-line bg-white p-6">
-              <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
-                <Icon name={item.icono} size={23} />
-              </span>
-              <h3 class="text-[17px] font-bold text-brand">{item.titulo}</h3>
-              <p class="text-[13.8px] leading-relaxed text-neutral">{item.texto}</p>
+            <article>
+              <Icon name={item.icono} size={23} strokeWidth={2} dibujo class="text-accent-dark" />
+              <h3 class="mt-4 text-lg leading-snug font-bold text-brand">{item.titulo}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-neutral">{item.texto}</p>
             </article>
           ))
         }
@@ -215,16 +220,16 @@ const schema = [
 
       <div
         id="contacto"
-        class="mt-8 grid scroll-mt-24 grid-cols-1 gap-8 rounded-[32px] bg-brand p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12 lg:p-12"
+        class="mt-8 grid scroll-mt-24 grid-cols-1 gap-8 rounded-xl bg-brand p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12 lg:p-12"
       >
         <div>
-          <span class="block text-[12.5px] font-bold tracking-[1.8px] text-accent-light uppercase">
+          <span class="block text-xs font-bold tracking-[1.8px] text-accent-light uppercase">
             Contacto directo
           </span>
           <h2 class="mt-3 max-w-[560px] text-h2 font-bold text-white">
             Hable directamente con el equipo técnico
           </h2>
-          <p class="mt-4 max-w-[560px] text-[15px] leading-relaxed text-white/75">
+          <p class="mt-4 max-w-[560px] text-base leading-relaxed text-white/75">
             Línea exclusiva para profesionales de la salud, clínicas e instituciones de {site.provincia}.
             Consultas técnicas, convenios y coordinación de retiro de muestras.
           </p>
@@ -234,8 +239,8 @@ const schema = [
           <Button href={whatsappLink('convenios')} variant="sobreOscuro" icon="whatsapp-marca">
             Convenio institucional
           </Button>
-          <Button href={`mailto:${site.email}`} variant="sobreOscuro" icon="correo">
-            {site.email}
+          <Button href={`mailto:${site.emails.laboratorio}`} variant="sobreOscuro" icon="correo">
+            {site.emails.laboratorio}
           </Button>
         </div>
       </div>

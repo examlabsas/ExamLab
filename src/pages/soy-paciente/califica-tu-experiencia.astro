@@ -4,7 +4,7 @@ import PageHero from '@/components/PageHero.astro';
 import Icon from '@/components/Icon.astro';
 import Button from '@/components/Button.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
-import { site, sedes } from '@/lib/site';
+import { site, sedes, mapaEnlace } from '@/lib/site';
 import { whatsappLink } from '@/lib/whatsapp';
 import { breadcrumbSchema } from '@/lib/schema';
 
@@ -31,6 +31,7 @@ const aspectos = [
   schema={schema}
 >
   <PageHero
+    foto="laboratorio-equipo-trabajando"
     eyebrow="Califica tu experiencia"
     titulo="Su opinión mejora nuestro servicio"
     descripcion="Nos toma un minuto leerla y nos sirve todo el año. Cuéntenos qué salió bien y qué debemos corregir."
@@ -43,43 +44,46 @@ const aspectos = [
 
   <!-- Dos caminos -->
   <section class="bg-white py-section">
-    <div class="container-page grid grid-cols-1 gap-5 lg:grid-cols-2">
-      <div class="flex flex-col gap-4 rounded-[28px] border border-line bg-white p-7 lg:p-9">
-        <span class="flex h-13 w-13 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+    <div class="reveal-stagger container-page grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div class="flex flex-col gap-4 rounded-xl border border-line bg-white p-7 lg:p-9">
+        <span class="flex h-13 w-13 items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
           <Icon name="check" size={26} />
         </span>
         <h2 class="text-h3 font-bold text-brand">¿Quedó conforme?</h2>
-        <p class="text-[15px] leading-relaxed text-neutral">
+        <p class="text-base leading-relaxed text-neutral">
           Déjenos una reseña pública en Google. Nos ayuda a que más familias de {site.provincia}
           encuentren el laboratorio y confíen en él.
         </p>
         <ul class="flex flex-col gap-2.5">
           {
             aspectos.map((aspecto) => (
-              <li class="flex items-start gap-2.5 text-[14px] leading-relaxed text-neutral">
-                <Icon name={aspecto.icono} size={17} class="mt-0.5 text-accent" />
+              <li class="flex items-start gap-2.5 text-sm leading-relaxed text-neutral">
+                <Icon name={aspecto.icono} size={17} class="mt-0.5 text-accent-dark" />
                 {aspecto.texto}
               </li>
             ))
           }
         </ul>
         <div class="mt-auto pt-3">
-          <Button href={site.resenasGoogle} icon="usuarios" full>
+          <Button href={mapaEnlace(sedes[0]!)} icon="usuarios" full>
             Dejar mi reseña en Google
           </Button>
+          <p class="mt-3 text-xs text-neutral">
+            Le llevamos a la ficha de Google de la matriz. Desde ahí puede escribir su reseña.
+          </p>
         </div>
       </div>
 
-      <div class="flex flex-col gap-4 rounded-[28px] bg-brand p-7 lg:p-9">
-        <span class="flex h-13 w-13 items-center justify-center rounded-2xl bg-alert/20 text-alert-light">
+      <div class="flex flex-col gap-4 rounded-xl bg-brand p-7 lg:p-9">
+        <span class="flex h-13 w-13 items-center justify-center rounded-xl bg-alert/20 text-alert-light">
           <Icon name="alerta" size={26} />
         </span>
         <h2 class="text-h3 font-bold text-white">¿Algo no salió bien?</h2>
-        <p class="text-[15px] leading-relaxed text-white/75">
+        <p class="text-base leading-relaxed text-white/75">
           Preferimos enterarnos directamente. Escríbanos por WhatsApp contándonos qué pasó, en qué
           sede y cuándo. Revisamos cada caso y le respondemos con lo que vamos a corregir.
         </p>
-        <p class="text-[13.5px] leading-relaxed text-white/60">
+        <p class="text-sm leading-relaxed text-white/75">
           Si su reclamo requiere un trámite formal, se lo indicamos por el mismo canal y le damos
           seguimiento hasta cerrarlo.
         </p>
@@ -100,19 +104,19 @@ const aspectos = [
         titulo="Califique la sede donde le atendieron"
         descripcion="Cada sede tiene su propia ficha en Google. Elegir la correcta ayuda a que su comentario llegue al equipo que le atendió."
       />
-      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-5 md:grid-cols-2">
         {
           sedes.map((sede) => (
-            <div class="flex flex-col gap-3 rounded-3xl bg-white p-6 shadow-card">
-              <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+            <div class="flex flex-col gap-3 rounded-xl bg-white p-6 border border-line">
+              <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
                 <Icon name="pin" size={23} />
               </span>
-              <h3 class="text-[17px] font-bold text-brand">{sede.nombre}</h3>
-              <p class="text-[13.8px] leading-relaxed text-neutral">
+              <h3 class="text-lg font-bold text-brand">{sede.nombre}</h3>
+              <p class="text-sm leading-relaxed text-neutral">
                 {sede.direccion} · {sede.ciudad}
               </p>
               <div class="mt-auto pt-3">
-                <Button href={site.resenasGoogle} variant="secondary" size="sm" full>
+                <Button href={mapaEnlace(sede)} variant="secondary" size="sm" full>
                   Calificar esta sede
                 </Button>
               </div>
@@ -120,9 +124,6 @@ const aspectos = [
           ))
         }
       </div>
-      <p class="mt-6 text-[13px] leading-relaxed text-neutral">
-        Pendiente de Fase 3: enlazar el identificador de Google Business Profile de cada sede.
-      </p>
     </div>
   </section>
 </BaseLayout>

@@ -1,0 +1,163 @@
+---
+/**
+ * Calculadora de ayuno de un examen concreto, en su propia ficha.
+ *
+ * La calculadora general vive en «Soy paciente», pero la pregunta aparece
+ * aquí: la persona acaba de leer «necesita 8 horas de ayuno» y lo que quiere
+ * saber es a qué hora deja de comer. Esta versión ya sabe de qué examen se
+ * trata, así que solo pide la hora de la cita.
+ *
+ * Al final ofrece descargar un recordatorio para el calendario del teléfono.
+ * Se genera en el navegador —un archivo .ics es texto plano—, así que no hace
+ * falta servidor y la cita no sale del dispositivo de la persona.
+ *
+ * Solo se dibuja si el examen requiere ayuno.
+ */
+import Icon from './Icon.astro';
+import { interpretarAyuno, type Examen } from '@/lib/examenes';
+
+interface Props {
+  examen: Examen;
+}
+
+const { examen } = Astro.props;
+const ayuno = interpretarAyuno(examen);
+const id = `ayuno-${examen.slug}`;
+
+/*
+  El nombre del examen viaja en `data-ayuno-nombre` y no en `data-examen`:
+  ese último lo usa el catálogo para marcar sus tarjetas, y dos cosas
+  distintas con el mismo nombre terminan cruzándose.
+*/
+---
+
+{
+  ayuno.requiere && (
+    <div
+      class="mt-5 rounded-xl border border-line bg-white p-5"
+      data-ayuno-ficha
+      data-horas={ayuno.horas}
+      data-ayuno-nombre={examen.nombre}
+    >
+      <div class="flex items-center gap-2.5">
+        <Icon name="reloj" size={18} class="text-accent-dark" />
+        <h3 class="text-sm font-bold text-brand">¿A qué hora dejo de comer?</h3>
+      </div>
+
+      <label for={id} class="mt-3 block text-xs font-semibold text-neutral">
+        Hora de su cita
+      </label>
+      <input
+        type="datetime-local"
+        id={id}
+        data-ayuno-cita
+        class="mt-1.5 min-h-11 w-full rounded-lg border border-line-strong bg-white px-3 py-2 text-sm text-black focus:border-accent focus:outline-none"
+      />
+
+      <p class="mt-3 text-sm leading-relaxed text-neutral" data-ayuno-resultado aria-live="polite">
+        Ponga la hora de su cita y le decimos el momento exacto.
+      </p>
+
+      <a
+        href="#"
+        hidden
+        download={`ayuno-${examen.slug}.ics`}
+        data-ayuno-recordatorio
+        class="mt-3 inline-flex min-h-11 items-center gap-2 rounded-lg border-[1.5px] border-line-strong bg-white px-4 py-2.5 text-xs font-bold text-brand transition-colors hover:border-accent-dark"
+      >
+        <Icon name="calendario" size={15} class="text-accent-dark" />
+        Añadir recordatorio al calendario
+      </a>
+    </div>
+  )
+}
+
+<script>
+  const initAyunoFicha = () => {
+    for (const caja of document.querySelectorAll<HTMLElement>('[data-ayuno-ficha]')) {
+      if (caja.dataset.iniciado === 'true') continue;
+      caja.dataset.iniciado = 'true';
+
+      const horas = Number(caja.dataset.horas ?? 0);
+      const nombreExamen = caja.dataset.ayunoNombre ?? 'su examen';
+      const cita = caja.querySelector<HTMLInputElement>('[data-ayuno-cita]');
+      const resultado = caja.querySelector<HTMLElement>('[data-ayuno-resultado]');
+      const recordatorio = caja.querySelector<HTMLAnchorElement>('[data-ayuno-recordatorio]');
+      if (!cita || !resultado || !recordatorio) continue;
+
+      // El mismo formato que la calculadora de «Soy paciente»: 24 horas, como
+      // los horarios de las sedes. En 12 horas, «12:30 a. m.» se lee como
+      // mediodía y el ayuno empieza justo a esas horas raras de la madrugada.
+      const formato = new Intl.DateTimeFormat('es-EC', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+
+      /** Fecha en el formato que pide el calendario: 20260930T220000. */
+      const aIcs = (fecha: Date) =>
+        `${fecha.getFullYear()}${String(fecha.getMonth() + 1).padStart(2, '0')}${String(
+          fecha.getDate(),
+        ).padStart(2, '0')}T${String(fecha.getHours()).padStart(2, '0')}${String(
+          fecha.getMinutes(),
+        ).padStart(2, '0')}00`;
+
+      let urlPrevia = '';
+
+      const calcular = () => {
+        if (!cita.value) {
+          resultado.textContent = 'Ponga la hora de su cita y le decimos el momento exacto.';
+          recordatorio.hidden = true;
+          return;
+        }
+
+        const momentoCita = new Date(cita.value);
+        if (Number.isNaN(momentoCita.getTime())) return;
+
+        const inicio = new Date(momentoCita.getTime() - horas * 60 * 60 * 1000);
+        // El formato ya no termina en punto, así que la frase cierra limpia.
+        resultado.textContent = `No coma ni tome nada desde el ${formato.format(inicio)}. Puede tomar agua.`;
+
+        /*
+          El recordatorio se arma en memoria y se entrega como un enlace de
+          descarga. `DTSTART` sin zona horaria es «hora local del teléfono»,
+          que es exactamente lo que queremos: la cita es en Ecuador y el
+          paciente también.
+        */
+        const ics = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//ExamLab//Ayuno//ES',
+          'BEGIN:VEVENT',
+          `UID:${Date.now()}@examlabsas.com`,
+          `DTSTAMP:${aIcs(new Date())}`,
+          `DTSTART:${aIcs(inicio)}`,
+          `DTEND:${aIcs(momentoCita)}`,
+          `SUMMARY:Empieza el ayuno para ${nombreExamen}`,
+          `DESCRIPTION:No coma ni tome nada (puede tomar agua) hasta su examen en ExamLab.`,
+          'BEGIN:VALARM',
+          'TRIGGER:-PT30M',
+          'ACTION:DISPLAY',
+          'DESCRIPTION:En 30 minutos empieza su ayuno',
+          'END:VALARM',
+          'END:VEVENT',
+          'END:VCALENDAR',
+        ].join('\r\n');
+
+        // Se libera el anterior: cada cambio de hora crea un archivo nuevo.
+        if (urlPrevia) URL.revokeObjectURL(urlPrevia);
+        urlPrevia = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+        recordatorio.href = urlPrevia;
+        recordatorio.hidden = false;
+      };
+
+      cita.addEventListener('input', calcular);
+    }
+  };
+
+  initAyunoFicha();
+  document.addEventListener('astro:page-load', initAyunoFicha);
+</script>

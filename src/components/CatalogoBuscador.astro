@@ -39,8 +39,8 @@ const especialidades = getEspecialidades(lista);
 <section class="bg-surface py-10 lg:py-14">
   <div class="container-page sin-reveal">
     <!-- Buscador -->
-    <div class="rounded-3xl bg-white p-5 shadow-card lg:p-7">
-      <label for="buscador" class="block text-[13px] font-bold text-brand">Buscar examen</label>
+    <div class="rounded-xl bg-white p-5 border border-line lg:p-7">
+      <label for="buscador" class="block text-xs font-bold text-brand">Buscar examen</label>
       <div class="relative mt-2.5">
         <Icon
           name="lupa"
@@ -53,12 +53,12 @@ const especialidades = getEspecialidades(lista);
           name="q"
           autocomplete="off"
           placeholder={placeholder}
-          class="w-full rounded-2xl border border-line-strong bg-white py-4 pr-4 pl-12 text-[15px] text-black placeholder:text-neutral/70 focus:border-accent focus:outline-none"
+          class="w-full rounded-xl border border-line-strong bg-white py-4 pr-4 pl-12 text-base text-black placeholder:text-neutral/70 focus:border-accent focus:outline-none"
         />
       </div>
 
       <fieldset class="mt-5">
-        <legend class="text-[13px] font-bold text-brand">Especialidad</legend>
+        <legend class="text-xs font-bold text-brand">Especialidad</legend>
         <div class="mt-2.5 flex flex-wrap gap-2" id="filtros">
           {
             /*
@@ -73,7 +73,7 @@ const especialidades = getEspecialidades(lista);
                 type="button"
                 data-filtro={especialidad}
                 aria-pressed={especialidad === 'todas' ? 'true' : 'false'}
-                class="filtro rounded-full border-[1.5px] border-line-strong bg-white px-4 py-2.5 text-[13px] font-bold text-neutral transition-colors hover:border-accent hover:text-brand aria-pressed:border-brand aria-pressed:bg-brand aria-pressed:text-white aria-pressed:hover:border-brand-dark aria-pressed:hover:bg-brand-dark aria-pressed:hover:text-white"
+                class="filtro rounded-full border-[1.5px] border-line-strong bg-white px-4 py-2.5 text-xs font-bold text-neutral transition-colors hover:border-accent hover:text-brand aria-pressed:border-brand aria-pressed:bg-brand aria-pressed:text-white aria-pressed:hover:border-brand-dark aria-pressed:hover:bg-brand-dark aria-pressed:hover:text-white"
               >
                 {especialidad === 'todas' ? 'Todas' : especialidad}
               </button>
@@ -84,26 +84,65 @@ const especialidades = getEspecialidades(lista);
     </div>
 
     <!-- Resultados -->
-    <p class="mt-7 text-sm font-semibold text-neutral" id="conteo" aria-live="polite">
+    {/* `scroll-mt-28` deja aire bajo la cabecera fija al saltar aquí. */}
+    <p
+      class="mt-7 scroll-mt-28 text-sm font-semibold text-neutral"
+      id="conteo"
+      aria-live="polite"
+    >
       {lista.length} exámenes disponibles
     </p>
+    {/* Se muestra cuando algún resultado entró solo por parecerse a lo escrito. */}
+    <p id="nota-aproximada" hidden class="mt-1.5 text-xs text-neutral">
+      Incluimos también exámenes parecidos a lo que escribió.
+    </p>
 
+    {/*
+      `data-paginado` lo pone el script en cuanto arranca. Mientras no está,
+      y solo si hay JavaScript, se ocultan las tarjetas que de todas formas
+      van a quedar fuera de la primera página: así el primer trazado maqueta
+      24 tarjetas y no 559. Sin JavaScript la regla no aplica y salen todas,
+      que es lo correcto.
+    */}
     <div class="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3" id="resultados">
       {lista.map((examen) => <ExamCard examen={examen} basePath={basePath} tecnico={tecnico} />)}
     </div>
 
+    {/*
+      Paginación. Sin JavaScript el listado sale entero, que es lo correcto:
+      el contenido nunca depende del script. Con JavaScript se muestra de a
+      tandas para que la página no arranque con casi trescientas tarjetas.
+    */}
+    <nav id="paginacion" hidden class="mt-9 flex flex-wrap items-center justify-center gap-2" aria-label="Páginas de resultados">
+      <button
+        type="button"
+        data-pagina="anterior"
+        class="min-h-11 rounded-lg border border-line-strong bg-white px-4 text-sm font-semibold text-brand transition-colors hover:border-accent-dark disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-line-strong"
+      >
+        Anterior
+      </button>
+      <span id="paginas" class="flex flex-wrap items-center gap-1.5"></span>
+      <button
+        type="button"
+        data-pagina="siguiente"
+        class="min-h-11 rounded-lg border border-line-strong bg-white px-4 text-sm font-semibold text-brand transition-colors hover:border-accent-dark disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-line-strong"
+      >
+        Siguiente
+      </button>
+    </nav>
+
     <div
       id="sin-resultados"
       hidden
-      class="mt-4 rounded-3xl border border-dashed border-line-strong bg-white p-10 text-center"
+      class="mt-4 rounded-xl border border-dashed border-line-strong bg-white p-10 text-center"
     >
-      <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent-dark">
+      <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-accent-soft text-accent-dark">
         <Icon name="lupa" size={26} />
       </span>
-      <h2 class="mt-4 text-[19px] font-bold text-brand">No encontramos ese examen</h2>
+      <h2 class="mt-4 text-lg font-bold text-brand">No encontramos ese examen</h2>
       <p class="mx-auto mt-2 max-w-[420px] text-sm leading-relaxed text-neutral">
-        Trabajamos con más de 400 análisis y este catálogo muestra una selección. Escríbanos y le
-        confirmamos disponibilidad y preparación.
+        Puede que lo tengamos con otro nombre, o que se procese por derivación. Escríbanos y le
+        confirmamos disponibilidad, preparación y tiempo de entrega.
       </p>
       <div class="mt-6 flex justify-center">
         <Button href={whatsappHref} icon="whatsapp-marca" size="sm">Consultar por WhatsApp</Button>
@@ -115,19 +154,35 @@ const especialidades = getEspecialidades(lista);
 <!-- Aviso -->
 <section class="bg-white py-12">
   <div class="container-page">
-    <div class="flex flex-col gap-4 rounded-3xl border border-line bg-surface p-6 sm:flex-row lg:p-8">
-      <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white text-accent-dark">
+    <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-6 sm:flex-row lg:p-8">
+      <span class="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-white text-accent-dark">
         <Icon name="alerta" size={22} />
       </span>
       <div>
-        <h2 class="text-[17px] font-bold text-brand">Sobre las condiciones del estudio</h2>
+        <h2 class="text-lg font-bold text-brand">Sobre las condiciones del estudio</h2>
         <p class="mt-2 max-w-[720px] text-sm leading-relaxed text-neutral">{aviso}</p>
       </div>
     </div>
   </div>
 </section>
 
+<style>
+  /*
+    Antes de que el script pagine, el navegador maquetaría las 559 tarjetas
+    para después esconder 535. Esta regla deja fuera las que de todas formas
+    no entran en la primera página, así el primer trazado solo maqueta 24.
+
+    Depende de `.js`, así que sin JavaScript no aplica y el listado completo
+    sigue saliendo entero, como debe ser.
+  */
+  :global(.js) #resultados:not([data-paginado]) > :nth-child(n + 25) {
+    display: none;
+  }
+</style>
+
 <script>
+  import { coincide } from '@/lib/busqueda';
+
   // Se vuelve a montar en cada navegación con transiciones de página.
   const initCatalogo = () => {
     const input = document.getElementById('buscador') as HTMLInputElement | null;
@@ -138,6 +193,7 @@ const especialidades = getEspecialidades(lista);
 
     const contenedor = document.getElementById('resultados');
     const conteo = document.getElementById('conteo');
+    const notaAproximada = document.getElementById('nota-aproximada');
     const vacio = document.getElementById('sin-resultados');
     const botones = Array.from(document.querySelectorAll<HTMLButtonElement>('.filtro'));
     if (!contenedor || !conteo || !vacio) return;
@@ -145,11 +201,12 @@ const especialidades = getEspecialidades(lista);
     const tarjetas = Array.from(contenedor.querySelectorAll<HTMLElement>('[data-examen]'));
     let especialidadActiva = 'todas';
 
-    const normalizar = (texto: string) =>
-      texto
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/\p{Diacritic}/gu, '');
+    /*
+      A partir de aquí manda el script: se retira la regla de CSS que ocultaba
+      lo que no cabía en la primera página (ver el `<style>` de arriba), porque
+      ya es `filtrar()` quien decide qué tarjeta se ve.
+    */
+    contenedor.dataset.paginado = 'true';
 
     // El aspecto lo resuelve el CSS a partir de `aria-pressed`: aquí solo se
     // marca cuál está activo.
@@ -160,34 +217,221 @@ const especialidades = getEspecialidades(lista);
       }
     };
 
-    const filtrar = () => {
-      const termino = normalizar(input.value.trim());
-      let visibles = 0;
+    /*
+      ── Paginación ──────────────────────────────────────────────────────
+      24 por página: son ocho filas de tres en escritorio y deja el catálogo
+      completo en 24 páginas. Estaba en 6, que era razonable cuando el
+      catálogo tenía media docena de exámenes de muestra; con los 559 reales
+      salían 94 páginas y encontrar algo por navegación era inviable.
+    */
+    const POR_PAGINA = 24;
+    const paginacion = document.getElementById('paginacion');
+    const listaPaginas = document.getElementById('paginas');
+    const anterior = document.querySelector<HTMLButtonElement>('[data-pagina="anterior"]');
+    const siguiente = document.querySelector<HTMLButtonElement>('[data-pagina="siguiente"]');
+    let pagina = 1;
+    let coincidentes: HTMLElement[] = [];
 
-      for (const tarjeta of tarjetas) {
-        const indice = tarjeta.dataset.indice ?? '';
-        const coincideTexto = termino === '' || indice.includes(termino);
+    const totalPaginas = () => Math.max(1, Math.ceil(coincidentes.length / POR_PAGINA));
+
+    /** Ventana de números alrededor de la página actual, con la primera y la última siempre visibles. */
+    const numerosVisibles = () => {
+      const total = totalPaginas();
+      if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+      const cerca = [pagina - 1, pagina, pagina + 1].filter((n) => n > 1 && n < total);
+      const nums = [1, ...cerca, total];
+      const salida: (number | '…')[] = [];
+      for (let i = 0; i < nums.length; i++) {
+        if (i > 0 && nums[i]! - nums[i - 1]! > 1) salida.push('…');
+        salida.push(nums[i]!);
+      }
+      return salida;
+    };
+
+    const pintarPaginacion = () => {
+      if (!paginacion || !listaPaginas || !anterior || !siguiente) return;
+      const total = totalPaginas();
+      paginacion.hidden = coincidentes.length <= POR_PAGINA;
+      anterior.disabled = pagina === 1;
+      siguiente.disabled = pagina === total;
+
+      listaPaginas.replaceChildren();
+      for (const n of numerosVisibles()) {
+        if (n === '…') {
+          const hueco = document.createElement('span');
+          hueco.className = 'px-1 text-sm text-neutral';
+          hueco.textContent = '…';
+          listaPaginas.append(hueco);
+          continue;
+        }
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = String(n);
+        const activa = n === pagina;
+        b.className =
+          'min-h-11 min-w-11 rounded-lg border px-3 text-sm font-semibold transition-colors ' +
+          (activa
+            ? 'border-accent-dark bg-accent-dark text-white'
+            : 'border-line-strong bg-white text-brand hover:border-accent-dark');
+        if (activa) b.setAttribute('aria-current', 'page');
+        b.addEventListener('click', () => {
+          pagina = n;
+          mostrarPagina();
+          // Devuelve la vista al inicio de los resultados, no al tope del documento.
+          contenedor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        });
+        listaPaginas.append(b);
+      }
+    };
+
+    /** Oculta todo lo que no pertenezca a la página actual. */
+    const mostrarPagina = () => {
+      const desde = (pagina - 1) * POR_PAGINA;
+      coincidentes.forEach((t, i) => {
+        t.hidden = i < desde || i >= desde + POR_PAGINA;
+      });
+      pintarPaginacion();
+    };
+
+    const filtrar = ({ conservarPagina = false } = {}) => {
+      const termino = input.value.trim();
+      let hayAproximadas = false;
+
+      /*
+        Cada tarjeta se puntúa (ver src/lib/busqueda.ts) y se ordena por
+        relevancia: el examen cuyo nombre empieza por lo escrito va antes que
+        el que solo lo menciona en la descripción. A igual puntuación se
+        conserva el orden alfabético original.
+      */
+      const puntuadas: { tarjeta: HTMLElement; puntuacion: number; largo: number; orden: number }[] = [];
+      tarjetas.forEach((tarjeta, orden) => {
         const coincideEspecialidad =
           especialidadActiva === 'todas' || tarjeta.dataset.especialidad === especialidadActiva;
-        const visible = coincideTexto && coincideEspecialidad;
-        tarjeta.hidden = !visible;
-        if (visible) visibles++;
-      }
+        if (!coincideEspecialidad) return;
+        const resultado = coincide(
+          tarjeta,
+          tarjeta.dataset.indice ?? '',
+          tarjeta.dataset.nombre ?? '',
+          termino,
+        );
+        if (!resultado.ok) return;
+        if (resultado.aproximada) hayAproximadas = true;
+        puntuadas.push({
+          tarjeta,
+          puntuacion: resultado.puntuacion,
+          largo: (tarjeta.dataset.nombre ?? '').length,
+          orden,
+        });
+      });
+      // Entre coincidencias por nombre, el nombre más corto es el más
+      // parecido a lo escrito: «GLUCOSA» antes que «GLUCOSA AL AZAR».
+      puntuadas.sort(
+        (a, b) =>
+          a.puntuacion - b.puntuacion ||
+          (a.puntuacion <= 2 ? a.largo - b.largo : 0) ||
+          a.orden - b.orden,
+      );
+      coincidentes = puntuadas.map((p) => p.tarjeta);
 
+      // El orden visual es el del DOM: se recolocan las coincidentes al
+      // frente en su nuevo orden; las demás quedan detrás, ocultas.
+      contenedor.append(...coincidentes);
+      if (notaAproximada) notaAproximada.hidden = !hayAproximadas || coincidentes.length === 0;
+
+      // Cada búsqueda nueva vuelve a la primera página: quedarse en la siete
+      // de un resultado que ahora tiene dos deja la pantalla en blanco.
+      if (!conservarPagina) pagina = 1;
+      if (pagina > totalPaginas()) pagina = totalPaginas();
+
+      for (const tarjeta of tarjetas) tarjeta.hidden = true;
+      mostrarPagina();
+
+      const visibles = coincidentes.length;
       conteo.textContent =
         visibles === 1 ? '1 examen encontrado' : `${visibles} exámenes encontrados`;
       vacio.hidden = visibles > 0;
       contenedor.hidden = visibles === 0;
+      if (paginacion) paginacion.hidden = visibles <= POR_PAGINA;
     };
 
-    input.addEventListener('input', filtrar);
+    anterior?.addEventListener('click', () => {
+      if (pagina > 1) {
+        pagina--;
+        mostrarPagina();
+        contenedor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+    });
+
+    siguiente?.addEventListener('click', () => {
+      if (pagina < totalPaginas()) {
+        pagina++;
+        mostrarPagina();
+        contenedor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+    });
+
+    /*
+      Lleva la vista al primer resultado. `scroll-mt` en el contenedor deja aire
+      bajo la cabecera fija; sin eso, la primera fila queda tapada por el menú.
+    */
+    /*
+      Al conteo, no a las tarjetas: así lo primero que se lee es cuántos hay.
+
+      `esperarTeclado` existe por el móvil. Al cerrar el teclado la ventana crece
+      de golpe, y si el desplazamiento se calculó con la ventana pequeña el
+      navegador lo recorta y el resultado queda a media pantalla. Se espera a que
+      la ventana visual deje de cambiar antes de mover nada.
+    */
+    const esperarTeclado = () =>
+      new Promise<void>((listo) => {
+        const vv = window.visualViewport;
+        if (!vv) return void setTimeout(listo, 120);
+
+        const alturaInicial = vv.height;
+        let temporizador = window.setTimeout(terminar, 400); // por si nunca cambia
+
+        function terminar() {
+          clearTimeout(temporizador);
+          vv!.removeEventListener('resize', alCambiar);
+          listo();
+        }
+        function alCambiar() {
+          if (vv!.height === alturaInicial) return;
+          // Un cambio más puede venir enseguida; se deja asentar.
+          clearTimeout(temporizador);
+          temporizador = window.setTimeout(terminar, 60);
+        }
+        vv.addEventListener('resize', alCambiar);
+      });
+
+    const irAResultados = async ({ trasTeclado = false } = {}) => {
+      if (trasTeclado) await esperarTeclado();
+      conteo.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    };
+
+    input.addEventListener('input', () => filtrar());
+
+    /*
+      Enter baja a los resultados. El filtrado ya ocurrió mientras se escribía,
+      así que aquí solo se mueve la vista: en el móvil, con el teclado abierto,
+      el listado queda fuera de pantalla y parece que no pasó nada.
+    */
+    input.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Enter') return;
+      ev.preventDefault();
+      filtrar();
+      input.blur(); // cierra el teclado del teléfono
+      irAResultados({ trasTeclado: true });
+    });
 
     for (const boton of botones) {
       boton.addEventListener('click', () => {
         activarBoton(boton.dataset.filtro ?? 'todas');
         filtrar();
+        irAResultados();
       });
     }
+
 
     // Estado inicial desde la URL: ?q=tsh&especialidad=Microbiología
     const params = new URLSearchParams(window.location.search);
@@ -197,7 +441,9 @@ const especialidades = getEspecialidades(lista);
     if (especialidad && botones.some((b) => b.dataset.filtro === especialidad)) {
       activarBoton(especialidad);
     }
-    if (q || especialidad) filtrar();
+    // Siempre, no solo con parámetros: es la pasada que aplica la paginación
+    // inicial. Sin ella la página arrancaría con las 277 tarjetas a la vista.
+    filtrar();
   };
 
   if (document.readyState === 'loading') {

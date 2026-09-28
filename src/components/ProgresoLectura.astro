@@ -1,0 +1,50 @@
+---
+/**
+ * Barra de progreso de lectura, pegada bajo la cabecera.
+ *
+ * Va en los textos largos —artículos y fichas de examen— donde saber cuánto
+ * falta ayuda a decidir si seguir leyendo ahora o volver después.
+ *
+ * Se apoya en `animation-timeline: scroll()`, así que el navegador la anima
+ * sin JavaScript. Donde no exista esa propiedad simplemente no aparece: es
+ * decoración, no contenido, y no vale cargar un script por ella.
+ */
+---
+
+<div class="progreso-lectura" aria-hidden="true"></div>
+
+<style>
+  .progreso-lectura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    height: 3px;
+    width: 100%;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--color-accent-dark), var(--color-accent));
+    /* Sin soporte, queda en escala 0: invisible. */
+    scale: 0 1;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .progreso-lectura {
+      animation: progreso-lectura linear;
+      animation-timeline: scroll(root block);
+    }
+
+    @keyframes progreso-lectura {
+      from {
+        scale: 0 1;
+      }
+      to {
+        scale: 1 1;
+      }
+    }
+  }
+
+  /*
+    Con movimiento reducido se mantiene: no es una animación decorativa sino
+    un indicador que sigue al scroll, igual que la barra del navegador.
+  */
+</style>

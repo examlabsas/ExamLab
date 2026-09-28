@@ -11,6 +11,37 @@ dist/
 .env.production
 .env.local
 
+# Herramientas de desarrollo instaladas localmente.
+# `impeccable` se reinstala con `npx impeccable install`; son ~3 MB de código
+# de terceros que no forman parte del sitio ni se despliegan.
+.claude/skills/
+
+# Del detector de diseño se versiona `config.json`, que documenta las
+# excepciones acordadas. Lo demás es de cada máquina.
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+
+# Fotos originales del laboratorio (1–2 MB cada una). Al sitio solo van las
+# variantes optimizadas que genera `npm run imagenes` en public/images/.
+# En `sin-usar/` quedan las descartadas; ver fotos-laboratorio/LEEME.md.
+fotos-laboratorio/
+
+# Tarifario mayorista de los laboratorios asociados. El sitio NO publica los
+# precios (`MOSTRAR_PRECIOS = false`), pero el archivo que consume el build
+# tampoco debe llevarlos: el despliegue es por repositorio y cualquiera con
+# acceso a él vería la lista completa de convenio.
+#
+# Por eso son dos archivos:
+#   catalogo-asociados.json          se versiona, con `precio: null` en todo
+#   catalogo-asociados.privado.json  queda aquí, es el que trae los importes
+#
+# `node scripts/importar-catalogo-asociados.mjs <excel>` regenera los dos.
+src/data/catalogo-asociados.privado.json
+
+# Salida intermedia de `scripts/importar-catalogo-publico.mjs`. El sitio no lo
+# importa en ningún sitio: solo sirve para revisar la importación a mano.
+src/data/catalogo-info.json
+
 # Sistema y editores
 .DS_Store
 Thumbs.db

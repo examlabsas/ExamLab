@@ -42,19 +42,19 @@ const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
 ---
 
 <div
-  class="rounded-3xl border border-line bg-white p-6 lg:p-8"
+  class="rounded-xl border border-line bg-white p-6 lg:p-8"
   data-ayuno
   data-examenes={JSON.stringify(datos)}
 >
   <div class="flex items-start gap-4">
     <span
-      class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-accent-soft text-accent-dark"
+      class="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-accent-soft text-accent-dark"
     >
       <Icon name="reloj" size={24} />
     </span>
     <div>
-      <h3 class="text-[19px] font-bold text-brand">¿A qué hora dejo de comer?</h3>
-      <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+      <h3 class="text-lg font-bold text-brand">¿A qué hora dejo de comer?</h3>
+      <p class="mt-1.5 text-sm leading-relaxed text-neutral">
         Elija su examen y la hora de su cita. Le decimos el momento exacto en que debe empezar el
         ayuno.
       </p>
@@ -63,46 +63,46 @@ const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
 
   <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-      <label for="ayuno-examen" class="block text-[13px] font-bold text-brand">Examen</label>
+      <label for="ayuno-examen" class="block text-xs font-bold text-brand">Examen</label>
       <select
         id="ayuno-examen"
-        class="mt-2 w-full rounded-xl border border-line-strong bg-white px-3.5 py-3 text-[14px] text-black focus:border-accent focus:outline-none"
+        class="mt-2 w-full rounded-lg border border-line-strong bg-white px-3.5 py-3 text-sm text-black focus:border-accent focus:outline-none"
       >
         {ordenados.map((e) => <option value={e.slug}>{e.nombre}</option>)}
       </select>
     </div>
 
     <div>
-      <label for="ayuno-cita" class="block text-[13px] font-bold text-brand">
+      <label for="ayuno-cita" class="block text-xs font-bold text-brand">
         Fecha y hora de su cita
       </label>
       <input
         type="datetime-local"
         id="ayuno-cita"
-        class="mt-2 w-full rounded-xl border border-line-strong bg-white px-3.5 py-3 text-[14px] text-black focus:border-accent focus:outline-none"
+        class="mt-2 w-full rounded-lg border border-line-strong bg-white px-3.5 py-3 text-sm text-black focus:border-accent focus:outline-none"
       />
     </div>
   </div>
 
   <!-- El resultado se anuncia a lectores de pantalla al cambiar. -->
   <div
-    class="mt-5 rounded-2xl border border-dashed border-line-strong bg-surface p-5"
+    class="mt-5 rounded-xl border border-dashed border-line-strong bg-surface p-5"
     data-resultado
     aria-live="polite"
   >
-    <p class="text-[14px] leading-relaxed text-neutral" data-mensaje>
+    <p class="text-sm leading-relaxed text-neutral" data-mensaje>
       Complete los dos campos para ver su hora de ayuno.
     </p>
   </div>
 
   <noscript>
-    <p class="mt-4 text-[13px] leading-relaxed text-neutral">
+    <p class="mt-4 text-xs leading-relaxed text-neutral">
       La calculadora necesita JavaScript. Las horas de ayuno de cada examen también están escritas
-      en su ficha del <a href="/catalogo" class="font-semibold text-accent underline">catálogo</a>.
+      en su ficha del <a href="/catalogo" class="font-semibold text-accent-dark underline">catálogo</a>.
     </p>
   </noscript>
 
-  <p class="mt-4 text-[12.5px] leading-relaxed text-neutral">
+  <p class="mt-4 text-xs leading-relaxed text-neutral">
     Si su médico le indicó un ayuno distinto, siga siempre la indicación de su médico.
   </p>
 </div>

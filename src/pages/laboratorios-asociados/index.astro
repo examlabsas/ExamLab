@@ -5,6 +5,8 @@ import Icon from '@/components/Icon.astro';
 import Button from '@/components/Button.astro';
 import SectionHeading from '@/components/SectionHeading.astro';
 import BuscadorExamenes from '@/components/BuscadorExamenes.astro';
+import FondoGotas from '@/components/FondoGotas.astro';
+import PulsoEcg from '@/components/PulsoEcg.astro';
 import { site } from '@/lib/site';
 import { whatsappLink } from '@/lib/whatsapp';
 import { breadcrumbSchema } from '@/lib/schema';
@@ -24,8 +26,6 @@ type Acceso = {
   descripcion: string;
   cta: string;
   href: string;
-  /** Depende de Avalab, que todavía no está implementado. */
-  pendiente?: boolean;
 };
 
 const accesos: Acceso[] = [
@@ -36,8 +36,7 @@ const accesos: Acceso[] = [
     descripcion:
       'Registre las órdenes de sus pacientes directamente en el sistema, con los datos de la muestra y las pruebas solicitadas.',
     cta: 'Ingresar orden',
-    href: site.avalabOrden,
-    pendiente: !site.avalabDisponible,
+    href: site.sistema.url,
   },
   {
     id: 'catalogo-laboratorios',
@@ -55,8 +54,7 @@ const accesos: Acceso[] = [
     descripcion:
       'Consulte y descargue los informes validados de las órdenes que su laboratorio nos derivó.',
     cta: 'Ver resultados',
-    href: site.avalabResultados,
-    pendiente: !site.avalabDisponible,
+    href: site.sistema.url,
   },
 ];
 
@@ -95,8 +93,9 @@ const beneficios: { icono: IconName; titulo: string; texto: string }[] = [
   schema={schema}
 >
   <PageHero
+    foto="tecnologa-en-analizador"
     eyebrow="Laboratorios asociados"
-    titulo="Su laboratorio, respaldado por el nuestro"
+    titulo="Derivación de pruebas para laboratorios"
     descripcion="Derive las pruebas que no procesa y manténgase como el laboratorio de confianza de su paciente. Ingreso de órdenes, catálogo y resultados en un solo lugar."
     migas={[
       { nombre: 'Inicio', href: '/' },
@@ -125,44 +124,22 @@ const beneficios: { icono: IconName; titulo: string; texto: string }[] = [
     <div class="container-page">
       <SectionHeading eyebrow="Accesos" titulo="Qué puede hacer desde aquí" />
 
-      <div class="mt-9 grid grid-cols-1 gap-5 md:grid-cols-3">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-x-9 gap-y-10 md:grid-cols-3">
         {
           accesos.map((acceso) => (
             <article
               id={acceso.id}
-              class="flex scroll-mt-28 flex-col gap-4 rounded-2xl border border-line bg-white p-7 transition-all duration-200 hover:border-brand hover:shadow-md"
+              class="flex scroll-mt-28 flex-col gap-3 border-t-2 border-line pt-5"
             >
-              <div class="flex items-start justify-between gap-3">
-                <span class="text-brand">
-                  <Icon name={acceso.icono} size={26} strokeWidth={2} />
-                </span>
-                {acceso.pendiente && (
-                  <span class="rounded-lg bg-alert-soft px-2.5 py-1 text-[10.5px] font-bold tracking-[0.4px] text-alert-dark uppercase">
-                    En implementación
-                  </span>
-                )}
-              </div>
+              <Icon name={acceso.icono} size={23} strokeWidth={2} dibujo class="text-accent-dark" />
 
-              <h2 class="text-[19px] font-bold text-brand">{acceso.titulo}</h2>
-              <p class="text-[14px] leading-relaxed text-neutral">{acceso.descripcion}</p>
+              <h2 class="mt-1 text-lg leading-snug font-bold text-brand">{acceso.titulo}</h2>
+              <p class="text-sm leading-relaxed text-neutral">{acceso.descripcion}</p>
 
               <div class="mt-auto pt-3">
-                {acceso.pendiente ? (
-                  <>
-                    <span class="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-line-strong px-4 py-3 text-[13px] font-semibold text-neutral">
-                      <Icon name="reloj" size={16} />
-                      Disponible próximamente
-                    </span>
-                    <p class="mt-2.5 text-[12.5px] leading-relaxed text-neutral">
-                      Este acceso funcionará con Avalab, el sistema del laboratorio. Le avisaremos
-                      apenas esté habilitado.
-                    </p>
-                  </>
-                ) : (
-                  <Button href={acceso.href} size="sm" full>
-                    {acceso.cta}
-                  </Button>
-                )}
+                <Button href={acceso.href} size="sm" full>
+                  {acceso.cta}
+                </Button>
               </div>
             </article>
           ))
@@ -179,15 +156,15 @@ const beneficios: { icono: IconName; titulo: string; texto: string }[] = [
         titulo="Qué incluye ser laboratorio asociado"
         descripcion="Un acuerdo pensado para laboratorios pequeños y medianos que necesitan respaldo en pruebas especializadas."
       />
-      <div class="mt-9 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-x-9 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
         {
           beneficios.map((item) => (
-            <article class="flex flex-col gap-3 rounded-2xl border border-line bg-white p-6">
-              <span class="text-brand">
-                <Icon name={item.icono} size={24} strokeWidth={2} />
-              </span>
-              <h3 class="text-[16px] font-bold text-brand">{item.titulo}</h3>
-              <p class="text-[13.5px] leading-relaxed text-neutral">{item.texto}</p>
+            /* Afirmaciones, no destinos: sin filete. Además va sobre gris, donde
+               el filete obligaba a oscurecer la línea para que se viera. */
+            <article>
+              <Icon name={item.icono} size={23} strokeWidth={2} dibujo class="text-accent-dark" />
+              <h3 class="mt-4 text-lg leading-snug font-bold text-brand">{item.titulo}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-neutral">{item.texto}</p>
             </article>
           ))
         }
@@ -199,26 +176,28 @@ const beneficios: { icono: IconName; titulo: string; texto: string }[] = [
   <section class="bg-white py-section">
     <div class="container-page">
       <div
-        class="grid grid-cols-1 gap-8 rounded-2xl bg-brand p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12 lg:p-12"
+        class="relative grid grid-cols-1 gap-8 overflow-hidden rounded-xl bg-brand p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12 lg:p-12"
       >
-        <div>
-          <span class="text-[12.5px] font-bold tracking-[1.8px] text-accent-light uppercase">
+        <FondoGotas />
+        <PulsoEcg class="text-white opacity-25" />
+        <div class="relative">
+          <span class="text-xs font-bold tracking-[1.8px] text-accent-light uppercase">
             Sumarse a la red
           </span>
           <h2 class="mt-3 max-w-[560px] text-h2 font-bold text-white">
             Conversemos sobre el convenio para su laboratorio
           </h2>
-          <p class="mt-4 max-w-[560px] text-[15px] leading-relaxed text-white/75">
+          <p class="mt-4 max-w-[560px] text-base leading-relaxed text-white/75">
             Cuéntenos qué pruebas necesita derivar y con qué frecuencia, y le preparamos una
             propuesta con tarifario y logística de recolección.
           </p>
         </div>
-        <div class="flex flex-col gap-3">
+        <div class="relative flex flex-col gap-3">
           <Button href={whatsappLink('laboratorios')} icon="whatsapp-marca">
             Escribir por WhatsApp
           </Button>
-          <Button href={`mailto:${site.email}`} variant="sobreOscuro" icon="correo">
-            {site.email}
+          <Button href={`mailto:${site.emails.laboratorio}`} variant="sobreOscuro" icon="correo">
+            {site.emails.laboratorio}
           </Button>
         </div>
       </div>

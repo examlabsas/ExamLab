@@ -1,0 +1,288 @@
+---
+/**
+ * Franja de publicaciones de Instagram.
+ *
+ * A diferencia de la cuadrícula quieta que usan otros laboratorios, esta se
+ * desplaza sola en bucle y se detiene cuando el cursor entra o cuando alguien
+ * llega con el tabulador. Cada tarjeta se levanta, la imagen hace zoom y
+ * aparece el pie de la publicación; al pulsar se abre en Instagram.
+ *
+ * El bucle es continuo porque la lista se imprime dos veces y la animación
+ * desplaza exactamente la mitad: al terminar, la segunda copia está donde
+ * empezó la primera y el salto no se ve. La copia va oculta para lectores de
+ * pantalla y fuera del orden de tabulación, para no repetir los enlaces.
+ *
+ * Si no hay publicaciones cargadas, la sección no se dibuja: es preferible
+ * que no exista a que muestre huecos.
+ */
+import Icon from './Icon.astro';
+import datos from '@/data/instagram.json';
+import { site } from '@/lib/site';
+
+type Publicacion = {
+  imagen: string;
+  url: string;
+  tipo?: 'foto' | 'reel' | 'carrusel';
+  pie?: string;
+  alt?: string;
+};
+
+// Sin enlace no se publica: una tarjeta que no lleva a ningún lado confunde.
+const publicaciones = ((datos.publicaciones ?? []) as Publicacion[]).filter((p) => p.url && p.imagen);
+const usuario = site.redes.instagram.split('/').filter(Boolean).pop() ?? 'examlab_s.a.s';
+
+/*
+  Con pocas publicaciones el bucle se vería vacío a mitad de recorrido, así
+  que la lista se repite hasta llenar el ancho antes de duplicarla para el
+  desplazamiento.
+*/
+const MINIMO = 6;
+const base =
+  publicaciones.length === 0
+    ? []
+    : Array.from({ length: Math.max(MINIMO, publicaciones.length) }, (_, i) => publicaciones[i % publicaciones.length]!);
+
+/* Solo se marcan reels y carruseles: Instagram tampoco distingue las fotos sueltas. */
+const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
+---
+
+{
+  publicaciones.length > 0 && (
+    <section class="relative overflow-hidden bg-white py-section">
+      <div class="container-page reveal">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span class="block text-xs font-bold tracking-[1.8px] text-accent-dark uppercase">
+              Síganos en Instagram
+            </span>
+            <h2 class="mt-3 text-h2 font-bold text-brand">Lo que pasa en el laboratorio</h2>
+            <p class="mt-3 max-w-[52ch] text-base leading-relaxed text-neutral">
+              Campañas, novedades y recordatorios de preparación, en la cuenta oficial del
+              laboratorio.
+            </p>
+          </div>
+          {/* Degradado oficial de Instagram: es el único sitio del sitio donde
+              se usa un color que no es de la marca del laboratorio, y se
+              justifica porque el botón representa a Instagram. */}
+          <a
+            href={site.redes.instagram}
+            target="_blank"
+            rel="noopener"
+            class="boton-ig inline-flex min-h-11 items-center gap-2.5 rounded-xl px-5 py-3 text-sm font-bold text-white transition-transform duration-200 hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
+          >
+            <Icon name="instagram-marca" size={18} />
+            @{usuario}
+          </a>
+        </div>
+      </div>
+
+      {/*
+        La franja sale del contenedor a propósito: al ocupar todo el ancho se
+        entiende que sigue más allá del borde y que hay más publicaciones.
+      */}
+      <div class="franja-ig relative mt-9" data-franja-ig>
+        <div class="franja-ig-pista" data-pista>
+          {[0, 1].map((copia) => (
+            <ul
+              class="franja-ig-grupo"
+              aria-hidden={copia === 1 ? 'true' : undefined}
+              inert={copia === 1 ? true : undefined}
+            >
+              {base.map((post) => (
+                <li>
+                  <a
+                    href={post.url}
+                    target="_blank"
+                    rel="noopener"
+                    class="group relative block aspect-[3/4] w-[15rem] overflow-hidden rounded-xl border border-line bg-surface transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-accent-dark hover:shadow-[0_16px_36px_rgb(0_90_140/0.16)] focus-visible:-translate-y-1 motion-reduce:hover:translate-y-0"
+                  >
+                    <img
+                      src={post.imagen}
+                      alt={post.alt ?? `Publicación de ${site.nombre} en Instagram`}
+                      width="600"
+                      height="800"
+                      loading="lazy"
+                      decoding="async"
+                      class="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-110 motion-reduce:group-hover:scale-100"
+                    />
+
+                    {/* Distintivo del tipo de publicación, como en Instagram. */}
+                    {post.tipo && post.tipo !== 'foto' && (
+                      <span class="absolute top-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-lg bg-black/45 text-white backdrop-blur-sm">
+                        <Icon name={iconoPorTipo[post.tipo]} size={15} />
+                      </span>
+                    )}
+
+                    {/* Velo con el pie: sube al pasar el cursor. */}
+                    <span class="pointer-events-none absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-brand-dark/95 via-brand-dark/80 to-transparent px-4 pt-10 pb-4 transition-transform duration-300 ease-out group-hover:translate-y-0 group-focus-visible:translate-y-0 motion-reduce:translate-y-0">
+                      <span class="line-clamp-3 text-xs leading-relaxed font-medium text-white">
+                        {post.pie ?? 'Ver publicación en Instagram'}
+                      </span>
+                      <span class="mt-2 flex items-center gap-1.5 text-[11px] font-bold tracking-wide text-accent-light uppercase">
+                        Abrir
+                        <Icon name="flecha" size={12} strokeWidth={2.6} />
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+
+        {/* Degradados en los bordes: la franja se desvanece en vez de cortarse. */}
+        <span class="franja-ig-borde franja-ig-borde--izq" aria-hidden="true" />
+        <span class="franja-ig-borde franja-ig-borde--der" aria-hidden="true" />
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /*
+    Degradado de la identidad de Instagram (amarillo → rosa → violeta). El
+    segundo, más oscuro, se cruza al pasar el cursor: con el degradado a
+    `background-size` doble, mover la posición desplaza el color sin recalcular
+    nada.
+  */
+  .boton-ig {
+    background-image: linear-gradient(
+      70deg,
+      #f9ce34 0%,
+      #ee2a7b 45%,
+      #6228d7 100%
+    );
+    background-size: 160% 100%;
+    background-position: 0% 0%;
+    transition:
+      background-position 0.5s ease,
+      transform 0.2s ease;
+    box-shadow: 0 8px 22px rgb(221 42 123 / 0.28);
+  }
+  .boton-ig:hover {
+    background-position: 100% 0%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .boton-ig {
+      transition: none;
+    }
+  }
+
+  .franja-ig {
+    --ig-paso: 16.25rem; /* tarjeta (15rem) + separación (1.25rem) */
+    overflow: hidden;
+  }
+
+  .franja-ig-pista {
+    display: flex;
+    width: max-content;
+    animation: ig-desplaza var(--ig-duracion, 60s) linear infinite;
+  }
+
+  /* Detenida mientras se mira. */
+  .franja-ig:hover .franja-ig-pista {
+    animation-play-state: paused;
+  }
+
+  /*
+    También detenida mientras se recorre con el teclado, pero NO tras un clic
+    de ratón: el enlace se abre en otra pestaña y conserva el foco, así que
+    con `:focus-within` la franja se quedaba congelada al volver. `:focus-visible`
+    solo se activa cuando el foco llegó por teclado, que es cuando pausar sirve.
+
+    Va en una regla aparte a propósito: un navegador sin `:has()` descarta
+    solo esta y la pausa al pasar el cursor sigue funcionando.
+  */
+  .franja-ig:has(:focus-visible) .franja-ig-pista {
+    animation-play-state: paused;
+  }
+
+  .franja-ig-grupo {
+    display: flex;
+    gap: 1.25rem;
+    padding-inline: 0.625rem;
+    margin: 0;
+    list-style: none;
+  }
+
+  /* Desplaza justo un grupo: al llegar, la copia ocupa el lugar del original. */
+  @keyframes ig-desplaza {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-1 * var(--ig-ancho-grupo, 50%)));
+    }
+  }
+
+  .franja-ig-borde {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4rem;
+    pointer-events: none;
+  }
+  .franja-ig-borde--izq {
+    left: 0;
+    background: linear-gradient(to right, #fff, transparent);
+  }
+  .franja-ig-borde--der {
+    right: 0;
+    background: linear-gradient(to left, #fff, transparent);
+  }
+
+  /*
+    Sin movimiento automático: la franja se convierte en un carrusel que se
+    arrastra a mano, con puntos de anclaje para que las tarjetas no queden
+    cortadas.
+  */
+  @media (prefers-reduced-motion: reduce) {
+    .franja-ig {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+    .franja-ig-pista {
+      animation: none;
+    }
+    .franja-ig-grupo[aria-hidden='true'] {
+      display: none;
+    }
+    .franja-ig-grupo > li {
+      scroll-snap-align: center;
+    }
+  }
+</style>
+
+<script>
+  /*
+    La animación desplaza el ancho exacto de un grupo de tarjetas. Ese ancho
+    depende de la base tipográfica (cambia en pantallas grandes), así que se
+    mide en el navegador en vez de fijarlo en el CSS. La velocidad se deriva
+    del ancho para que la franja avance siempre a los mismos píxeles por
+    segundo, tenga seis publicaciones o veinte.
+  */
+  const VELOCIDAD = 42; // px por segundo
+
+  const medirFranja = () => {
+    for (const franja of document.querySelectorAll<HTMLElement>('[data-franja-ig]')) {
+      const grupo = franja.querySelector<HTMLElement>('.franja-ig-grupo');
+      if (!grupo) continue;
+      const ancho = grupo.getBoundingClientRect().width;
+      if (ancho === 0) continue;
+      franja.style.setProperty('--ig-ancho-grupo', `${ancho}px`);
+      franja.style.setProperty('--ig-duracion', `${Math.round(ancho / VELOCIDAD)}s`);
+    }
+  };
+
+  const initFranjaIg = () => {
+    if (document.querySelector('[data-franja-ig]') === null) return;
+    medirFranja();
+    // Las imágenes pueden llegar después y cambiar el ancho del grupo.
+    window.addEventListener('load', medirFranja, { once: true });
+    window.addEventListener('resize', medirFranja);
+  };
+
+  initFranjaIg();
+  document.addEventListener('astro:page-load', initFranjaIg);
+</script>

@@ -1,0 +1,89 @@
+{
+  "_comentario": [
+    "Publicaciones de Instagram que se muestran en la portada.",
+    "",
+    "`fuentes` es la lista de enlaces; `publicaciones` la genera",
+    "`npm run instagram`, que descarga la portada de cada una y deduce si es",
+    "reel o publicación. El pie y el texto alternativo se escriben a mano aquí",
+    "y el script los respeta al volver a ejecutarse.",
+    "",
+    "Para añadir una: pegue su enlace en `fuentes` y ejecute `npm run instagram`.",
+    "Para quitarla: borre el enlace y vuelva a ejecutar."
+  ],
+  "publicaciones": [
+    {
+      "codigo": "DduCjSAJkWf",
+      "url": "https://www.instagram.com/p/DduCjSAJkWf/",
+      "imagen": "/images/instagram/DduCjSAJkWf.webp",
+      "tipo": "reel",
+      "pie": "¿Sabes cómo vencer una bacteria? 🦠",
+      "alt": "Tecnóloga de ExamLab habla a cámara en la entrada del laboratorio"
+    },
+    {
+      "codigo": "DdcCKznJXLN",
+      "url": "https://www.instagram.com/p/DdcCKznJXLN/",
+      "imagen": "/images/instagram/DdcCKznJXLN.webp",
+      "tipo": "reel",
+      "pie": "¿Le falta velocidad? Un poco de humor de laboratorio. 👩🏻‍⚕️",
+      "alt": "Integrante del equipo de ExamLab sostiene dos tubos de muestra con tapa amarilla"
+    },
+    {
+      "codigo": "DdHYY7rpzaY",
+      "url": "https://www.instagram.com/p/DdHYY7rpzaY/",
+      "imagen": "/images/instagram/DdHYY7rpzaY.webp",
+      "tipo": "reel",
+      "pie": "¿Sabes cómo tomar la muestra de tu bebé? Te explicamos cómo hacerlo de forma fácil y segura.",
+      "alt": "Tecnóloga de ExamLab explica frente al emblema del laboratorio"
+    },
+    {
+      "codigo": "Dcy8-aapEH5",
+      "url": "https://www.instagram.com/p/Dcy8-aapEH5/",
+      "imagen": "/images/instagram/Dcy8-aapEH5.webp",
+      "tipo": "reel",
+      "pie": "Ahora automatizamos el estudio de Concentración Mínima Inhibitoria: procesos más rápidos y resultados más confiables.",
+      "alt": "Tecnóloga de ExamLab junto a un analizador automatizado Mindray"
+    },
+    {
+      "codigo": "DcwQMYkJ_Vr",
+      "url": "https://www.instagram.com/p/DcwQMYkJ_Vr/",
+      "imagen": "/images/instagram/DcwQMYkJ_Vr.webp",
+      "tipo": "reel",
+      "pie": "ExamLab se capacita: seguimos tomando cursos para ser los mejores para ti. 🧪",
+      "alt": "Expositor durante una capacitación de ExamLab, frente a una pantalla con una imagen anatómica"
+    },
+    {
+      "codigo": "Dcv7yyyEUaC",
+      "url": "https://www.instagram.com/p/Dcv7yyyEUaC/",
+      "imagen": "/images/instagram/Dcv7yyyEUaC.webp",
+      "tipo": "foto",
+      "pie": "El equipo en su jornada de capacitación. Crecemos como equipo y nos especializamos para ti.",
+      "alt": "Integrante del equipo de ExamLab en su puesto de trabajo durante la jornada de capacitación"
+    },
+    {
+      "codigo": "DbntWegkZoi",
+      "url": "https://www.instagram.com/p/DbntWegkZoi/",
+      "imagen": "/images/instagram/DbntWegkZoi.webp",
+      "tipo": "carrusel",
+      "pie": "Nuestro conversatorio sobre diagnóstico molecular y medicina de precisión, con profesionales de laboratorio.",
+      "alt": "Expositor en el conversatorio de ExamLab, frente a una diapositiva sobre medicina de precisión"
+    },
+    {
+      "codigo": "DbWMw9gJu0V",
+      "url": "https://www.instagram.com/p/DbWMw9gJu0V/",
+      "imagen": "/images/instagram/DbWMw9gJu0V.webp",
+      "tipo": "reel",
+      "pie": "¡Día Mundial contra la Hepatitis! Recuerda que la mejor medicina es la prevención. 🦠",
+      "alt": "El Dr. Silva, con bata del laboratorio, en el área de equipos de ExamLab"
+    }
+  ],
+  "fuentes": [
+    "https://www.instagram.com/p/DduCjSAJkWf/",
+    "https://www.instagram.com/p/DdcCKznJXLN/",
+    "https://www.instagram.com/p/DdHYY7rpzaY/",
+    "https://www.instagram.com/p/Dcy8-aapEH5/",
+    "https://www.instagram.com/p/DcwQMYkJ_Vr/",
+    "https://www.instagram.com/p/Dcv7yyyEUaC/",
+    "https://www.instagram.com/p/DbntWegkZoi/",
+    "https://www.instagram.com/p/DbWMw9gJu0V/"
+  ]
+}

@@ -29,10 +29,11 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
   data-horario={JSON.stringify(horario)}
   data-zona={ZONA_HORARIA}
 >
+  {/* Cuando el laboratorio está abierto, el punto late (ver `.punto-vivo` en global.css). */}
   <span
     class:list={[
-      'h-2 w-2 flex-none rounded-full bg-current opacity-60 transition-colors',
-      oscuro ? 'text-white/60' : 'text-neutral',
+      'punto-vivo relative h-2 w-2 flex-none rounded-full bg-current opacity-60 transition-colors',
+      oscuro ? 'text-white/75' : 'text-neutral',
     ]}
     data-punto
     aria-hidden="true"></span>
@@ -44,7 +45,8 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
     const nodos = document.querySelectorAll<HTMLElement>('[data-apertura]');
     if (nodos.length === 0) return;
 
-    type Franja = { abre: string; cierra: string } | null;
+    type Tramo = { abre: string; cierra: string };
+    type Franja = Tramo[] | null;
 
     const aMinutos = (hhmm: string) => {
       const [h, m] = hhmm.split(':').map(Number);
@@ -76,18 +78,23 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
       const hoy = semana[dia] ?? null;
 
       if (hoy) {
-        const abre = aMinutos(hoy.abre);
-        const cierra = aMinutos(hoy.cierra);
+        for (const tramo of hoy) {
+          const abre = aMinutos(tramo.abre);
+          const cierra = aMinutos(tramo.cierra);
 
-        if (minutos >= abre && minutos < cierra) {
-          const faltan = cierra - minutos;
-          return {
-            abierto: true,
-            texto: faltan <= 60 ? `Cierra en ${faltan} min` : `Abierto · cierra ${hoy.cierra}`,
-          };
+          if (minutos >= abre && minutos < cierra) {
+            const faltan = cierra - minutos;
+            return {
+              abierto: true,
+              texto: faltan <= 60 ? `Cierra en ${faltan} min` : `Abierto · cierra ${tramo.cierra}`,
+            };
+          }
         }
-        if (minutos < abre) {
-          return { abierto: false, texto: `Cerrado · abre hoy ${hoy.abre}` };
+        // No está dentro de ningún tramo: puede ser antes del primero o, si
+        // hay pausa de mediodía, estar en la pausa entre dos tramos.
+        const siguiente = hoy.find((t) => minutos < aMinutos(t.abre));
+        if (siguiente) {
+          return { abierto: false, texto: `Cerrado · abre hoy ${siguiente.abre}` };
         }
       }
 
@@ -95,9 +102,9 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
       for (let i = 1; i <= 7; i++) {
         const indice = (dia + i) % 7;
         const franja = semana[indice];
-        if (!franja) continue;
+        if (!franja || franja.length === 0) continue;
         const cuando = i === 1 ? 'mañana' : `el ${nombreDia[indice]}`;
-        return { abierto: false, texto: `Cerrado · abre ${cuando} ${franja.abre}` };
+        return { abierto: false, texto: `Cerrado · abre ${cuando} ${franja[0]!.abre}` };
       }
       return { abierto: false, texto: 'Cerrado' };
     };

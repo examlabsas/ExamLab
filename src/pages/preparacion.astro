@@ -67,15 +67,21 @@ const schema = [
   <section class="bg-brand">
     <div class="container-page py-10 lg:py-14">
       <nav aria-label="Ruta de navegación" class="mb-6 sin-imprimir">
-        <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] text-white/60">
-          <li><a href="/" class="transition-colors hover:text-accent-light">Inicio</a></li>
+        <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/75">
+          <!-- Relleno vertical con margen negativo: agranda el área de toque a
+               los 24px que pide WCAG sin alterar la línea de la miga de pan. -->
+          <li>
+            <a href="/" class="-my-1.5 inline-block py-1.5 transition-colors hover:text-accent-light">
+              Inicio
+            </a>
+          </li>
           <li aria-hidden="true">/</li>
           <li class="text-white/85" aria-current="page">Preparación</li>
         </ol>
       </nav>
 
       <span
-        class="inline-block rounded-lg bg-white/12 px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-light uppercase"
+        class="inline-block rounded-md bg-brand-dark px-2.5 py-1.5 text-[11px] font-bold tracking-[0.4px] text-accent-light uppercase"
       >
         Manual para pacientes
       </span>
@@ -115,7 +121,7 @@ const schema = [
             <li>
               <a
                 href={`#${bloque.id}`}
-                class="flex items-center gap-2.5 rounded-full border border-line-strong px-5 py-3.5 text-[15px] font-semibold whitespace-nowrap text-brand transition-colors hover:border-accent hover:bg-accent-soft"
+                class="flex items-center gap-2.5 rounded-full border border-line-strong px-5 py-3.5 text-base font-semibold whitespace-nowrap text-brand transition-colors hover:border-accent hover:bg-accent-soft"
               >
                 <Icon name={bloque.icono} size={19} class="flex-none text-accent-dark" />
                 {bloque.titulo}
@@ -140,7 +146,7 @@ const schema = [
         bloquesPreparacion.map((bloque) => (
           <article
             id={bloque.id}
-            class="bloque rounded-3xl border border-line bg-white p-6 lg:p-8"
+            class="bloque rounded-xl border border-line bg-white p-6 lg:p-8"
           >
             {/*
               Solo el icono y el título se quedan pegados. El resumen va debajo,
@@ -148,20 +154,20 @@ const schema = [
               celular y se comía un tercio de la pantalla mientras se lee.
             */}
             <header class="cabecera-bloque">
-              <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-accent-soft text-accent-dark lg:h-12 lg:w-12 lg:rounded-2xl">
+              <span class="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-accent-soft text-accent-dark lg:h-12 lg:w-12 lg:rounded-xl">
                 <Icon name={bloque.icono} size={22} />
               </span>
               {/* En el celular no cabe el tamaño completo sin partirse en dos
                   líneas, y la banda pegajosa crecería de 85 a 108 píxeles. */}
-              <h2 class="text-[22px] leading-tight font-bold text-brand lg:text-h2">
+              <h2 class="text-xl leading-tight font-bold text-brand lg:text-h2">
                 {bloque.titulo}
               </h2>
             </header>
 
-            <p class="mt-5 text-[14.5px] leading-relaxed text-neutral">{bloque.resumen}</p>
+            <p class="mt-5 text-sm leading-relaxed text-neutral">{bloque.resumen}</p>
 
             {bloque.destacado && (
-              <p class="mt-6 flex items-start gap-3 rounded-2xl border border-accent/30 bg-accent-soft/50 px-4 py-3.5 text-[15px] leading-relaxed font-semibold text-brand">
+              <p class="mt-6 flex items-start gap-3 rounded-xl border border-accent/30 bg-accent-soft/50 px-4 py-3.5 text-base leading-relaxed font-semibold text-brand">
                 <Icon name="alerta" size={19} class="mt-0.5 flex-none text-accent-dark" />
                 <span>
                   {resaltar(bloque.destacado).map((tramo) =>
@@ -174,10 +180,10 @@ const schema = [
             <ol class="mt-6 flex flex-col gap-4">
               {bloque.indicaciones.map((indicacion, i) => (
                 <li class="flex items-start gap-3.5">
-                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-brand text-[12px] font-bold text-white">
+                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
                     {i + 1}
                   </span>
-                  <span class="text-[15px] leading-relaxed text-neutral">
+                  <span class="text-base leading-relaxed text-neutral">
                     {resaltar(indicacion).map((tramo) =>
                       tramo.fuerte ? <strong class="clave">{tramo.texto}</strong> : tramo.texto,
                     )}
@@ -187,15 +193,15 @@ const schema = [
             </ol>
 
             {bloque.id === 'orina-24-horas' && (
-              <div class="mt-7 rounded-2xl border border-line bg-surface p-5">
-                <h3 class="text-[14px] font-bold tracking-[0.3px] text-brand uppercase">
+              <div class="mt-7 rounded-xl border border-line bg-surface p-5">
+                <h3 class="text-sm font-bold tracking-[0.3px] text-brand uppercase">
                   Ejemplo de un día de recolección
                 </h3>
                 <ol class="mt-4 flex flex-col gap-3.5">
                   {ejemploOrina24.map((paso) => (
                     <li class="grid grid-cols-1 gap-1 sm:grid-cols-[190px_1fr] sm:gap-4">
-                      <span class="text-[13px] font-bold text-accent-dark">{paso.hora}</span>
-                      <span class="text-[14.5px] leading-relaxed text-neutral">{paso.texto}</span>
+                      <span class="text-xs font-bold text-accent-deep">{paso.hora}</span>
+                      <span class="text-sm leading-relaxed text-neutral">{paso.texto}</span>
                     </li>
                   ))}
                 </ol>
@@ -211,9 +217,9 @@ const schema = [
                   height="1254"
                   loading="lazy"
                   decoding="async"
-                  class="w-full max-w-[380px] rounded-2xl border border-line bg-white"
+                  class="w-full max-w-[380px] rounded-xl border border-line bg-white"
                 />
-                <figcaption class="mt-2.5 text-[13px] leading-relaxed text-neutral">
+                <figcaption class="mt-2.5 text-xs leading-relaxed text-neutral">
                   {bloque.imagen.pie}
                 </figcaption>
               </figure>
@@ -225,8 +231,8 @@ const schema = [
               de 8 a 12 horas en una hora concreta.
             */}
             {bloque.id === 'sangre' && (
-              <div class="mt-7 flex flex-col gap-3 rounded-2xl bg-accent-soft/40 p-5 sm:flex-row sm:items-center sm:justify-between sin-imprimir">
-                <p class="text-[14.5px] leading-relaxed text-neutral">
+              <div class="mt-7 flex flex-col gap-3 rounded-xl bg-accent-soft/40 p-5 sm:flex-row sm:items-center sm:justify-between sin-imprimir">
+                <p class="text-sm leading-relaxed text-neutral">
                   <strong class="clave">¿A qué hora exacta debe dejar de comer?</strong>
                   <br />
                   Se lo calculamos según la hora de su cita.
@@ -245,12 +251,12 @@ const schema = [
   <!-- Nota final del laboratorio -->
   <section class="bg-white py-section">
     <div class="container-page max-w-[860px]">
-      <div class="rounded-3xl bg-brand p-7 lg:p-10">
-        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/12 text-accent-light">
+      <div class="rounded-xl bg-brand p-7 lg:p-10">
+        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/12 text-accent-light">
           <Icon name="telefono" size={23} />
         </span>
         <h2 class="mt-5 text-h3 font-bold text-white">¿Le queda alguna duda?</h2>
-        <p class="mt-3 max-w-[58ch] text-[15px] leading-relaxed text-white/75">
+        <p class="mt-3 max-w-[58ch] text-base leading-relaxed text-white/75">
           En caso de requerir mayor información sobre las condiciones clínicas para acudir al
           laboratorio, comuníquese con nosotros. Es preferible preguntar antes que repetir la toma
           de muestra.
@@ -268,10 +274,10 @@ const schema = [
         la madre de un bebé, un familiar que ayuda. Reenviar las indicaciones
         por WhatsApp evita que se transmitan de memoria.
       -->
-      <div class="mt-8 flex flex-col gap-4 rounded-3xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sin-imprimir">
+      <div class="mt-8 flex flex-col gap-4 rounded-xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sin-imprimir">
         <div>
-          <h2 class="text-[17px] font-bold text-brand">¿Otra persona recoge la muestra?</h2>
-          <p class="mt-1.5 text-[14px] leading-relaxed text-neutral">
+          <h2 class="text-lg font-bold text-brand">¿Otra persona recoge la muestra?</h2>
+          <p class="mt-1.5 text-sm leading-relaxed text-neutral">
             Envíele estas indicaciones para que no se transmitan de memoria.
           </p>
         </div>
@@ -280,7 +286,7 @@ const schema = [
         </Button>
       </div>
 
-      <p class="mt-8 text-[13px] leading-relaxed text-neutral">
+      <p class="mt-8 text-xs leading-relaxed text-neutral">
         Si su médico le entregó una indicación distinta a las de esta página, siga siempre la
         indicación de su médico.
       </p>
@@ -366,7 +372,8 @@ const schema = [
     margin: -1.5rem -1.5rem 0;
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--color-line);
-    border-radius: 1.5rem 1.5rem 0 0;
+    /* 0.75rem = el radio grande del sistema (12px), como el resto de paneles. */
+    border-radius: 0.75rem 0.75rem 0 0;
     background: #fff;
   }
 

@@ -1,0 +1,38 @@
+---
+/**
+ * Define todos los iconos una sola vez por página, para que `Icon` pueda
+ * referenciarlos con `<use>` en vez de repetir el trazo completo.
+ *
+ * El motivo es el catálogo: imprime 559 tarjetas con cuatro iconos cada una,
+ * o sea 2236 SVG completos, más de un megabyte solo en trazos repetidos. Con
+ * el sprite, cada uso son unos 80 bytes y el navegador maneja 2236 nodos en
+ * vez de 8000.
+ *
+ * Va oculto y fuera del árbol de accesibilidad: es una biblioteca de formas,
+ * no contenido.
+ */
+import { iconos, iconosRellenos, type IconName } from '@/lib/iconos';
+
+const nombres = Object.keys(iconos) as IconName[];
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
+  style="position:absolute;width:0;height:0;overflow:hidden"
+>
+  {
+    nombres.map((nombre) => (
+      <symbol
+        id={`i-${nombre}`}
+        viewBox="0 0 24 24"
+        fill={iconosRellenos.has(nombre) ? 'currentColor' : 'none'}
+        stroke={iconosRellenos.has(nombre) ? undefined : 'currentColor'}
+        stroke-linecap={iconosRellenos.has(nombre) ? undefined : 'round'}
+        stroke-linejoin={iconosRellenos.has(nombre) ? undefined : 'round'}
+        set:html={iconos[nombre]}
+      />
+    ))
+  }
+</svg>

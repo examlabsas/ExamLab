@@ -26,17 +26,26 @@ const {
   ...rest
 } = Astro.props;
 
+// `min-h-11` son 44px: el objetivo táctil mínimo cómodo. Se fija en la base
+// para que ninguna variante de tamaño quede por debajo.
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-xl font-bold no-underline transition-all duration-200 active:scale-[0.99]';
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg font-bold no-underline transition-colors duration-200 active:scale-[0.99]';
 
+/*
+  Sin sombras: un botón se distingue por su color de fondo, no por flotar. La
+  sombra sobre un botón sólido no añade información y es el gesto más repetido
+  de las interfaces generadas.
+*/
 const variantes: Record<NonNullable<Props['variant']>, string> = {
-  primary: 'bg-accent text-white shadow-sm hover:bg-accent-dark hover:shadow-md',
+  // El cian de marca no llega al contraste AA con texto blanco (2,98:1); la
+  // variante oscura da 4,73:1 y mantiene la identidad.
+  primary: 'bg-accent-dark text-white hover:bg-accent-deep',
   secondary:
     'bg-white text-brand border border-line-strong hover:border-brand hover:bg-brand-soft/30',
-  brand: 'bg-brand text-white shadow-sm hover:bg-brand-dark',
+  brand: 'bg-brand text-white hover:bg-brand-dark',
   sobreOscuro:
     'bg-white/10 text-white border border-white/30 hover:bg-white hover:text-brand',
-  blanco: 'bg-white text-brand shadow-sm hover:bg-brand-soft',
+  blanco: 'bg-white text-brand hover:bg-brand-soft',
 };
 
 const tamanos: Record<NonNullable<Props['size']>, string> = {

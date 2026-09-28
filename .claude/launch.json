@@ -6,6 +6,13 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 4321
+    },
+    {
+      "//": "Igual que examlab pero escuchando en la red local, para abrirlo desde el teléfono. Astro solo acepta conexiones de la propia máquina si no se le pasa --host.",
+      "name": "examlab-red",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--host"],
+      "port": 4321
     }
   ]
 }

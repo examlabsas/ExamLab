@@ -4,6 +4,7 @@ descripcion: Una guía sencilla para cuidar su salud durante todo el año.
 categoria: Chequeos
 fecha: 2026-06-03
 autor: Equipo ExamLab
+foto: microscopio
 ---
 
 Un chequeo anual no busca encontrar enfermedades: busca confirmar que todo está en orden y detectar a tiempo lo que todavía no da síntomas. Estos son los seis exámenes con mejor rendimiento para el adulto sano.

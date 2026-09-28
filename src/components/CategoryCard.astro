@@ -17,12 +17,12 @@ const Tag = href ? 'a' : 'div';
 
 <Tag
   {...href ? { href } : {}}
-  class="group flex flex-col justify-between rounded-xl border border-line bg-white p-6 transition-all duration-200 hover:border-brand hover:shadow-md"
+  class="group flex flex-col justify-between rounded-lg border border-line bg-white p-6 transition-colors duration-200 hover:border-accent-dark"
 >
   <div>
     <div class="flex items-center justify-between">
-      <span class="text-brand transition-colors duration-200 group-hover:text-accent">
-        <Icon name={icono} size={24} strokeWidth={2} />
+      <span class="text-brand transition-colors duration-200 group-hover:text-accent-dark">
+        <Icon name={icono} size={24} strokeWidth={2} dibujo />
       </span>
       <span class="rounded-full bg-brand-soft/70 px-2.5 py-1 text-xs font-semibold text-brand">
         {conteo}
@@ -31,7 +31,7 @@ const Tag = href ? 'a' : 'div';
     <h3 class="mt-4 text-base font-bold text-brand transition-colors duration-200 group-hover:text-accent-dark">{titulo}</h3>
     <p class="mt-2 text-xs leading-relaxed text-neutral">{descripcion}</p>
   </div>
-  <div class="mt-4 flex items-center gap-1 text-xs font-semibold text-brand transition-colors duration-200 group-hover:text-accent">
+  <div class="mt-4 flex items-center gap-1 text-xs font-semibold text-brand transition-colors duration-200 group-hover:text-accent-dark">
     <span>Ver exámenes</span>
     <Icon name="flecha" size={13} strokeWidth={2.4} class="transition-transform duration-200 group-hover:translate-x-1" />
   </div>

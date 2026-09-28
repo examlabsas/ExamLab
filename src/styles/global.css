@@ -9,9 +9,19 @@
   --color-brand: #005a8c; /* azul institucional */
   --color-brand-dark: #00456b;
   --color-brand-soft: #e6eef4;
-  --color-accent: #00a3c4; /* cian de acción */
+  /*
+    El cian de marca (#00a3c4) mide 2,98:1 con texto blanco, por debajo del
+    4,5:1 que exige WCAG AA. Se conserva como color de marca, pero los
+    elementos que llevan texto encima usan las variantes oscuras: `accent-dark`
+    da 4,73:1 en blanco, y `accent-deep` sirve para el estado hover y para
+    texto pequeño sobre superficies claras.
+  */
+  --color-accent: #00a3c4; /* cian de acción — solo como fondo sin texto */
   --color-accent-dark: #007e99;
-  --color-accent-light: #6fd8ea;
+  --color-accent-deep: #00697f;
+  /* Aclarado desde #6fd8ea: sobre el azul de marca medía 4,47:1 y se quedaba
+     tres centésimas por debajo de AA. Ahora da 4,81:1. */
+  --color-accent-light: #7cdff0;
   --color-accent-soft: #e6f5f9;
   --color-neutral: #6d6e71; /* gris de texto secundario */
   --color-alert: #e1251b; /* rojo de énfasis / urgencias */
@@ -19,9 +29,15 @@
   --color-alert-light: #ff6f66;
   --color-alert-soft: #f8e0ee;
 
-  /* Verde oficial de WhatsApp (solo para el botón flotante) */
+  /*
+    Verdes oficiales de WhatsApp. El verde claro (#25d366) con texto blanco mide
+    1,98:1, muy por debajo del 4,5:1 de AA, así que el botón flotante —que sí
+    lleva texto— usa el verde azulado de la misma paleta de marca, que da 5,02:1.
+    El claro se conserva para el glifo, que va sobre fondos claros.
+  */
   --color-whatsapp: #25d366;
-  --color-whatsapp-dark: #1da851;
+  --color-whatsapp-boton: #0f7d6f;
+  --color-whatsapp-dark: #0b6b5e;
 
   /* Superficies y bordes derivados */
   --color-surface: #f6f8fa;
@@ -48,11 +64,13 @@
   --spacing-section: clamp(3.5rem, 6vw, 5.5rem);
   --spacing-section-sm: clamp(2.875rem, 5vw, 4.5rem);
 
-  /* Sombras de marca */
-  --shadow-card: 0 2px 10px rgb(0 90 140 / 0.05);
-  --shadow-card-hover: 0 18px 38px rgb(0 90 140 / 0.1);
-  --shadow-float: 0 12px 30px rgb(0 90 140 / 0.28);
-  --shadow-accent: 0 10px 24px rgb(0 163 196 / 0.32);
+  /*
+    Sin escala de sombras. Las cuatro que había —tarjeta, tarjeta al pasar el
+    mouse, flotante y acento— servían para elevar cosas que no flotan. Lo que sí
+    flota sobre el contenido (cabecera, banner de cookies, menú desplegable,
+    botón de WhatsApp) lleva su sombra escrita en el propio componente, porque
+    ahí la elevación significa algo.
+  */
 
   /*
     Punto de quiebre propio para la cabecera. Con ocho secciones —incluida
@@ -61,9 +79,14 @@
   */
   --breakpoint-menu: 75rem;
 
-  /* Curvas del sistema de animaciones */
-  --ease-suave: cubic-bezier(0.16, 1, 0.3, 1); /* frenado marcado, se lee "suave" */
-  --ease-rebote: cubic-bezier(0.34, 1.28, 0.64, 1); /* rebote leve, para tarjetas */
+  /*
+    Curvas del sistema de animaciones. Las dos frenan, ninguna se pasa de largo:
+    un objeto real desacelera, no rebota. El rebote del diseño original
+    (`cubic-bezier(0.34, 1.28, …)`) se sobrepasaba un 28% del recorrido y es de
+    los gestos que hacen que una interfaz se lea como plantilla.
+  */
+  --ease-suave: cubic-bezier(0.16, 1, 0.3, 1); /* frenado marcado, para bloques */
+  --ease-tarjeta: cubic-bezier(0.22, 1, 0.36, 1); /* frenado algo más corto, para rejillas */
 }
 
 /* ------------------------------------------------------------------
@@ -71,16 +94,46 @@
    cambia todo el sitio; no hace falta tocar nada más.
 ------------------------------------------------------------------- */
 :root {
-  --reveal-distancia: 64px; /* cuánto sube cada bloque al aparecer */
-  --reveal-duracion: 1s; /* cuánto dura ese recorrido */
-  --reveal-escala: 0.97; /* tamaño inicial del bloque */
-  --stagger-paso: 0.1s; /* retardo entre tarjeta y tarjeta */
+  /*
+    Punto intermedio. El ajuste original (64px en 1s, escala 0.97 y rebote) hacía
+    que el recorrido se notara más que el contenido; recortarlo a 28px en 0,55s
+    sin escala lo dejó demasiado seco. Estos valores están entre ambos: el
+    movimiento se percibe, pero no obliga a esperar a que termine para leer.
+  */
+  --reveal-distancia: 40px; /* cuánto sube cada bloque al aparecer */
+  --reveal-duracion: 0.7s; /* cuánto dura ese recorrido */
+  --reveal-escala: 0.99; /* apenas perceptible; a 0.97 el texto "respiraba" */
+  --stagger-paso: 0.08s; /* retardo entre tarjeta y tarjeta */
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+  }
+
+  /*
+    Pantallas grandes. El diseño se maquetó a 1240 px de ancho útil; en un
+    monitor de 27" quedaba como una tarjeta en el centro con el texto pequeño.
+    Todo el sitio está en rem —contenedor, tipografía, espacios, alturas de
+    foto—, así que basta subir la base para que crezca en proporción, sin
+    tocar página por página. Las consultas van en rem del navegador (16 px),
+    no de esta base, así que no se realimentan.
+  */
+  @media (min-width: 96rem) {
+    html {
+      font-size: 17px; /* ≥ 1536 px */
+    }
+  }
+  @media (min-width: 120rem) {
+    html {
+      font-size: 18.5px; /* ≥ 1920 px: la pantalla del Dr. Silva */
+    }
+  }
+  @media (min-width: 150rem) {
+    html {
+      font-size: 20px; /* ≥ 2400 px */
+    }
   }
 
   body {
@@ -100,9 +153,12 @@
     text-wrap: balance;
   }
 
-  /* Accesibilidad: foco visible coherente con la marca */
+  /*
+    Foco visible. Usa el cian oscuro y no el de marca: WCAG exige 3:1 para
+    elementos no textuales, y el cian claro se queda en 2,98:1 sobre blanco.
+  */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-accent-dark);
     outline-offset: 3px;
     border-radius: 4px;
   }
@@ -187,8 +243,9 @@
     color: var(--color-accent);
   }
 
+  /* Cian oscuro: el de marca se queda en 2,98:1 y no llega al 4,5:1 de AA. */
   & a {
-    color: var(--color-accent);
+    color: var(--color-accent-dark);
     font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -207,7 +264,7 @@
     margin-top: 1.5rem;
     border-left: 3px solid var(--color-accent);
     background: var(--color-surface);
-    border-radius: 0 1rem 1rem 0;
+    border-radius: 0 0.75rem 0.75rem 0;
     padding: 1rem 1.25rem;
     font-size: 1rem;
     line-height: 1.6;
@@ -216,7 +273,7 @@
 
   & img {
     margin-top: 1.5rem;
-    border-radius: 1.25rem;
+    border-radius: 0.75rem;
     width: 100%;
     height: auto;
   }
@@ -265,13 +322,18 @@
   will-change: auto;
 }
 
-/* Entrada escalonada para rejillas de tarjetas, con rebote leve al asentar. */
+/*
+  Entrada escalonada para rejillas de tarjetas. Recorre algo menos que un bloque
+  entero —son piezas más pequeñas— y frena con una curva un punto más corta, que
+  es lo que las hace sentirse más ligeras que un bloque. Sin rebote.
+*/
 .js .reveal-stagger > * {
   opacity: 0;
-  transform: translateY(calc(48px * var(--reveal-signo, 1))) scale(0.94);
+  transform: translateY(calc(var(--reveal-distancia) * 0.8 * var(--reveal-signo, 1)))
+    scale(var(--reveal-escala));
   transition:
-    opacity 0.75s var(--ease-suave),
-    transform 0.75s var(--ease-rebote);
+    opacity var(--reveal-duracion) var(--ease-suave),
+    transform var(--reveal-duracion) var(--ease-tarjeta);
 }
 
 .js .reveal-stagger.is-visible > * {
@@ -371,6 +433,111 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   Detalles con vida
+   ------------------------------------------------------------------
+   Pequeñas animaciones que no dependen del scroll: cada una responde a algo
+   real del sitio (el laboratorio está abierto, el botón de WhatsApp lleva a
+   una persona, la foto es un lugar de verdad). Todas se apagan con
+   prefers-reduced-motion.
+------------------------------------------------------------------- */
+
+/*
+  Iconos que se dibujan trazo a trazo cuando su tarjeta entra en pantalla.
+  Icon.astro les pone `pathLength="1"`, así que el recorrido siempre va de 1
+  a 0 sea cual sea la forma. El retardo sigue al de la tarjeta (+0,25 s) para
+  que el icono termine de dibujarse justo cuando la tarjeta asienta.
+*/
+.js .reveal-stagger > * .icono-dibujo :is(path, circle, rect, line, polyline) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.9s var(--ease-suave);
+}
+.js .reveal-stagger.is-visible > * .icono-dibujo :is(path, circle, rect, line, polyline) {
+  stroke-dashoffset: 0;
+}
+.js .reveal-stagger.is-visible > :nth-child(1) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 0 + 0.25s); }
+.js .reveal-stagger.is-visible > :nth-child(2) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 1 + 0.25s); }
+.js .reveal-stagger.is-visible > :nth-child(3) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 2 + 0.25s); }
+.js .reveal-stagger.is-visible > :nth-child(4) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 3 + 0.25s); }
+.js .reveal-stagger.is-visible > :nth-child(5) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 4 + 0.25s); }
+.js .reveal-stagger.is-visible > :nth-child(6) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 5 + 0.25s); }
+.js .reveal-stagger.is-visible > :nth-child(7) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 6 + 0.25s); }
+.js .reveal-stagger.is-visible > :nth-child(8) .icono-dibujo * { transition-delay: calc(var(--stagger-paso) * 7 + 0.25s); }
+
+/*
+  Punto del indicador de apertura: cuando el laboratorio está abierto, un
+  anillo del mismo color se expande y desvanece cada 2,4 s. Cerrado, quieto.
+*/
+[data-abierto='true'] .punto-vivo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: latido 2.4s ease-out infinite;
+}
+
+@keyframes latido {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+/*
+  Botón flotante de WhatsApp: un anillo lo rodea y se disipa. La animación
+  dura 5 s pero el anillo solo se ve el primer 30 %: el resto es pausa, para
+  que llame la atención de vez en cuando y no todo el tiempo.
+*/
+.wa-anillo {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid var(--color-whatsapp);
+  opacity: 0;
+  pointer-events: none;
+  animation: wa-anillo 5s ease-out infinite 2s;
+}
+
+@keyframes wa-anillo {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  30% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+/*
+  Foto de cabecera: un acercamiento muy lento, de ida y vuelta, como el
+  encuadre de un documental. 4 % en 28 s: se percibe que la imagen respira,
+  no que se mueve.
+*/
+.foto-viva {
+  animation: foto-viva 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes foto-viva {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.04);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* Sin desplazamiento ni escalado, pero se conserva un fundido corto:
      la preferencia del sistema es sobre el movimiento, no sobre la opacidad. */
@@ -386,6 +553,18 @@
     transform: none !important;
     animation: none !important;
     transition: opacity 0.7s ease-out !important;
+  }
+
+  .js .reveal-stagger > * .icono-dibujo :is(path, circle, rect, line, polyline) {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+
+  .punto-vivo::after,
+  .wa-anillo,
+  .foto-viva {
+    animation: none !important;
   }
 }
 

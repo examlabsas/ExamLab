@@ -1,10 +1,16 @@
 // @ts-check
-import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-import react from '@astrojs/react';
+/*
+  Páginas que llevan `noindex` y por tanto no deben anunciarse en el sitemap:
+  sería contradictorio pedirle a Google que no las indexe y a la vez
+  entregárselas en la lista de URL. La integración no lee la etiqueta de cada
+  página, así que se declaran aquí; si se añade otra página con `noindex`,
+  hay que sumarla a esta lista.
+*/
+const rutasSinIndexar = ['/laboratorios-asociados/catalogo'];
 
 // https://astro.build/config
 export default defineConfig({
@@ -21,20 +27,13 @@ export default defineConfig({
     Pages, Netlify o cualquier hosting con FTP.
   */
   output: 'static',
-  integrations: [sitemap(), react()],
+  integrations: [
+    sitemap({
+      filter: (pagina) => !rutasSinIndexar.some((ruta) => new URL(pagina).pathname.startsWith(ruta)),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
-    resolve: {
-      alias: {
-        /*
-          Los componentes de Framer importan utilidades de `"framer"`, un
-          paquete que solo existe dentro del editor. Se redirige a un
-          sustituto local para que funcionen en el sitio publicado.
-          Ver src/lib/framer-shim.ts
-        */
-        framer: fileURLToPath(new URL('./src/lib/framer-shim.ts', import.meta.url)),
-      },
-    },
     server: {
       /*
         Vite solo responde a hosts conocidos (protección contra rebinding de

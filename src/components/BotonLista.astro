@@ -1,0 +1,174 @@
+---
+/**
+ * Botón para añadir o quitar un examen de la lista del paciente.
+ *
+ * Lleva los datos del examen en atributos, así que funciona igual dentro de
+ * una tarjeta del catálogo que en la ficha, sin que ninguna de las dos tenga
+ * que conocer la lista.
+ *
+ * Sin JavaScript no se dibuja: un botón que no hace nada es peor que ninguno.
+ */
+import Icon from './Icon.astro';
+import { interpretarAyuno, etiquetaMuestra, type Examen } from '@/lib/examenes';
+
+interface Props {
+  examen: Examen;
+  /** `compacto` es el círculo de la esquina de la tarjeta; `ancho`, el de la ficha. */
+  variante?: 'compacto' | 'ancho';
+  class?: string;
+}
+
+const { examen, variante = 'compacto', class: className } = Astro.props;
+const ayuno = interpretarAyuno(examen);
+---
+
+{/*
+  Las clases van en el `<style>` y no como utilidades: este botón se imprime
+  559 veces en el catálogo y la lista de utilidades pesaba más que el resto
+  del botón junto. El texto para lectores de pantalla va en `aria-label`, que
+  el script reescribe al marcar, en vez de en un `<span>` oculto.
+*/}
+<button
+  type="button"
+  data-lista-boton
+  data-slug={examen.slug}
+  data-nombre={examen.nombre}
+  data-horas={ayuno.requiere ? ayuno.horas : 0}
+  data-muestra={etiquetaMuestra(examen)}
+  aria-pressed="false"
+  aria-label={`Añadir ${examen.nombre} a mi lista`}
+  class:list={['boton-lista', `boton-lista--${variante}`, className]}
+>
+  <Icon name="mas" size={variante === 'compacto' ? 18 : 17} class="boton-lista-icono" />
+  {variante === 'ancho' && <span class="boton-lista-texto">Añadir a mi lista</span>}
+</button>
+
+<style>
+  /* Sin JavaScript el botón no existe: el script lo destapa al arrancar. */
+  .boton-lista {
+    display: none;
+  }
+  :global(.js) .boton-lista {
+    position: relative;
+    /* Por encima del `::after` del título, que cubre la tarjeta entera. */
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--color-line-strong);
+    background: #fff;
+    font-weight: 700;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s,
+      transform 0.2s;
+  }
+  .boton-lista:hover {
+    border-color: var(--color-accent-dark);
+  }
+
+  .boton-lista--compacto {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 0.5rem;
+    color: var(--color-accent-dark);
+  }
+  .boton-lista--compacto:hover {
+    transform: translateY(-0.125rem);
+  }
+
+  .boton-lista--ancho {
+    min-height: 2.75rem;
+    width: 100%;
+    border-width: 1.5px;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    color: var(--color-brand);
+  }
+
+  /* Dentro de la lista: fondo lleno y el «+» girado a «×» para quitarlo. */
+  .boton-lista[aria-pressed='true'] {
+    background: var(--color-accent-dark);
+    border-color: var(--color-accent-dark);
+    color: #fff;
+  }
+  .boton-lista[aria-pressed='true'] .boton-lista-icono {
+    transform: rotate(45deg);
+  }
+  .boton-lista-icono {
+    transition: transform 0.2s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .boton-lista-icono {
+      transition: none;
+    }
+    .boton-lista--compacto:hover {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { alternar, leerLista, EVENTO } from '@/lib/lista-examenes';
+
+  const initBotonesLista = () => {
+    const botones = [...document.querySelectorAll<HTMLButtonElement>('[data-lista-boton]')].filter(
+      (b) => b.dataset.iniciado !== 'true',
+    );
+
+    /*
+      La lista se lee UNA vez y se pasa como conjunto. Preguntar por cada
+      botón salía a `localStorage` y hacía `JSON.parse` 559 veces al abrir el
+      catálogo, que es justo lo que lo hacía tardar.
+    */
+    const enLista = () => new Set(leerLista().map((e) => e.slug));
+
+    const pintar = (boton: HTMLButtonElement, dentroDe: Set<string>) => {
+      const dentro = dentroDe.has(boton.dataset.slug ?? '');
+      boton.setAttribute('aria-pressed', String(dentro));
+      const nombre = boton.dataset.nombre ?? 'este examen';
+      boton.setAttribute(
+        'aria-label',
+        dentro ? `Quitar ${nombre} de mi lista` : `Añadir ${nombre} a mi lista`,
+      );
+      const texto = boton.querySelector('.boton-lista-texto');
+      if (texto) texto.textContent = dentro ? 'En mi lista' : 'Añadir a mi lista';
+    };
+
+    const marcados = enLista();
+    for (const boton of botones) {
+      boton.dataset.iniciado = 'true';
+      pintar(boton, marcados);
+
+      boton.addEventListener('click', (evento) => {
+        // En el catálogo el botón vive dentro de una tarjeta que es un enlace.
+        evento.preventDefault();
+        evento.stopPropagation();
+        alternar({
+          slug: boton.dataset.slug ?? '',
+          nombre: boton.dataset.nombre ?? '',
+          horas: Number(boton.dataset.horas ?? 0),
+          muestra: boton.dataset.muestra ?? '',
+        });
+      });
+    }
+
+    // Un examen se puede quitar desde la barra: todos los botones se repintan.
+    if (!(window as { __examlabListaSuscrito?: boolean }).__examlabListaSuscrito) {
+      (window as { __examlabListaSuscrito?: boolean }).__examlabListaSuscrito = true;
+      document.addEventListener(EVENTO, () => {
+        const ahora = enLista();
+        document
+          .querySelectorAll<HTMLButtonElement>('[data-lista-boton]')
+          .forEach((b) => pintar(b, ahora));
+      });
+    }
+  };
+
+  initBotonesLista();
+  document.addEventListener('astro:page-load', initBotonesLista);
+</script>

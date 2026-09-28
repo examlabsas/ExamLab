@@ -4,12 +4,11 @@ descripcion: Más capacidad de procesamiento y tiempos de entrega más cortos pa
 categoria: Laboratorio
 fecha: 2026-06-28
 autor: Equipo ExamLab
-imagen: /images/Fotoequipo.png
-imagenAlt: Sala de equipos y analizadores automatizados de ExamLab
+foto: analizador-automatizado
 destacado: true
 ---
 
-Desde este mes, la sede Matriz Centro opera con una nueva línea de analizadores automatizados para hematología y química clínica. La inversión responde a un objetivo concreto: **entregar más resultados el mismo día sin sacrificar la calidad del informe.**
+Desde este mes, la matriz de Ficoa opera con una nueva línea de analizadores automatizados para hematología y química clínica. La inversión responde a un objetivo concreto: **entregar más resultados el mismo día sin sacrificar la calidad del informe.**
 
 ## Qué cambia para el paciente
 
