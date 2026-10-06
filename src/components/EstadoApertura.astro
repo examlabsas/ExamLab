@@ -41,101 +41,109 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
 </span>
 
 <script>
-  const initApertura = () => {
-    const nodos = document.querySelectorAll<HTMLElement>('[data-apertura]');
-    if (nodos.length === 0) return;
+  /*
+    El reloj del estado «Abierto / Cerrado».
 
-    type Tramo = { abre: string; cierra: string };
-    type Franja = Tramo[] | null;
+    Todo vive en el ámbito del módulo, que se evalúa una sola vez. Antes estaba
+    dentro de la función de arranque y esa función corre en cada `astro:page-load`:
+    con las transiciones de página se creaba un `setInterval` nuevo por
+    navegación —dos ya en la primera carga— y ninguno se limpiaba. Los viejos
+    seguían repintando nodos de páginas ya descartadas, que además quedaban
+    retenidos en memoria. Medido con cinco navegaciones: cinco intervalos vivos.
 
-    const aMinutos = (hhmm: string) => {
-      const [h, m] = hhmm.split(':').map(Number);
-      return (h ?? 0) * 60 + (m ?? 0);
-    };
+    Ahora hay un único intervalo para toda la sesión y consulta el DOM en cada
+    pulso, así que siempre apunta a la página que se está viendo.
+  */
+  type Tramo = { abre: string; cierra: string };
+  type Franja = Tramo[] | null;
 
-    /** Día y minutos actuales en la zona horaria del laboratorio. */
-    const ahoraEnZona = (zona: string) => {
-      const partes = new Intl.DateTimeFormat('en-US', {
-        timeZone: zona,
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }).formatToParts(new Date());
-
-      const buscar = (tipo: string) => partes.find((p) => p.type === tipo)?.value ?? '';
-      const dias: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-      // A las 24:00 algunos navegadores devuelven "24"; se normaliza a 0.
-      const hora = Number(buscar('hour')) % 24;
-
-      return { dia: dias[buscar('weekday')] ?? 0, minutos: hora * 60 + Number(buscar('minute')) };
-    };
-
-    const nombreDia = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-
-    const calcular = (semana: Franja[], zona: string) => {
-      const { dia, minutos } = ahoraEnZona(zona);
-      const hoy = semana[dia] ?? null;
-
-      if (hoy) {
-        for (const tramo of hoy) {
-          const abre = aMinutos(tramo.abre);
-          const cierra = aMinutos(tramo.cierra);
-
-          if (minutos >= abre && minutos < cierra) {
-            const faltan = cierra - minutos;
-            return {
-              abierto: true,
-              texto: faltan <= 60 ? `Cierra en ${faltan} min` : `Abierto · cierra ${tramo.cierra}`,
-            };
-          }
-        }
-        // No está dentro de ningún tramo: puede ser antes del primero o, si
-        // hay pausa de mediodía, estar en la pausa entre dos tramos.
-        const siguiente = hoy.find((t) => minutos < aMinutos(t.abre));
-        if (siguiente) {
-          return { abierto: false, texto: `Cerrado · abre hoy ${siguiente.abre}` };
-        }
-      }
-
-      // Cerrado: se busca el próximo día con atención.
-      for (let i = 1; i <= 7; i++) {
-        const indice = (dia + i) % 7;
-        const franja = semana[indice];
-        if (!franja || franja.length === 0) continue;
-        const cuando = i === 1 ? 'mañana' : `el ${nombreDia[indice]}`;
-        return { abierto: false, texto: `Cerrado · abre ${cuando} ${franja[0]!.abre}` };
-      }
-      return { abierto: false, texto: 'Cerrado' };
-    };
-
-    const pintar = () => {
-      for (const nodo of nodos) {
-        let semana: Franja[];
-        try {
-          semana = JSON.parse(nodo.dataset.horario ?? '[]');
-        } catch {
-          continue;
-        }
-
-        const { abierto, texto } = calcular(semana, nodo.dataset.zona ?? 'America/Guayaquil');
-        const punto = nodo.querySelector<HTMLElement>('[data-punto]');
-        const etiqueta = nodo.querySelector<HTMLElement>('[data-texto]');
-
-        if (etiqueta) etiqueta.textContent = texto;
-        if (punto) {
-          punto.classList.remove('opacity-60');
-          punto.style.color = abierto ? '#25D366' : '#E1251B';
-        }
-        nodo.dataset.abierto = String(abierto);
-      }
-    };
-
-    pintar();
-    // Se refresca cada minuto para que el estado no quede congelado.
-    window.setInterval(pintar, 60_000);
+  const aMinutos = (hhmm: string) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    return (h ?? 0) * 60 + (m ?? 0);
   };
 
-  initApertura();
-  document.addEventListener('astro:page-load', initApertura);
+  /** Día y minutos actuales en la zona horaria del laboratorio. */
+  const ahoraEnZona = (zona: string) => {
+    const partes = new Intl.DateTimeFormat('en-US', {
+      timeZone: zona,
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).formatToParts(new Date());
+
+    const buscar = (tipo: string) => partes.find((p) => p.type === tipo)?.value ?? '';
+    const dias: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+    // A las 24:00 algunos navegadores devuelven "24"; se normaliza a 0.
+    const hora = Number(buscar('hour')) % 24;
+
+    return { dia: dias[buscar('weekday')] ?? 0, minutos: hora * 60 + Number(buscar('minute')) };
+  };
+
+  const nombreDia = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+  const calcular = (semana: Franja[], zona: string) => {
+    const { dia, minutos } = ahoraEnZona(zona);
+    const hoy = semana[dia] ?? null;
+
+    if (hoy) {
+      for (const tramo of hoy) {
+        const abre = aMinutos(tramo.abre);
+        const cierra = aMinutos(tramo.cierra);
+
+        if (minutos >= abre && minutos < cierra) {
+          const faltan = cierra - minutos;
+          return {
+            abierto: true,
+            texto: faltan <= 60 ? `Cierra en ${faltan} min` : `Abierto · cierra ${tramo.cierra}`,
+          };
+        }
+      }
+      // No está dentro de ningún tramo: puede ser antes del primero o, si
+      // hay pausa de mediodía, estar en la pausa entre dos tramos.
+      const siguiente = hoy.find((t) => minutos < aMinutos(t.abre));
+      if (siguiente) {
+        return { abierto: false, texto: `Cerrado · abre hoy ${siguiente.abre}` };
+      }
+    }
+
+    // Cerrado: se busca el próximo día con atención.
+    for (let i = 1; i <= 7; i++) {
+      const indice = (dia + i) % 7;
+      const franja = semana[indice];
+      if (!franja || franja.length === 0) continue;
+      const cuando = i === 1 ? 'mañana' : `el ${nombreDia[indice]}`;
+      return { abierto: false, texto: `Cerrado · abre ${cuando} ${franja[0]!.abre}` };
+    }
+    return { abierto: false, texto: 'Cerrado' };
+  };
+
+  /** Repinta todos los indicadores que haya ahora mismo en la página. */
+  const pintar = () => {
+    for (const nodo of document.querySelectorAll<HTMLElement>('[data-apertura]')) {
+      let semana: Franja[];
+      try {
+        semana = JSON.parse(nodo.dataset.horario ?? '[]');
+      } catch {
+        continue;
+      }
+
+      const { abierto, texto } = calcular(semana, nodo.dataset.zona ?? 'America/Guayaquil');
+      const punto = nodo.querySelector<HTMLElement>('[data-punto]');
+      const etiqueta = nodo.querySelector<HTMLElement>('[data-texto]');
+
+      if (etiqueta) etiqueta.textContent = texto;
+      if (punto) {
+        punto.classList.remove('opacity-60');
+        punto.style.color = abierto ? '#25D366' : '#E1251B';
+      }
+      nodo.dataset.abierto = String(abierto);
+    }
+  };
+
+  pintar();
+  document.addEventListener('astro:page-load', pintar);
+
+  // Un solo intervalo por sesión, para que el estado no quede congelado.
+  window.setInterval(pintar, 60_000);
 </script>

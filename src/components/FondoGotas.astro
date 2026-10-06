@@ -27,6 +27,7 @@ const { intensidad = 'normal', tono = 'oscuro' } = Astro.props;
     intensidad === 'suave' && 'fondo-gotas--suave',
     tono === 'claro' && 'fondo-gotas--claro',
   ]}
+  data-anim-fondo
   aria-hidden="true"
 >
   <span class="gota gota-1"></span>
@@ -60,7 +61,6 @@ const { intensidad = 'normal', tono = 'oscuro' } = Astro.props;
     background: var(--gota-color, white);
     opacity: var(--gota-opacidad);
     filter: blur(1px);
-    will-change: transform;
     animation: gota-flota var(--duracion, 24s) ease-in-out infinite alternate;
   }
 

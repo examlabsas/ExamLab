@@ -54,22 +54,20 @@ const schema = [
   whatsapp="paciente"
   schema={schema}
 >
-  <!--
-    Membrete que solo aparece al imprimir. La cabecera del sitio se oculta en
-    papel, así que sin esto la hoja saldría sin identificar de quién es.
-  -->
+  {/* Membrete que solo aparece al imprimir. La cabecera del sitio se oculta en
+    papel, así que sin esto la hoja saldría sin identificar de quién es. */}
   <div class="solo-imprimir">
     <strong>{site.nombre}</strong> · Preparación para sus exámenes<br />
     {site.telefono} · {site.url.replace('https://', '')}/preparacion
   </div>
 
-  <!-- Cabecera -->
+  {/* Cabecera */}
   <section class="bg-brand">
     <div class="container-page py-10 lg:py-14">
       <nav aria-label="Ruta de navegación" class="mb-6 sin-imprimir">
         <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/75">
-          <!-- Relleno vertical con margen negativo: agranda el área de toque a
-               los 24px que pide WCAG sin alterar la línea de la miga de pan. -->
+          {/* Relleno vertical con margen negativo: agranda el área de toque a
+               los 24px que pide WCAG sin alterar la línea de la miga de pan. */}
           <li>
             <a href="/" class="-my-1.5 inline-block py-1.5 transition-colors hover:text-accent-light">
               Inicio
@@ -104,14 +102,12 @@ const schema = [
     </div>
   </section>
 
-  <!-- Índice de accesos directos -->
-  <!--
-    Carrusel de accesos directos, a todo el ancho de la pantalla.
+  {/* Índice de accesos directos */}
+  {/* Carrusel de accesos directos, a todo el ancho de la pantalla.
 
     Se renderiza una sola copia: el script clona las que hagan falta para
     llenar la pantalla. Sin JavaScript queda una franja deslizable normal, que
-    es exactamente lo que se necesita.
-  -->
+    es exactamente lo que se necesita. */}
   <section id="tipos" class="bloque border-b border-line bg-white sin-imprimir">
     <h2 class="sr-only">Ir a un tipo de muestra</h2>
     <div class="carrusel" data-carrusel>
@@ -133,14 +129,12 @@ const schema = [
     </div>
   </section>
 
-  <!-- Bloques -->
+  {/* Bloques */}
   <section class="bg-surface py-section">
-    <!--
-      `sin-reveal`: la animación de entrada aplica un `transform` al contenedor,
+    {/* `sin-reveal`: la animación de entrada aplica un `transform` al contenedor,
       y un ancestro transformado altera el comportamiento de `position: sticky`
       de los títulos. Además, en una página de instrucciones a la que se llega
-      con el frasco en la mano, el contenido debe estar legible de inmediato.
-    -->
+      con el frasco en la mano, el contenido debe estar legible de inmediato. */}
     <div class="container-page sin-reveal flex max-w-[860px] flex-col gap-10">
       {
         bloquesPreparacion.map((bloque) => (
@@ -248,7 +242,7 @@ const schema = [
     </div>
   </section>
 
-  <!-- Nota final del laboratorio -->
+  {/* Nota final del laboratorio */}
   <section class="bg-white py-section">
     <div class="container-page max-w-[860px]">
       <div class="rounded-xl bg-brand p-7 lg:p-10">
@@ -269,11 +263,9 @@ const schema = [
         </div>
       </div>
 
-      <!--
-        Muchas veces quien recoge la muestra no es quien vino al laboratorio:
+      {/* Muchas veces quien recoge la muestra no es quien vino al laboratorio:
         la madre de un bebé, un familiar que ayuda. Reenviar las indicaciones
-        por WhatsApp evita que se transmitan de memoria.
-      -->
+        por WhatsApp evita que se transmitan de memoria. */}
       <div class="mt-8 flex flex-col gap-4 rounded-xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sin-imprimir">
         <div>
           <h2 class="text-lg font-bold text-brand">¿Otra persona recoge la muestra?</h2>
@@ -293,11 +285,9 @@ const schema = [
     </div>
   </section>
 
-  <!--
-    Atajo al índice. La página es larga y quien busca su tipo de muestra suele
+  {/* Atajo al índice. La página es larga y quien busca su tipo de muestra suele
     equivocarse a la primera. Va abajo a la izquierda para no chocar con el
-    botón flotante de WhatsApp.
-  -->
+    botón flotante de WhatsApp. */}
   <a href="#tipos" class="volver-indice sin-imprimir" data-volver hidden>
     <Icon name="flecha" size={16} strokeWidth={2.4} class="-rotate-90" />
     Índice
@@ -565,6 +555,42 @@ const schema = [
   /** Píxeles de margen antes de considerar que es un arrastre y no un clic. */
   const UMBRAL_ARRASTRE = 5;
 
+  /*
+    Un único oyente de `resize` para todos los carruseles y para toda la
+    sesión. Cada carrusel deja aquí su función de recalibrado; el oyente busca
+    los que haya en la página en ese momento, así que no retiene ninguno.
+
+    Antes el oyente se registraba dentro del bucle de arranque, que corre en
+    cada `astro:page-load`: quedaba uno por carrusel y por visita a la página,
+    midiendo elementos ya descartados.
+  */
+  const recalibradores = new WeakMap<HTMLElement, () => void>();
+  let esperaResize: number | undefined;
+
+  /*
+    Bucles de animación vivos, para poder pararlos al cambiar de página.
+
+    `isConnected` dentro del bucle ya basta para que se termine solo, pero lo
+    hace en su siguiente fotograma: hasta entonces queda uno pendiente por cada
+    visita a esta página. Cancelarlos en `astro:before-swap` —justo antes de
+    que el router sustituya el documento— los corta en el acto, y deja el
+    número de bucles vivos en uno, se entre las veces que se entre.
+  */
+  const bucles = new Set<number>();
+  document.addEventListener('astro:before-swap', () => {
+    for (const id of bucles) cancelAnimationFrame(id);
+    bucles.clear();
+  });
+
+  window.addEventListener('resize', () => {
+    window.clearTimeout(esperaResize);
+    esperaResize = window.setTimeout(() => {
+      for (const c of document.querySelectorAll<HTMLElement>('[data-carrusel]')) {
+        recalibradores.get(c)?.();
+      }
+    }, 200);
+  });
+
   const initCarrusel = () => {
     for (const carrusel of document.querySelectorAll<HTMLElement>('[data-carrusel]')) {
       // `astro:page-load` corre también en la carga inicial.
@@ -660,11 +686,7 @@ const schema = [
 
       document.fonts?.ready.then(recalibrar).catch(() => {});
 
-      let esperaResize: number | undefined;
-      window.addEventListener('resize', () => {
-        window.clearTimeout(esperaResize);
-        esperaResize = window.setTimeout(recalibrar, 200);
-      });
+      recalibradores.set(carrusel, recalibrar);
 
       let pausado = false;
       let temporizador: number | undefined;
@@ -798,7 +820,20 @@ const schema = [
       );
 
       let anterior = performance.now();
+      let idBucle: number | undefined;
       const paso = (ahora: number) => {
+        /*
+          Única salida del bucle. Con las transiciones de página el `<body>` se
+          sustituye entero, así que el carrusel queda fuera del documento pero
+          el bucle seguía encadenándose a 60 fps para siempre, escribiendo
+          `transform` sobre nodos que ya nadie ve. Y como `initCarrusel` corre
+          en cada `astro:page-load` y la guarda `dataset.iniciado` vuelve a
+          estar vacía en el elemento nuevo, cada visita a esta página sumaba
+          otro bucle: tres visitas, tres bucles compitiendo por la batería.
+        */
+        if (idBucle !== undefined) bucles.delete(idBucle);
+        if (!carrusel.isConnected) return;
+
         // Se limita el delta para que al volver de otra pestaña no dé un salto.
         const delta = Math.min((ahora - anterior) / 1000, 0.05);
         anterior = ahora;
@@ -809,9 +844,11 @@ const schema = [
           aplicar();
         }
 
-        requestAnimationFrame(paso);
+        idBucle = requestAnimationFrame(paso);
+        bucles.add(idBucle);
       };
-      requestAnimationFrame(paso);
+      idBucle = requestAnimationFrame(paso);
+      bucles.add(idBucle);
     }
   };
 

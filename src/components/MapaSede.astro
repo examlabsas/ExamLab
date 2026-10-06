@@ -1,0 +1,171 @@
+---
+/**
+ * Mapa de una sede, que no se carga hasta que el visitante lo pide.
+ *
+ * El iframe de Google costaba 1,3 s de los 1,375 s que tardaba la portada en
+ * terminar de cargar: todo lo demás junto sumaba 62 ms. Y se traía antes de
+ * que nadie tocara el banner de cookies, o sea que un tercero sabía de la
+ * visita antes de que el paciente decidiera.
+ *
+ * Así que primero se pinta un marcador propio —dirección, referencia y un
+ * botón— y el iframe entra solo al pulsarlo. Quien solo quiere el teléfono o
+ * el horario nunca paga ese segundo y medio.
+ *
+ * Sin JavaScript el botón se oculta y queda el enlace a Google Maps, que es
+ * lo que de verdad usa quien va a conducir hasta allá.
+ */
+import Icon from './Icon.astro';
+import { site, mapaEmbed, mapaEnlace, type Sede } from '@/lib/site';
+
+interface Props {
+  sede: Sede;
+  zoom?: number;
+  /** Clases de alto del bloque. Cada página tiene su proporción. */
+  alto?: string;
+  /**
+   * `true` cuando el bloque que rodea al mapa ya muestra la dirección y el
+   * enlace para llegar, como el panel de sedes de la portada. Evita repetir
+   * dos veces lo mismo a dos centímetros de distancia.
+   */
+  compacto?: boolean;
+  class?: string;
+}
+
+const {
+  sede,
+  zoom = 17,
+  alto = 'h-[clamp(16rem,30vw,24rem)]',
+  compacto = false,
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={['mapa-sede relative overflow-hidden bg-brand-soft/40', alto, className]}
+  data-mapa-sede
+  data-src={mapaEmbed(sede, zoom)}
+  data-titulo={`Mapa de ${site.nombre} ${sede.nombre}`}
+>
+  {/* Marcador: lo que se ve antes de traer nada de Google. */}
+  <div
+    class="mapa-sede-aviso absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center"
+    data-mapa-aviso
+  >
+    <span class="flex h-14 w-14 items-center justify-center rounded-full bg-white text-accent-dark shadow-sm">
+      <Icon name="pin" size={26} />
+    </span>
+
+    {
+      !compacto && (
+        <p class="max-w-[34ch] text-sm leading-relaxed font-semibold text-brand">
+          {sede.direccion}
+          {sede.referencia && <span class="block font-normal text-neutral">{sede.referencia}</span>}
+        </p>
+      )
+    }
+
+    <div class="flex flex-wrap items-center justify-center gap-2.5">
+      <button
+        type="button"
+        data-mapa-cargar
+        hidden
+        class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-dark px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-accent-deep"
+      >
+        <Icon name="monitor" size={17} />
+        Ver el mapa aquí
+      </button>
+
+      {
+        !compacto && (
+          <a
+            href={mapaEnlace(sede)}
+            target="_blank"
+            rel="noopener"
+            class="inline-flex min-h-11 items-center gap-2 rounded-lg border-[1.5px] border-line-strong bg-white px-5 py-3 text-sm font-bold text-brand transition-colors hover:border-accent"
+          >
+            <Icon name="flecha" size={17} class="text-accent-dark" />
+            Cómo llegar
+          </a>
+        )
+      }
+    </div>
+
+    <p class="text-xs text-neutral">Al ver el mapa aquí se carga Google Maps.</p>
+  </div>
+</div>
+
+<style>
+  .mapa-sede iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>
+
+<script>
+  /**
+   * Inserta el iframe al pulsar. Una vez que el visitante acepta en una sede,
+   * se recuerda para el resto de la sesión: si está comparando sedes, no tiene
+   * sentido volver a preguntarle en cada pestaña.
+   */
+  const CLAVE = 'examlab:mapas';
+
+  const aceptado = () => {
+    try {
+      return sessionStorage.getItem(CLAVE) === 'si';
+    } catch {
+      return false;
+    }
+  };
+
+  const recordar = () => {
+    try {
+      sessionStorage.setItem(CLAVE, 'si');
+    } catch {
+      /* En navegación privada simplemente no se recuerda. */
+    }
+  };
+
+  /** Cambia el marcador por el mapa de verdad. */
+  export const cargarMapa = (caja: HTMLElement) => {
+    if (caja.dataset.cargado === 'true') return;
+    caja.dataset.cargado = 'true';
+
+    const iframe = document.createElement('iframe');
+    iframe.src = caja.dataset.src ?? '';
+    iframe.title = caja.dataset.titulo ?? 'Mapa';
+    iframe.loading = 'lazy';
+    iframe.allowFullscreen = true;
+    // Sin este atributo se heredaba una política más laxa que la del sitio y
+    // a Google le llegaba la URL completa de la página, no solo el origen.
+    iframe.referrerPolicy = 'no-referrer';
+
+    caja.querySelector<HTMLElement>('[data-mapa-aviso]')?.remove();
+    caja.append(iframe);
+  };
+
+  const initMapas = () => {
+    for (const caja of document.querySelectorAll<HTMLElement>('[data-mapa-sede]')) {
+      if (caja.dataset.iniciado === 'true') continue;
+      caja.dataset.iniciado = 'true';
+
+      if (aceptado()) {
+        cargarMapa(caja);
+        continue;
+      }
+
+      const boton = caja.querySelector<HTMLButtonElement>('[data-mapa-cargar]');
+      if (!boton) continue;
+      // Nace oculto: sin JavaScript no serviría de nada.
+      boton.hidden = false;
+      boton.addEventListener('click', () => {
+        recordar();
+        cargarMapa(caja);
+      });
+    }
+  };
+
+  initMapas();
+  document.addEventListener('astro:page-load', initMapas);
+</script>

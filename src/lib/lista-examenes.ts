@@ -34,11 +34,22 @@ export function leerLista(): ExamenEnLista[] {
     if (!crudo) return [];
     const datos: unknown = JSON.parse(crudo);
     if (!Array.isArray(datos)) return [];
-    // Se filtra por forma y no por confianza: el contenido de localStorage lo
-    // pudo dejar una versión anterior del sitio con otros campos.
+    /*
+      Se filtra por forma y no por confianza: el contenido de localStorage lo
+      pudo dejar una versión anterior del sitio con otros campos.
+
+      `horas` se comprueba aparte porque de ahí sale el ayuno del resumen, y
+      ese número viaja al mensaje de WhatsApp que el paciente nos manda. Con un
+      valor no numérico, `Math.max` devuelve NaN y el paciente escribía
+      «Entiendo que necesito NaN horas de ayuno». Un dato clínico no puede
+      depender de que el almacenamiento esté intacto.
+    */
     return datos.filter(
       (e): e is ExamenEnLista =>
-        typeof e?.slug === 'string' && typeof e?.nombre === 'string',
+        typeof e?.slug === 'string' &&
+        typeof e?.nombre === 'string' &&
+        (e.horas === undefined || (typeof e.horas === 'number' && Number.isFinite(e.horas))) &&
+        (e.muestra === undefined || typeof e.muestra === 'string'),
     );
   } catch {
     // Navegación privada con el almacenamiento bloqueado: se sigue sin lista.
@@ -55,9 +66,6 @@ function guardar(lista: ExamenEnLista[]) {
   document.dispatchEvent(new CustomEvent(EVENTO, { detail: lista }));
 }
 
-export function estaEnLista(slug: string): boolean {
-  return leerLista().some((e) => e.slug === slug);
-}
 
 /** Añade o quita; devuelve `true` si quedó dentro. */
 export function alternar(examen: ExamenEnLista): boolean {

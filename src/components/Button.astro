@@ -43,8 +43,10 @@ const variantes: Record<NonNullable<Props['variant']>, string> = {
   secondary:
     'bg-white text-brand border border-line-strong hover:border-brand hover:bg-brand-soft/30',
   brand: 'bg-brand text-white hover:bg-brand-dark',
+  // El borde al 30% apenas se veía sobre el azul: subido a 65% y el relleno a
+  // 15%, el botón se lee como botón y no como un texto suelto.
   sobreOscuro:
-    'bg-white/10 text-white border border-white/30 hover:bg-white hover:text-brand',
+    'bg-white/15 text-white border-[1.5px] border-white/65 hover:bg-white hover:text-brand',
   blanco: 'bg-white text-brand hover:bg-brand-soft',
 };
 
@@ -58,6 +60,7 @@ const esExterna = href.startsWith('http');
 
 <a
   href={href}
+  data-variante={variant}
   class:list={[base, variantes[variant], tamanos[size], full && 'w-full', className]}
   target={external ?? esExterna ? '_blank' : undefined}
   rel={external ?? esExterna ? 'noopener' : undefined}

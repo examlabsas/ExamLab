@@ -1,3 +1,4 @@
+@import './fuentes.css';
 @import 'tailwindcss';
 
 /* ------------------------------------------------------------------
@@ -568,3 +569,65 @@
   }
 }
 
+
+/*
+  ─── IMPRESIÓN ────────────────────────────────────────────────────────────────
+
+  Todo lo que se revela al entrar en pantalla nace con `opacity: 0` y espera a
+  que un IntersectionObserver le ponga `is-visible`. Al imprimir no hay scroll
+  ni observadores: el navegador se lleva el estado tal como está, así que cada
+  bloque que el lector no había llegado a ver salía **en blanco**.
+
+  Medido antes de esta regla, cargando cada página sin bajar:
+    · portada ................... 11 de 17 bloques invisibles
+    · ficha de examen ...........  3 de 4, incluida «Para qué sirve» y la tabla
+                                   de especialidad, muestra y tiempo de entrega
+    · preparación ............... el bloque con el teléfono de contacto
+
+  O sea: un paciente que imprimía su examen recibía una hoja con el título y
+  poco más, y el manual de preparación que el laboratorio imprime en papel
+  perdía los datos de contacto.
+
+  Va al final del archivo para ganar por orden a las reglas que ocultan, y con
+  `!important` porque aquellas usan `:not()` y pesan más en especificidad.
+*/
+@media print {
+  .js .reveal,
+  .js .reveal-stagger > *,
+  .js main > section:not(:first-of-type) > .container-page:not(.sin-reveal) {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Los iconos se dibujan trazo a trazo: en papel se imprimen enteros. */
+  .js .icono-dibujo :is(path, circle, rect, line, polyline) {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+
+/*
+  ─── ANIMACIONES DE FONDO FUERA DE PANTALLA ──────────────────────────────────
+
+  Las gotas y el pulso del electro corren en bucle infinito. En `/servicios`
+  son doce gotas y cuatro trazos a la vez, y seguían animándose aunque su
+  sección estuviera a tres pantallas de distancia: en un teléfono de gama media
+  eso es batería y calor a cambio de nada, porque nadie lo está viendo.
+
+  Un observador en BaseLayout marca `data-fuera` cuando el bloque sale de la
+  pantalla y lo quita al volver. Sin JavaScript nunca se marca y todo se anima
+  como antes, que es el lado correcto en el que fallar.
+*/
+/*
+  `!important` porque las animaciones se declaran con el atajo `animation:` en
+  el `<style>` de cada componente, y ese atajo reinicia `animation-play-state`
+  a `running`. Al ir después en la cascada, ganaba siempre. Es el mismo motivo
+  por el que el bloque de movimiento reducido de más arriba también lo usa.
+*/
+[data-anim-fondo][data-fuera='true'],
+[data-anim-fondo][data-fuera='true'] * {
+  animation-play-state: paused !important;
+}

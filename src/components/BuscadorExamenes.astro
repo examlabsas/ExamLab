@@ -66,7 +66,7 @@ const {
     data-ejemplos={ejemplos ? JSON.stringify(ejemplos) : undefined}
     class:list={[
       'min-w-0 flex-1 bg-transparent py-2 text-sm focus:outline-none',
-      oscuro ? 'text-white placeholder:text-white/75' : 'text-black placeholder:text-neutral/70',
+      oscuro ? 'text-white placeholder:text-white/90' : 'text-black placeholder:text-neutral',
     ]}
   />
   <button
@@ -108,7 +108,19 @@ const {
       let indice = 0;
       let temporizador: number | undefined;
 
-      const activo = () => document.activeElement !== campo && campo.value === '';
+      /*
+        `isConnected` es lo que corta la cadena al cambiar de página.
+
+        Con las transiciones de página el `<body>` entero se sustituye, así que
+        este campo queda fuera del documento pero la cadena de `setTimeout`
+        sigue encadenándose. Sin esta comprobación no paraba nunca: en un campo
+        separado, `document.activeElement` es el `<body>` y `value` sigue
+        vacío, o sea que las otras dos condiciones se cumplían siempre. Cada
+        visita a la portada dejaba otra cadena escribiendo ~20 veces por
+        segundo sobre un elemento que ya no se ve.
+      */
+      const activo = () =>
+        campo.isConnected && document.activeElement !== campo && campo.value === '';
 
       const escribir = (texto: string, pos: number, luego: () => void) => {
         if (!activo()) return detener();

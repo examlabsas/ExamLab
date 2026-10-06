@@ -3,9 +3,6 @@
  * Todos comparten viewBox 0 0 24 24 y se pintan con `currentColor`.
  */
 export const iconos = {
-  chat: '<path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 4V6z"/>',
-  whatsapp:
-    '<path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 4V6z"/><path d="M8.5 8.5h7M8.5 12h4.5"/>',
   reloj: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>',
   pin: '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/>',
   documento:
@@ -30,7 +27,6 @@ export const iconos = {
     '<path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z"/>',
   correo: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7.5l8 5.5 8-5.5"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
-  cerrar: '<path d="M6 6l12 12M18 6L6 18"/>',
   alerta: '<circle cx="12" cy="12" r="9"/><path d="M12 7.6v5M12 16.2h.01"/>',
   camion:
     '<path d="M3 7.5h10.5v9H3z"/><path d="M13.5 10.5H17l3 3v3h-6.5z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
@@ -41,8 +37,6 @@ export const iconos = {
   /* ── Iconos técnicos: catálogo de laboratorios asociados ────────── */
   microscopio:
     '<path d="M6 20.5h12"/><path d="M13 20.5a7 7 0 0 0 4-6.6"/><path d="M8.5 14h5.5"/><path d="M9.8 4.2l3.4-1.4 2.6 6.3-3.4 1.4z"/><path d="M10.9 10.6l1.2 2.9"/>',
-  centrifuga:
-    '<path d="M20.5 12a8.5 8.5 0 1 1-2.9-6.4"/><path d="M20.5 4.5v4h-4"/><circle cx="12" cy="12" r="2.2"/>',
   pipeta:
     '<path d="M9.5 3h5v3.6l-1.3 12.7a1.2 1.2 0 0 1-2.4 0L9.5 6.6z"/><path d="M9.6 6.6h4.8"/><path d="M10.2 13.5h3.6"/>',
   matraz:
@@ -51,7 +45,6 @@ export const iconos = {
     '<path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9"/><path d="M12 6.6 9.9 4.5M12 6.6l2.1-2.1M12 17.4l-2.1 2.1M12 17.4l2.1 2.1"/>',
   termometro:
     '<path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 8.5v6.8"/>',
-  adn: '<path d="M7.5 3c0 5 9 6 9 9s-9 4-9 9"/><path d="M16.5 3c0 5-9 6-9 9s9 4 9 9"/><path d="M9.2 6h5.6M8 9.6h8M8 14.4h8M9.2 18h5.6"/>',
   'codigo-barras': '<path d="M4 5v14M7.2 5v14M10.4 5v9.5M13.6 5v14M16.8 5v9.5M20 5v14"/>',
   prohibido: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
   bebe: '<circle cx="12" cy="7.2" r="4.2"/><path d="M10.2 6.6h.01M13.8 6.6h.01"/><path d="M10.4 9a2.4 2.4 0 0 0 3.2 0"/><path d="M6 20.5v-1.8a6 6 0 0 1 12 0v1.8"/>',

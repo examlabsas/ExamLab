@@ -57,7 +57,7 @@ const dinero = (v: number | null) =>
               id="buscar-asociados"
               autocomplete="off"
               placeholder="Nombre, método o muestra…"
-              class="min-h-11 min-w-0 flex-1 bg-transparent text-sm text-black placeholder:text-neutral/70 focus:outline-none"
+              class="min-h-11 min-w-0 flex-1 bg-transparent text-sm text-black placeholder:text-neutral focus:outline-none"
             />
           </span>
         </label>
@@ -319,6 +319,17 @@ const dinero = (v: number | null) =>
     const campo = document.querySelector<HTMLInputElement>('#buscar-asociados');
     const selector = document.querySelector<HTMLSelectElement>('#filtro-especialidad');
     if (!campo || !selector) return;
+
+    /*
+      `astro:page-load` también corre en la carga inicial, después de que el
+      módulo ya se evaluó. Sin esta guarda —la única del proyecto que faltaba—
+      todo se montaba dos veces: dos oyentes en el buscador, dos en el selector
+      y dos `click` en cada una de las 272 filas. Filtrar recorría la tabla dos
+      veces por tecla y abrir una ficha llamaba a `showModal()` dos veces
+      seguidas.
+    */
+    if (campo.dataset.iniciado === 'true') return;
+    campo.dataset.iniciado = 'true';
 
     const filas = [...document.querySelectorAll<HTMLTableRowElement>('[data-prueba]')];
     const conteo = document.querySelector<HTMLElement>('[data-conteo]');

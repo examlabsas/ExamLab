@@ -15,7 +15,7 @@ import Icon from './Icon.astro';
   role="dialog"
   aria-live="polite"
   aria-label="Aviso de cookies"
-  class="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white px-4 pt-4 pb-4 shadow-[0_-8px_30px_rgb(0_90_140/0.12)] sm:px-6"
+  class="pointer-events-auto w-full border-t border-line bg-white px-4 pt-4 pb-4 shadow-[0_-8px_30px_rgb(0_90_140/0.12)] sm:px-6"
 >
   <div class="container-page flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
     <div class="flex items-start gap-3.5">
@@ -25,9 +25,10 @@ import Icon from './Icon.astro';
         <Icon name="escudo" size={20} />
       </span>
       <p class="max-w-[640px] text-sm leading-relaxed text-neutral">
-        Usamos cookies técnicas necesarias para el funcionamiento del sitio y, con su permiso,
-        cookies de medición para entender cómo se usa la página. Puede aceptarlas o rechazarlas.
-        Más detalles en nuestra <a
+        Hoy este sitio solo usa el almacenamiento imprescindible para funcionar: recordar esta
+        decisión y la lista de exámenes que usted arme. No hay cookies de medición ni de
+        publicidad. Si más adelante las añadimos, nos guiaremos por lo que elija aquí. Más
+        detalles en nuestra <a
           href="/cookies"
           class="font-semibold text-accent-dark underline underline-offset-2 hover:text-brand"
           >política de cookies</a
@@ -40,14 +41,14 @@ import Icon from './Icon.astro';
         data-cookies="rechazar"
         class="rounded-xl border-[1.5px] border-line-strong bg-white px-5 py-3 text-sm font-bold text-brand transition-colors hover:border-accent"
       >
-        Solo las necesarias
+        Solo lo necesario
       </button>
       <button
         type="button"
         data-cookies="aceptar"
         class="min-h-11 rounded-xl bg-accent-dark px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-accent-deep"
       >
-        Aceptar todas
+        De acuerdo
       </button>
     </div>
   </div>
@@ -64,21 +65,35 @@ import Icon from './Icon.astro';
     if (!banner || banner.dataset.iniciado === 'true') return;
     banner.dataset.iniciado = 'true';
 
-    if (localStorage.getItem(CLAVE)) {
+    /*
+      En navegación privada o con el almacenamiento bloqueado, leer lanza
+      `SecurityError`. Sin el try/catch la función se cortaba aquí y el banner
+      no llegaba a mostrarse nunca: nace con `hidden`. Ante la duda se muestra,
+      que es el lado correcto en el que equivocarse.
+    */
+    let decidido = false;
+    try {
+      decidido = Boolean(localStorage.getItem(CLAVE));
+    } catch {
+      decidido = false;
+    }
+
+    if (decidido) {
       banner.hidden = true;
-      delete document.body.dataset.cookiesPendiente;
       return;
     }
 
     banner.hidden = false;
-    document.body.dataset.cookiesPendiente = 'true';
 
     for (const boton of banner.querySelectorAll<HTMLButtonElement>('[data-cookies]')) {
       boton.addEventListener('click', () => {
         const decision = boton.dataset.cookies === 'aceptar' ? 'aceptadas' : 'rechazadas';
-        localStorage.setItem(CLAVE, decision);
+        try {
+          localStorage.setItem(CLAVE, decision);
+        } catch {
+          /* Sin almacenamiento la decisión vale solo para esta pantalla. */
+        }
         banner.hidden = true;
-        delete document.body.dataset.cookiesPendiente;
         document.dispatchEvent(new CustomEvent('cookies:decision', { detail: decision }));
       });
     }

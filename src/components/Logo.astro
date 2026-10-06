@@ -22,11 +22,17 @@ interface Props {
    */
   bajada?: boolean;
   /**
-   * En teléfonos muestra solo el emblema y esconde el nombre. La cabecera lo
-   * usa para que el botón de resultados quepa con su texto: a 375 px, nombre +
-   * botón + menú suman más que el ancho de la pantalla.
+   * En teléfonos encoge el conjunto para que quepa junto al botón de resultados
+   * y el menú. El nombre **siempre se ve**: antes se escondía por debajo de
+   * 640 px y la marca desaparecía justo en el dispositivo desde el que llega
+   * la mayoría de pacientes.
+   *
+   * Los números salen de medir la cabecera a 360 px: emblema 36 + nombre +
+   * botón 128 + menú 44 + separaciones 24 ≈ 232 px de todo lo que no es el
+   * nombre, sobre 328 útiles. Al nombre le quedan ~96 px, que a esta escala
+   * son unos 19 px de cuerpo.
    */
-  soloEmblemaEnMovil?: boolean;
+  compactoEnMovil?: boolean;
   class?: string;
 }
 
@@ -35,7 +41,7 @@ const {
   variant = 'claro',
   razonSocial = false,
   bajada: conBajada = true,
-  soloEmblemaEnMovil = false,
+  compactoEnMovil = false,
   class: className,
 } = Astro.props;
 
@@ -67,22 +73,40 @@ const anchoBajada = Math.max(260, Math.round(box * 4.05));
 const fluido = (valor: number, vw: number, minRatio: number) =>
   `clamp(${Math.round(valor * minRatio * 10) / 10}px, ${vw}vw, ${valor}px)`;
 
-const cajaFluida = conBajada ? fluido(box, 12, 0.85) : fluido(box, 11, 0.72);
-const nombreFluido = conBajada
-  ? fluido(nombre, 6.8, 0.85)
-  : fluido(nombre, 7.8, 0.65);
+/*
+  En la cabecera el conjunto convive con el botón de resultados y el menú, así
+  que baja bastante más que en el pie: el emblema hasta 36 px y el nombre hasta
+  17. Recupera el tamaño nominal alrededor de los 770 px, donde ya sobra sitio.
+*/
+const cajaFluida = compactoEnMovil
+  ? `clamp(36px, 10vw, ${box}px)`
+  : conBajada
+    ? fluido(box, 12, 0.85)
+    : fluido(box, 11, 0.72);
+
+const nombreFluido = compactoEnMovil
+  ? `clamp(17px, 5.2vw, ${nombre}px)`
+  : conBajada
+    ? fluido(nombre, 6.8, 0.85)
+    : fluido(nombre, 7.8, 0.65);
 ---
 
-<span class:list={['flex items-center gap-3', className]}>
+<span
+  class:list={[
+    'flex items-center',
+    // Cada píxel cuenta en la cabecera del teléfono: la separación entre
+    // emblema y nombre también se encoge y vuelve a 12 px en cuanto hay sitio.
+    compactoEnMovil ? 'gap-2 sm:gap-3' : 'gap-3',
+    className,
+  ]}
+>
   <span
     class="block shrink-0 overflow-hidden rounded-full"
     style={`width:${cajaFluida};height:${cajaFluida}`}
   >
-    <!--
-      El emblema no está centrado en el PNG (bordes medidos: 5,47% izq · 1,95% arriba ·
+    {/* El emblema no está centrado en el PNG (bordes medidos: 5,47% izq · 1,95% arriba ·
       4,1% der · 3,52% abajo). El desplazamiento lo centra y el escalado hace que llene
-      el recorte circular sin dejar fondo oscuro a la vista.
-    -->
+      el recorte circular sin dejar fondo oscuro a la vista. */}
     <img
       src="/images/logo.png"
       alt=""
@@ -95,10 +119,7 @@ const nombreFluido = conBajada
     />
   </span>
 
-  <span
-    class:list={['min-w-0 flex-col', soloEmblemaEnMovil ? 'hidden sm:flex' : 'flex']}
-    style={`gap:${separacion}px`}
-  >
+  <span class="flex min-w-0 flex-col" style={`gap:${separacion}px`}>
     <span
       class:list={[
         'font-display leading-none font-semibold tracking-[0.3px]',

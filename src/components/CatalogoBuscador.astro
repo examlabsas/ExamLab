@@ -38,7 +38,7 @@ const especialidades = getEspecialidades(lista);
 
 <section class="bg-surface py-10 lg:py-14">
   <div class="container-page sin-reveal">
-    <!-- Buscador -->
+    {/* Buscador */}
     <div class="rounded-xl bg-white p-5 border border-line lg:p-7">
       <label for="buscador" class="block text-xs font-bold text-brand">Buscar examen</label>
       <div class="relative mt-2.5">
@@ -53,7 +53,7 @@ const especialidades = getEspecialidades(lista);
           name="q"
           autocomplete="off"
           placeholder={placeholder}
-          class="w-full rounded-xl border border-line-strong bg-white py-4 pr-4 pl-12 text-base text-black placeholder:text-neutral/70 focus:border-accent focus:outline-none"
+          class="w-full rounded-xl border border-line-strong bg-white py-4 pr-4 pl-12 text-base text-black placeholder:text-neutral focus:border-accent focus:outline-none"
         />
       </div>
 
@@ -83,7 +83,7 @@ const especialidades = getEspecialidades(lista);
       </fieldset>
     </div>
 
-    <!-- Resultados -->
+    {/* Resultados */}
     {/* `scroll-mt-28` deja aire bajo la cabecera fija al saltar aquí. */}
     <p
       class="mt-7 scroll-mt-28 text-sm font-semibold text-neutral"
@@ -93,7 +93,7 @@ const especialidades = getEspecialidades(lista);
       {lista.length} exámenes disponibles
     </p>
     {/* Se muestra cuando algún resultado entró solo por parecerse a lo escrito. */}
-    <p id="nota-aproximada" hidden class="mt-1.5 text-xs text-neutral">
+    <p id="nota-aproximada" role="status" hidden class="mt-1.5 text-xs text-neutral">
       Incluimos también exámenes parecidos a lo que escribió.
     </p>
 
@@ -151,7 +151,7 @@ const especialidades = getEspecialidades(lista);
   </div>
 </section>
 
-<!-- Aviso -->
+{/* Aviso */}
 <section class="bg-white py-12">
   <div class="container-page">
     <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-6 sm:flex-row lg:p-8">
@@ -278,11 +278,32 @@ const especialidades = getEspecialidades(lista);
           pagina = n;
           mostrarPagina();
           // Devuelve la vista al inicio de los resultados, no al tope del documento.
-          contenedor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          irA(contenedor);
+          /*
+            `mostrarPagina` vuelve a crear los botones, así que el que acaba de
+            pulsarse deja de existir dentro de su propio manejador y el foco
+            cae al `<body>`: con el teclado, el siguiente tabulador reiniciaba
+            desde «Saltar al contenido». Se devuelve al botón de la página
+            activa, que ocupa el mismo sitio.
+          */
+          listaPaginas.querySelector<HTMLButtonElement>('[aria-current="page"]')?.focus();
         });
         listaPaginas.append(b);
       }
     };
+
+    /*
+      `scroll-behavior: auto` bajo movimiento reducido no anula un `behavior`
+      pasado por JavaScript, así que hay que mirarlo aquí. Era la única fuga
+      de `prefers-reduced-motion` que quedaba en el sitio.
+    */
+    const irA = (destino: Element) =>
+      destino.scrollIntoView({
+        block: 'start',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth',
+      });
 
     /** Oculta todo lo que no pertenezca a la página actual. */
     const mostrarPagina = () => {
@@ -293,7 +314,7 @@ const especialidades = getEspecialidades(lista);
       pintarPaginacion();
     };
 
-    const filtrar = ({ conservarPagina = false } = {}) => {
+    const filtrar = () => {
       const termino = input.value.trim();
       let hayAproximadas = false;
 
@@ -340,7 +361,7 @@ const especialidades = getEspecialidades(lista);
 
       // Cada búsqueda nueva vuelve a la primera página: quedarse en la siete
       // de un resultado que ahora tiene dos deja la pantalla en blanco.
-      if (!conservarPagina) pagina = 1;
+      pagina = 1;
       if (pagina > totalPaginas()) pagina = totalPaginas();
 
       for (const tarjeta of tarjetas) tarjeta.hidden = true;
@@ -358,7 +379,7 @@ const especialidades = getEspecialidades(lista);
       if (pagina > 1) {
         pagina--;
         mostrarPagina();
-        contenedor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        irA(contenedor);
       }
     });
 
@@ -366,7 +387,7 @@ const especialidades = getEspecialidades(lista);
       if (pagina < totalPaginas()) {
         pagina++;
         mostrarPagina();
-        contenedor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        irA(contenedor);
       }
     });
 
@@ -406,7 +427,7 @@ const especialidades = getEspecialidades(lista);
 
     const irAResultados = async ({ trasTeclado = false } = {}) => {
       if (trasTeclado) await esperarTeclado();
-      conteo.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      irA(conteo);
     };
 
     input.addEventListener('input', () => filtrar());

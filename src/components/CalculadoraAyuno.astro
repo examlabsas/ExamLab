@@ -39,12 +39,24 @@ const datos = examenes.map((e) => {
 
 // Los que requieren ayuno van primero: es lo que la gente viene a consultar.
 const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
+
+/*
+  Solo viajan al navegador los exámenes que SÍ requieren ayuno, y de ellos solo
+  las horas. El resto se deduce: si un slug no está en el mapa, no hay ayuno.
+
+  Antes se mandaban los 559 completos dentro de un atributo HTML, y en un
+  atributo cada comilla se escribe `&quot;`: 65 KB de JSON ocupaban 110. De los
+  559, además, 456 solo decían «no requiere ayuno» y el campo `texto` no lo
+  leía nadie. El nombre tampoco hace falta: ya está en cada `<option>`.
+*/
+const horasPorSlug: Record<string, number> = Object.fromEntries(
+  datos.filter((d) => d.ayuno && d.horas > 0).map((d) => [d.slug, d.horas]),
+);
 ---
 
 <div
   class="rounded-xl border border-line bg-white p-6 lg:p-8"
   data-ayuno
-  data-examenes={JSON.stringify(datos)}
 >
   <div class="flex items-start gap-4">
     <span
@@ -84,7 +96,7 @@ const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
     </div>
   </div>
 
-  <!-- El resultado se anuncia a lectores de pantalla al cambiar. -->
+  {/* El resultado se anuncia a lectores de pantalla al cambiar. */}
   <div
     class="mt-5 rounded-xl border border-dashed border-line-strong bg-surface p-5"
     data-resultado
@@ -105,6 +117,9 @@ const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
   <p class="mt-4 text-xs leading-relaxed text-neutral">
     Si su médico le indicó un ayuno distinto, siga siempre la indicación de su médico.
   </p>
+
+  {/* En un bloque JSON y no en un atributo: aquí las comillas no se escapan. */}
+  <script is:inline type="application/json" data-ayuno-horas set:html={JSON.stringify(horasPorSlug)} />
 </div>
 
 <script>
@@ -114,13 +129,23 @@ const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
       if (caja.dataset.iniciado === 'true') continue;
       caja.dataset.iniciado = 'true';
 
-      type Item = { slug: string; nombre: string; ayuno: boolean; horas: number };
-      let examenes: Item[] = [];
+      /*
+        Mapa `slug -> horas` de los exámenes que requieren ayuno. Lo que no
+        está en el mapa no lo requiere; el nombre se toma de la opción elegida,
+        que ya está en el documento.
+      */
+      let horasPorSlug: Record<string, number> = {};
       try {
-        examenes = JSON.parse(caja.dataset.examenes ?? '[]');
+        horasPorSlug = JSON.parse(
+          caja.querySelector('[data-ayuno-horas]')?.textContent ?? '{}',
+        );
       } catch {
         continue;
       }
+
+      /** El nombre viene de datos del laboratorio y se inserta como HTML. */
+      const escapar = (texto: string) =>
+        texto.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
       const selector = caja.querySelector<HTMLSelectElement>('#ayuno-examen');
       const cita = caja.querySelector<HTMLInputElement>('#ayuno-cita');
@@ -155,8 +180,15 @@ const ordenados = [...datos].sort((a, b) => Number(b.ayuno) - Number(a.ayuno));
       };
 
       const calcular = () => {
-        const examen = examenes.find((e) => e.slug === selector.value);
-        if (!examen) return;
+        const slug = selector.value;
+        if (!slug) return;
+
+        const horas = horasPorSlug[slug] ?? 0;
+        const examen = {
+          nombre: escapar(selector.selectedOptions[0]?.textContent?.trim() ?? ''),
+          ayuno: horas > 0,
+          horas,
+        };
 
         if (!examen.ayuno) {
           pintar(

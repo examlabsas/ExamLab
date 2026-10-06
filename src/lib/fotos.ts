@@ -48,6 +48,22 @@ export const FOTO_ANCHO = 1400;
 export const FOTO_ALTO = 1050;
 
 /**
+ * Fotos cuyo original da para la variante de 2000 px. Las dos que faltan son
+ * de 1448 px de ancho: ampliarlas no añadiría detalle, solo peso, así que
+ * `npm run imagenes` ni siquiera las genera. Si el laboratorio entrega esos
+ * dos originales en mayor resolución, basta con sumarlos a esta lista.
+ */
+const CON_2000: ReadonlySet<NombreFoto> = new Set([
+  'analizador-automatizado',
+  'laboratorio-equipo-trabajando',
+  'pipeteo-de-muestra',
+  'recepcion-de-muestras',
+  'revision-de-muestra',
+  'tecnologa-con-tubos',
+  'tecnologa-en-analizador',
+]);
+
+/**
  * `sizes` para una foto que ocupa media columna en escritorio y todo el ancho
  * en móvil, que es como se usan todas en el sitio.
  */
@@ -58,9 +74,15 @@ export const SIZES_MEDIA_COLUMNA = '(min-width: 64rem) 50vw, 100vw';
  * atributos válidos de `<img>`, así el spread no cuela nada raro en el HTML.
  */
 export function foto(nombre: NombreFoto) {
+  const fuentes = [
+    `/images/${nombre}-800.webp 800w`,
+    `/images/${nombre}-1400.webp 1400w`,
+    ...(CON_2000.has(nombre) ? [`/images/${nombre}-2000.webp 2000w`] : []),
+  ];
+
   return {
     src: `/images/${nombre}-1400.webp`,
-    srcset: `/images/${nombre}-800.webp 800w, /images/${nombre}-1400.webp 1400w`,
+    srcset: fuentes.join(', '),
     alt: ALT[nombre],
     width: FOTO_ANCHO,
     height: FOTO_ALTO,

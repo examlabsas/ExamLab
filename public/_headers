@@ -10,15 +10,34 @@
   # Impide que el sitio sea incrustado en un iframe ajeno (clickjacking).
   X-Frame-Options: SAMEORIGIN
   # Desactiva permisos del navegador que el sitio no usa.
-  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), serial=(), hid=(), bluetooth=(), midi=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=(), idle-detection=(), screen-wake-lock=(), autoplay=()
   # Obliga a usar HTTPS durante un año. Sin includeSubDomains, para no afectar
-  # subdominios de correo o del sistema Avalab.
+  # a los subdominios de correo, que administra Netlife.
   Strict-Transport-Security: max-age=31536000
+  # Aísla la pestaña de cualquier ventana que la haya abierto.
+  Cross-Origin-Opener-Policy: same-origin
+  # Contiene el daño si una dependencia comprometida intentara cargar algo de
+  # fuera. Los únicos terceros del sitio son las tipografías de Google y los
+  # mapas; todo lo demás es propio.
+  #
+  # `unsafe-inline` en estilos no se puede quitar: el HTML generado lleva más
+  # de nueve mil atributos `style=""` y los hash de CSP no cubren atributos.
+  # En scripts sigue haciendo falta mientras Astro inserte alguno en línea.
+  #
+  # Probada sobre el sitio compilado recorriendo portada, catálogo, ficha de
+  # examen y «soy paciente»: cero violaciones en consola.
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; frame-src https://maps.google.com https://www.google.com; connect-src 'self'; upgrade-insecure-requests
 
 # Los archivos con hash en el nombre nunca cambian: se cachean un año.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Las imágenes se revisan cada semana.
+# Las tipografías no cambian nunca: se cachean un año.
+/fuentes/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Las imágenes se revisan cada semana. `cross-origin` para que las vistas
+# previas de los enlaces compartidos por WhatsApp y Facebook sigan saliendo.
 /images/*
   Cache-Control: public, max-age=604800
+  Cross-Origin-Resource-Policy: cross-origin

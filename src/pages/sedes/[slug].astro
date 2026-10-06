@@ -4,9 +4,10 @@ import Icon from '@/components/Icon.astro';
 import Button from '@/components/Button.astro';
 import SedeCard from '@/components/SedeCard.astro';
 import EstadoApertura from '@/components/EstadoApertura.astro';
+import MapaSede from '@/components/MapaSede.astro';
 import FondoGotas from '@/components/FondoGotas.astro';
 import PulsoEcg from '@/components/PulsoEcg.astro';
-import { sedes, mapaEmbed, mapaEnlace, site } from '@/lib/site';
+import { sedes, mapaEnlace, site } from '@/lib/site';
 import { foto, fotoOg, SIZES_MEDIA_COLUMNA } from '@/lib/fotos';
 import { breadcrumbSchema, sedeSchema } from '@/lib/schema';
 import { whatsappSede, whatsappLink } from '@/lib/whatsapp';
@@ -94,18 +95,11 @@ const schema = [
     </div>
   </section>
 
-  <!-- Mapa y datos -->
+  {/* Mapa y datos */}
   <section class="bg-white py-10 lg:py-14">
     <div class="container-page grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px] lg:gap-12">
       <div class="overflow-hidden rounded-xl border border-line">
-        <iframe
-          src={mapaEmbed(sede)}
-          title={`Mapa de ${site.nombre} ${sede.nombre}`}
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          class="h-[320px] w-full border-0 lg:h-[460px]"
-          allowfullscreen
-        ></iframe>
+        <MapaSede sede={sede} alto="h-[320px] lg:h-[460px]" />
       </div>
 
       <div class="flex flex-col gap-4">
@@ -140,13 +134,30 @@ const schema = [
         <div class="rounded-xl border border-line p-6">
           <h2 class="text-lg font-bold text-brand">Contacto</h2>
           <div class="mt-4 flex flex-col gap-3">
-            <a
-              href={`tel:${sede.telefonoE164}`}
-              class="flex items-center gap-3 text-base font-bold text-brand transition-colors hover:text-accent-dark"
-            >
-              <Icon name="telefono" size={18} class="text-accent-dark" />
-              {sede.telefono}
-            </a>
+            {/*
+              Los dos números de la sede, como en el impreso del laboratorio:
+              fijo y celular. El celular no es WhatsApp —ese es uno solo y es
+              el de la matriz— así que ambos van como llamada.
+            */}
+            <div class="flex items-start gap-3">
+              <Icon name="telefono" size={18} class="mt-1 flex-none text-accent-dark" />
+              <span class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <a
+                  href={`tel:${sede.telefonoE164}`}
+                  class="text-base font-bold text-brand transition-colors hover:text-accent-dark"
+                >
+                  <span class="text-xs font-semibold text-neutral">Telf.</span>
+                  {' '}{sede.telefono}
+                </a>
+                <a
+                  href={`tel:${sede.celularE164}`}
+                  class="text-base font-bold text-brand transition-colors hover:text-accent-dark"
+                >
+                  <span class="text-xs font-semibold text-neutral">Cel.</span>
+                  {' '}{sede.celular}
+                </a>
+              </span>
+            </div>
             <a
               href={`mailto:${site.email}`}
               class="flex items-center gap-3 text-sm text-neutral transition-colors hover:text-accent-dark"
@@ -183,7 +194,7 @@ const schema = [
     </div>
   </section>
 
-  <!-- Accesos -->
+  {/* Accesos */}
   <section class="bg-surface py-section">
     <div class="reveal-stagger container-page grid grid-cols-1 gap-5 md:grid-cols-3">
       <a

@@ -101,7 +101,9 @@ const imagen = foto && !compacto ? fotoDe(foto) : undefined;
           </p>
         )
       }
-      <div class:list={['entrada entrada-4', compacto ? 'mt-4' : 'mt-7', 'empty:mt-0']}>
+      <div
+        class:list={['hero-acciones entrada entrada-4', compacto ? 'mt-4' : 'mt-7', 'empty:mt-0']}
+      >
         <slot />
       </div>
     </div>
@@ -121,3 +123,13 @@ const imagen = foto && !compacto ? fotoDe(foto) : undefined;
     }
   </div>
 </section>
+
+<style>
+  .hero-acciones :global([data-variante='primary']) {
+    background-color: var(--color-accent-light);
+    color: var(--color-brand-dark);
+  }
+  .hero-acciones :global([data-variante='primary']:hover) {
+    background-color: #ffffff;
+  }
+</style>

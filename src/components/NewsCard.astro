@@ -32,15 +32,20 @@ const imagen = foto ? fotoDe(foto) : undefined;
       />
     ) : (
       /* Sin imagen no se dibuja un marcador de maqueta: se deja el hueco liso. */
-      <span class="block h-43 bg-surface" />
+      <div class="h-43 bg-surface" />
     )
   }
-  <span class="block p-5.5">
+  <div class="p-5.5">
     <span class="flex items-center gap-2.5 text-xs font-bold text-accent-dark">
       <span class="uppercase">{categoria}</span>
       <span class="text-neutral">{formatoFecha(fecha)}</span>
     </span>
-    <span class="mt-2.5 block text-lg leading-snug font-bold text-brand">{titulo}</span>
-    <span class="mt-2 block text-sm leading-relaxed text-neutral">{descripcion}</span>
-  </span>
+    {/*
+      Encabezado de verdad, no un <span> con aspecto de título: así la lista de
+      noticias se puede recorrer saltando de encabezado en encabezado con un
+      lector de pantalla. Es `h3` porque la sección que la contiene lleva `h2`.
+    */}
+    <h3 class="mt-2.5 text-lg leading-snug font-bold text-brand">{titulo}</h3>
+    <p class="mt-2 text-sm leading-relaxed text-neutral">{descripcion}</p>
+  </div>
 </a>

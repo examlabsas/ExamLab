@@ -31,7 +31,9 @@ import { WHATSAPP_NUMERO } from '@/lib/whatsapp';
     del medio recorta lo que sobra mientras crece, y la de dentro es la que
     tiene el alto real y su propio desplazamiento si la lista es larga.
   */}
-  <div id="lista-detalle" class="lista-detalle" data-abierto="false">
+  {/* Nace cerrado, así que nace inerte: el atributo va en el HTML y no
+      esperando a que el script lo ponga. */}
+  <div id="lista-detalle" class="lista-detalle" data-abierto="false" inert>
     <div class="lista-detalle-recorte">
       <div class="container-page max-h-[40vh] overflow-y-auto border-b border-line py-4">
         <ul class="flex flex-col gap-1.5" data-lista-items></ul>
@@ -191,6 +193,27 @@ import { WHATSAPP_NUMERO } from '@/lib/whatsapp';
     type ExamenEnLista,
   } from '@/lib/lista-examenes';
 
+  /*
+    Estado que sobrevive a las navegaciones, no a la página.
+
+    La barra vive en el layout, pero con las transiciones de página el `<body>`
+    entero se sustituye: en cada navegación es un elemento nuevo, la guarda
+    `dataset.iniciado` vuelve a estar vacía y `initLista` se ejecuta otra vez.
+    Cuando los oyentes de `document` y `window` se registraban ahí dentro, se
+    acumulaba uno por página visitada y ninguno se quitaba; además, cada uno
+    retenía la barra, la fila y los ítems de su página, y con ellos —por la
+    referencia al padre— el árbol completo de aquel documento. Quien pasara por
+    el catálogo dejaba sus 559 tarjetas residentes el resto de la sesión.
+
+    Ahora los oyentes se registran una sola vez y delegan en `pintarActual`,
+    que apunta siempre a la página que se está viendo. `saliendo` también sube
+    aquí: era de cada cierre, así que el temporizador de una página anterior
+    podía disparar y quitar el `padding-bottom` que la barra viva acababa de
+    poner, dejando la barra tapando el final del documento.
+  */
+  let pintarActual: ((lista: ExamenEnLista[], animar?: boolean) => void) | undefined;
+  let saliendo: number | undefined;
+
   const initLista = () => {
     const barra = document.querySelector<HTMLElement>('[data-lista-barra]');
     if (!barra || barra.dataset.iniciado === 'true') return;
@@ -221,10 +244,16 @@ import { WHATSAPP_NUMERO } from '@/lib/whatsapp';
     const abrirDetalle = (abierto: boolean) => {
       detalle?.setAttribute('data-abierto', String(abierto));
       desplegar?.setAttribute('aria-expanded', String(abierto));
-    };
 
-    /** Espera a que termine la animación de salida antes de ocultar del todo. */
-    let saliendo: number | undefined;
+      /*
+        Cerrado, el panel mide `0fr` y se recorta, pero seguía existiendo: los
+        botones «Quitar» continuaban en el orden de tabulación y expuestos al
+        lector de pantalla, aunque `aria-expanded` dijera lo contrario. Con dos
+        o tres exámenes en la lista, el foco desaparecía dentro de una zona
+        invisible durante varias pulsaciones.
+      */
+      if (detalle) detalle.inert = !abierto;
+    };
 
     const esconder = (animar: boolean) => {
       abrirDetalle(false);
@@ -334,17 +363,20 @@ import { WHATSAPP_NUMERO } from '@/lib/whatsapp';
 
     barra.querySelector('[data-lista-vaciar]')?.addEventListener('click', () => vaciar());
 
-    document.addEventListener(EVENTO, (evento) => {
-      pintar((evento as CustomEvent<ExamenEnLista[]>).detail ?? leerLista(), true);
-    });
-
-    // Otra pestaña del mismo sitio puede haber cambiado la lista.
-    window.addEventListener('storage', (evento) => {
-      if (evento.key === 'examlab:lista') pintar(leerLista());
-    });
-
+    // A partir de aquí, los oyentes globales pintan sobre esta barra.
+    pintarActual = pintar;
     pintar(leerLista());
   };
+
+  // Registrados una sola vez: sobreviven a las navegaciones sin acumularse.
+  document.addEventListener(EVENTO, (evento) => {
+    pintarActual?.((evento as CustomEvent<ExamenEnLista[]>).detail ?? leerLista(), true);
+  });
+
+  // Otra pestaña del mismo sitio puede haber cambiado la lista.
+  window.addEventListener('storage', (evento) => {
+    if (evento.key === 'examlab:lista') pintarActual?.(leerLista());
+  });
 
   initLista();
   document.addEventListener('astro:page-load', initLista);

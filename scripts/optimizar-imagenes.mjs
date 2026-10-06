@@ -34,7 +34,16 @@ const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ORIGEN = resolve(raiz, 'fotos-laboratorio/usadas');
 const DESTINO = resolve(raiz, 'public/images');
 
-const ANCHOS = [800, 1400];
+/*
+  Tres anchos. El de 2000 es para pantallas grandes: en un iMac de 24", con
+  `sizes="50vw"` y densidad 2, la foto de portada necesita unos 2240 px reales
+  y recibía 1400 estirados casi el doble. Se notaba blanda, que es justo lo que
+  el laboratorio comentó al verla.
+
+  No todas las fotos llegan: las que vengan por debajo de un ancho se saltan
+  esa variante en vez de ampliarse, que solo añadiría peso sin añadir detalle.
+*/
+const ANCHOS = [800, 1400, 2000];
 const PROPORCION = 4 / 3;
 const OG = { ancho: 1200, alto: 630, pesoMaximo: 300 * 1024 };
 
@@ -81,6 +90,13 @@ async function procesar(foto) {
   const lineas = [`${foto.nombre}  (original ${meta.width}×${meta.height})`];
 
   for (const ancho of ANCHOS) {
+    // Ampliar una foto no inventa detalle: si el original no da, se omite.
+    const anchoDisponible = foto.recorte ? foto.recorte.width : (meta.width ?? 0);
+    if (ancho > anchoDisponible) {
+      lineas.push(`  ${ancho}px omitido (el original solo da ${anchoDisponible}px)`);
+      continue;
+    }
+
     const alto = Math.round(ancho / PROPORCION);
     const salida = resolve(DESTINO, `${foto.nombre}-${ancho}.webp`);
     await origen

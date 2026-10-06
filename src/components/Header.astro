@@ -5,6 +5,18 @@ import EstadoApertura from './EstadoApertura.astro';
 import { site, sedes, navPrincipal } from '@/lib/site';
 import { whatsappLink } from '@/lib/whatsapp';
 
+/*
+  El botón de la cabecera entra directo a Saluto, el sistema donde viven los
+  informes: es el acceso más usado del sitio y antes obligaba a pasar por una
+  página intermedia. Los demás botones de «resultados» repartidos por el sitio
+  siguen llevando a /soy-paciente/resultados, que explica qué se necesita y
+  cómo se descarga el informe, para quien entra por primera vez.
+
+  Como sale del sitio, se abre en otra pestaña y se avisa en el nombre
+  accesible, que conserva la palabra visible del botón.
+*/
+const ETIQUETA_RESULTADOS = 'Resultados en Saluto, se abre en otra pestaña';
+
 const ruta = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const esActivo = (href: string) => {
   const base = href.split('#')[0]!.replace(/\/+$/, '') || '/';
@@ -21,7 +33,7 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
   id="cabecera"
   class="cabecera sticky top-0 z-50 bg-white shadow-[0_1px_0_var(--color-line)]"
 >
-  <!-- Barra de utilidades (solo escritorio) -->
+  {/* Barra de utilidades (solo escritorio) */}
   <div class="hidden bg-brand text-xs font-medium text-white/80 menu:block">
     <div class="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5">
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -52,15 +64,15 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
     </div>
   </div>
 
-  <!-- Barra principal -->
+  {/* Barra principal */}
   <div class="barra-principal container-page flex items-center gap-2.5 py-3.5 menu:gap-5">
     <a href="/" class="flex-none" aria-label={`${site.nombre} · inicio`}>
-      <Logo box={54} bajada={false} soloEmblemaEnMovil />
+      <Logo box={54} bajada={false} compactoEnMovil />
     </a>
 
     <div class="flex-1"></div>
 
-    <!-- Navegación de escritorio -->
+    {/* Navegación de escritorio */}
     <nav class="hidden items-center gap-4 menu:flex" aria-label="Navegación principal">
       {
         navPrincipal.map((item) =>
@@ -73,7 +85,6 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
                   esActivo(item.href) ? 'font-semibold text-brand' : 'font-medium text-black',
                 ]}
                 aria-expanded="false"
-                aria-haspopup="true"
               >
                 {item.label}
                 <Icon name="flecha" size={13} strokeWidth={2.4} class="submenu-icono rotate-90 text-accent-dark transition-transform duration-200" />
@@ -139,19 +150,25 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
       {/* El acceso más usado del sitio: va más grande que el resto del menú y
           con un brillo que recorre el botón al pasar el cursor. */}
       <a
-        href="/soy-paciente/resultados"
-        class="boton-resultados ml-3 flex min-h-12 items-center gap-2.5 rounded-xl bg-accent-dark px-6 py-3 text-base font-bold text-white shadow-[0_6px_18px_rgb(0_126_153/0.35)] transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:bg-accent-deep hover:shadow-[0_10px_24px_rgb(0_126_153/0.45)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+        href={site.sistema.url}
+        target="_blank"
+        rel="noopener"
+        aria-label={ETIQUETA_RESULTADOS}
+        class="boton-resultados ml-3 flex min-h-12 items-center gap-2.5 rounded-xl bg-accent-dark px-6 py-3 text-base font-bold text-white ring-2 ring-accent-light/70 shadow-[0_6px_20px_rgb(0_126_153/0.45)] transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:bg-accent-deep hover:shadow-[0_12px_28px_rgb(0_126_153/0.55)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
       >
         <Icon name="documento" size={19} />
         Resultados
       </a>
     </nav>
 
-    <!-- Acciones móviles -->
+    {/* Acciones móviles */}
     <div class="flex items-center gap-2.5 menu:hidden">
       <a
-        href="/soy-paciente/resultados"
-        class="boton-resultados flex min-h-11 items-center gap-2 rounded-xl bg-accent-dark px-4 py-2.5 text-sm font-bold text-white shadow-[0_6px_18px_rgb(0_126_153/0.35)]"
+        href={site.sistema.url}
+        target="_blank"
+        rel="noopener"
+        aria-label={ETIQUETA_RESULTADOS}
+        class="boton-resultados flex min-h-11 items-center gap-2 rounded-xl bg-accent-dark px-4 py-2.5 text-sm font-bold text-white ring-2 ring-accent-light/70 shadow-[0_6px_20px_rgb(0_126_153/0.45)]"
       >
         <Icon name="documento" size={17} />
         Resultados
@@ -169,7 +186,7 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
     </div>
   </div>
 
-  <!-- Menú móvil -->
+  {/* Menú móvil */}
   <nav
     id="menu-movil"
     hidden
@@ -247,6 +264,31 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
 </header>
 
 <style>
+  /*
+    Reparto del ancho en teléfonos.
+
+    El nombre de la marca tiene que verse siempre: es lo primero que identifica
+    al laboratorio y esconderlo dejaba la cabecera con un emblema mudo. Pero el
+    botón de resultados es el acceso más usado del sitio y tampoco puede
+    encogerse hasta perder su texto.
+
+    Medido a 360 px: el emblema, el botón y el menú suman ~232 px de los 328
+    útiles. Para que al nombre le queden los ~96 px que necesita, por debajo de
+    26rem (416 px) se recorta el margen lateral de la barra, su separación
+    interna y el relleno del botón. Solo afecta a esta barra, no al resto de la
+    página, que sigue con el margen de 1,5rem de `container-page`.
+  */
+  @media (max-width: 26rem) {
+    .barra-principal {
+      padding-inline: 1rem;
+      gap: 0.5rem;
+    }
+    .barra-principal .boton-resultados {
+      padding-inline: 0.75rem;
+      gap: 0.375rem;
+    }
+  }
+
   /*
     Brillo que cruza el botón de resultados al pasar el cursor. Es un
     pseudoelemento con degradado que se desplaza de izquierda a derecha; sin

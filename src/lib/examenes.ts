@@ -1,5 +1,4 @@
 import datos from '@/data/examenes.json';
-import datosLaboratorios from '@/data/examenes-laboratorios.json';
 import { bloquesPreparacion, type BloquePreparacion } from '@/data/preparacion';
 
 /**
@@ -54,23 +53,10 @@ export type FichaTecnica = {
 /** Catálogo público, para pacientes. */
 export const examenes: Examen[] = datos as Examen[];
 
-/**
- * Catálogo para laboratorios asociados. Cuando el laboratorio entregue su
- * cartera de derivación basta con reemplazar el JSON, sin tocar código.
- */
-export const examenesLaboratorios: Examen[] = datosLaboratorios as Examen[];
-
-export function getExamen(slug: string, lista: Examen[] = examenes): Examen | undefined {
-  return lista.find((e) => e.slug === slug);
-}
-
 export function getEspecialidades(lista: Examen[] = examenes): string[] {
   return [...new Set(lista.map((e) => e.especialidad))].sort((a, b) => a.localeCompare(b, 'es'));
 }
 
-export function contarPorEspecialidad(especialidad: string, lista: Examen[] = examenes): number {
-  return lista.filter((e) => e.especialidad === especialidad).length;
-}
 
 export function getRelacionados(examen: Examen, lista: Examen[] = examenes, limite = 3): Examen[] {
   return lista
@@ -260,6 +246,38 @@ export function resumenCorto(examen: Examen, maximo = 160): string {
   const primera = (examen.utilidad ?? '').split(/(?<=\.)\s/)[0] ?? '';
   if (primera.length <= maximo) return primera;
   return `${primera.slice(0, maximo).trimEnd()}…`;
+}
+
+/**
+ * Descripción de la ficha para buscadores y redes.
+ *
+ * Solo menciona los datos que existen. La plantilla anterior interpolaba los
+ * campos en crudo, así que los 495 exámenes sin plazo confirmado publicaban
+ * «Entrega en consultar.» y otros 17 «muestra: Consultar.» — el texto que el
+ * doctor pidió suavizar, corregido en la página visible pero no en lo que sale
+ * en Google, que es justo donde más se lee.
+ *
+ * Se recorta a 160 caracteres porque por encima de ahí Google trunca.
+ */
+export function descripcionMeta(examen: Examen, maximo = 160): string {
+  const frases = [resumenCorto(examen), `Especialidad ${examen.especialidad.toLowerCase()}.`];
+  // La muestra conserva sus mayúsculas: hay siglas («Sangre total con EDTA»)
+  // que en minúscula dejan de leerse como lo que son. Y cinco exámenes ya
+  // traen la palabra dentro del valor («Muestra cervicovaginal»), así que
+  // añadir la etiqueta daría «Muestra: Muestra cervicovaginal».
+  if (tieneDato(examen.tipoMuestra)) {
+    const muestra = examen.tipoMuestra;
+    frases.push(/^muestra/i.test(muestra) ? `${muestra}.` : `Muestra: ${muestra}.`);
+  }
+  if (tieneDato(examen.tiempoEntrega)) {
+    frases.push(`Entrega en ${examen.tiempoEntrega.toLowerCase()}.`);
+  }
+
+  const texto = frases.join(' ').replace(/\s+/g, ' ').trim();
+  if (texto.length <= maximo) return texto;
+  // Se corta por la última palabra entera para no dejar sílabas sueltas.
+  const recorte = texto.slice(0, maximo - 1);
+  return `${recorte.slice(0, recorte.lastIndexOf(' ')).trimEnd()}…`;
 }
 
 /** Texto plano que indexa el buscador del catálogo. */

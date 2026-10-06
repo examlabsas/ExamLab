@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ExamenFicha from '@/components/ExamenFicha.astro';
-import { examenes, getRelacionados, resumenCorto } from '@/lib/examenes';
+import { examenes, getRelacionados, descripcionMeta } from '@/lib/examenes';
 import { breadcrumbSchema, medicalTestSchema } from '@/lib/schema';
 
 export function getStaticPaths() {
@@ -27,7 +27,7 @@ const schema = [
 
 <BaseLayout
   titulo={examen.nombre}
-  descripcion={`${resumenCorto(examen)} Especialidad ${examen.especialidad}, muestra: ${examen.tipoMuestra}. Entrega en ${examen.tiempoEntrega.toLowerCase()}.`}
+  descripcion={descripcionMeta(examen)}
   whatsapp="catalogo"
   schema={schema}
 >

@@ -1,0 +1,15 @@
+{
+  "name": "ExamLab · Laboratorio clínico",
+  "short_name": "ExamLab",
+  "description": "Laboratorio clínico de alta complejidad en Ambato y Pelileo.",
+  "lang": "es-EC",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#005A8C",
+  "icons": [
+    { "src": "/images/logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/images/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

@@ -15,6 +15,7 @@
  * de cada sede siguen funcionando: no se pierde información.
  */
 import Icon from './Icon.astro';
+import MapaSede from './MapaSede.astro';
 import EstadoApertura from './EstadoApertura.astro';
 import { sedes, mapaEmbed, mapaEnlace, site } from '@/lib/site';
 import { whatsappSede } from '@/lib/whatsapp';
@@ -30,6 +31,8 @@ const datos = sedes.map((sede) => ({
   ciudad: sede.ciudad,
   telefono: sede.telefono,
   telefonoE164: sede.telefonoE164,
+  celular: sede.celular,
+  celularE164: sede.celularE164,
   horarios: sede.horarios,
   mapa: mapaEmbed(sede, 17),
   comoLlegar: mapaEnlace(sede),
@@ -54,7 +57,7 @@ const datos = sedes.map((sede) => ({
     </div>
 
     <div class="mt-9 grid grid-cols-1 gap-6 lg:grid-cols-[22rem_1fr] lg:gap-8">
-      <!-- Lista de sedes -->
+      {/* Lista de sedes */}
       <div
         class="reveal-stagger flex flex-col gap-2.5"
         role="tablist"
@@ -100,23 +103,14 @@ const datos = sedes.map((sede) => ({
         }
       </div>
 
-      <!-- Mapa y datos de la sede activa -->
+      {/* Mapa y datos de la sede activa */}
       <div
         id="panel-sede"
         role="tabpanel"
         aria-labelledby={`tab-${inicial.slug}`}
         class="flex flex-col overflow-hidden rounded-xl border border-line bg-white"
       >
-        <div class="relative">
-          <iframe
-            data-mapa
-            src={mapaEmbed(inicial, 17)}
-            title={`Mapa de ${site.nombre} ${inicial.nombre}`}
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            class="h-[clamp(16rem,30vw,24rem)] w-full border-0 transition-opacity duration-300"
-            allowfullscreen></iframe>
-        </div>
+        <MapaSede sede={sedes[0]!} zoom={17} compacto />
 
         <div class="flex flex-col gap-4 p-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
           <div>
@@ -127,14 +121,25 @@ const datos = sedes.map((sede) => ({
             <p class="mt-3 text-sm leading-relaxed text-neutral" data-panel-horario>
               {inicial.horarios.map((h) => `${h.dias} ${h.horas}`).join(' · ')}
             </p>
-            <a
-              href={`tel:${inicial.telefonoE164}`}
-              data-panel-telefono
-              class="mt-3 inline-flex items-center gap-2 text-sm font-bold text-brand transition-colors hover:text-accent-dark"
-            >
-              <Icon name="telefono" size={16} class="text-accent-dark" />
-              <span data-panel-telefono-texto>{inicial.telefono}</span>
-            </a>
+            {/* Fijo y celular de la sede, como en el impreso del laboratorio. */}
+            <span class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+              <a
+                href={`tel:${inicial.telefonoE164}`}
+                data-panel-telefono
+                class="inline-flex items-center gap-2 text-sm font-bold text-brand transition-colors hover:text-accent-dark"
+              >
+                <Icon name="telefono" size={16} class="text-accent-dark" />
+                <span data-panel-telefono-texto>{inicial.telefono}</span>
+              </a>
+              <a
+                href={`tel:${inicial.celularE164}`}
+                data-panel-celular
+                class="inline-flex items-center gap-2 text-sm font-bold text-brand transition-colors hover:text-accent-dark"
+              >
+                <span class="text-xs font-semibold text-neutral">Cel.</span>
+                <span data-panel-celular-texto>{inicial.celular}</span>
+              </a>
+            </span>
           </div>
 
           <div class="flex flex-none flex-col gap-2.5 sm:flex-row lg:flex-col">
@@ -238,6 +243,8 @@ const datos = sedes.map((sede) => ({
     ciudad: string;
     telefono: string;
     telefonoE164: string;
+    celular: string;
+    celularE164: string;
     horarios: { dias: string; horas: string }[];
     mapa: string;
     comoLlegar: string;
@@ -254,7 +261,7 @@ const datos = sedes.map((sede) => ({
     if (!datos) return;
 
     const tabs = [...lista.querySelectorAll<HTMLButtonElement>('[data-sede]')];
-    const mapa = document.querySelector<HTMLIFrameElement>('[data-mapa]');
+    const caja = document.querySelector<HTMLElement>('[data-mapa-sede]');
     const panel = document.getElementById('panel-sede');
     const texto = (sel: string) => document.querySelector<HTMLElement>(sel);
     const enlace = (sel: string) => document.querySelector<HTMLAnchorElement>(sel);
@@ -270,13 +277,25 @@ const datos = sedes.map((sede) => ({
         if (activa && moverFoco) tab.focus();
       }
 
-      // El mapa se desvanece mientras carga el nuevo: el salto en seco entre
-      // dos mapas distintos se lee como un parpadeo de error.
-      if (mapa && mapa.src !== sede.mapa) {
-        mapa.style.opacity = '0.35';
-        mapa.src = sede.mapa;
-        mapa.title = `Mapa de ${sede.nombre}`;
-        mapa.addEventListener('load', () => (mapa.style.opacity = '1'), { once: true });
+      /*
+        El mapa no se trae hasta que el visitante lo pide (ver MapaSede). Aquí
+        solo se apunta a la sede nueva: si todavía está el marcador, el cambio
+        es gratis; si ya lo cargó, se cambia el iframe que haya dentro.
+
+        Se desvanece mientras carga: el salto en seco entre dos mapas distintos
+        se lee como un parpadeo de error.
+      */
+      if (caja) {
+        caja.dataset.src = sede.mapa;
+        caja.dataset.titulo = `Mapa de ${sede.nombre}`;
+
+        const iframe = caja.querySelector('iframe');
+        if (iframe && iframe.src !== sede.mapa) {
+          iframe.style.opacity = '0.35';
+          iframe.src = sede.mapa;
+          iframe.title = `Mapa de ${sede.nombre}`;
+          iframe.addEventListener('load', () => (iframe.style.opacity = '1'), { once: true });
+        }
       }
 
       const nombre = texto('[data-panel-nombre]');
@@ -298,6 +317,11 @@ const datos = sedes.map((sede) => ({
       const telefonoTexto = texto('[data-panel-telefono-texto]');
       if (telefono) telefono.href = `tel:${sede.telefonoE164}`;
       if (telefonoTexto) telefonoTexto.textContent = sede.telefono;
+
+      const celular = enlace('[data-panel-celular]');
+      const celularTexto = texto('[data-panel-celular-texto]');
+      if (celular) celular.href = `tel:${sede.celularE164}`;
+      if (celularTexto) celularTexto.textContent = sede.celular;
 
       const whatsapp = enlace('[data-panel-whatsapp]');
       if (whatsapp) whatsapp.href = sede.whatsapp;

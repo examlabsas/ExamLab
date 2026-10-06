@@ -33,12 +33,32 @@ export const site = {
   // Número que consta en el manual para pacientes entregado por el laboratorio.
   telefono: '096 382 0177',
   telefonoE164: '+593963820177',
-  emergencias: '096 382 0177', // POR CONFIRMAR: ¿hay una línea distinta para urgencias?
+  /*
+    Urgencias. El laboratorio confirmó que sí existe una línea aparte —la del
+    Dr. Silva— pero todavía no entregó el número, así que aquí sigue el general
+    mientras tanto. No es falso: ese número llega al laboratorio y la tarjeta
+    no promete una línea exclusiva. En cuanto manden el del doctor, se cambia
+    solo aquí y se actualiza en las cinco páginas que lo muestran.
+  */
+  emergencias: '096 382 0177', // PENDIENTE: pedir el número del Dr. Silva.
   emergenciasE164: '+593963820177',
   ciudad: 'Ambato',
   provincia: 'Tungurahua',
   pais: 'Ecuador',
-  fundacion: '2008', // PROVISIONAL: aún sin confirmar con el Dr. Silva.
+  /*
+    El laboratorio abrió en 2001 con el nombre Pasteur y se constituyó como
+    ExamLab S.A.S. en 2023. Para `foundingDate` se usa 2001, que es cuando
+    empieza la trayectoria real del laboratorio: es lo mismo que hace cualquier
+    empresa que cambia de nombre sin interrumpir su actividad, y encaja con el
+    «nueva imagen, la misma trayectoria» de la portada.
+
+    El dato llegó del laboratorio con reservas («me parece que desde el 2023»),
+    así que el año de la constitución conviene contrastarlo antes de publicarlo
+    en ningún texto visible.
+  */
+  fundacion: '2001',
+  /** Año en que el laboratorio pasó a ser ExamLab S.A.S. Sin usar todavía. */
+  constituidaSas: '2023',
   // Confirmadas por el Dr. Silva (7 sep 2026). @examlab_s.a.s es la cuenta oficial.
   redes: {
     facebook: 'https://www.facebook.com/share/1HqUjdUXC6/',
@@ -119,6 +139,14 @@ export type Sede = {
   provincia: string;
   telefono: string;
   telefonoE164: string;
+  /**
+   * Celular de la sede, el que consta en el material impreso del laboratorio.
+   * Sirve para llamar; el WhatsApp sigue siendo uno solo y es el de la matriz
+   * (lo confirmó el Dr. Silva: todo lo que entra por redes y por la web se
+   * capta desde ahí).
+   */
+  celular: string;
+  celularE164: string;
   /** Fuente de verdad del horario. Alimenta el texto y el estado de apertura. */
   horarioSemanal: HorarioSemanal;
   /** Aclaración que no cabe en la tabla de horarios. */
@@ -188,6 +216,8 @@ export const sedes: Sede[] = [
     provincia: 'Tungurahua',
     telefono: '03 2425081', // Línea fija de la sede.
     telefonoE164: '+59332425081',
+    celular: '096 382 0177',
+    celularE164: '+593963820177',
     horarioSemanal: horarioMatriz,
     horarios: horariosLegibles(horarioMatriz),
     servicios: [
@@ -213,6 +243,9 @@ export const sedes: Sede[] = [
     provincia: 'Tungurahua',
     telefono: '03 2425081',
     telefonoE164: '+59332425081',
+    // Comparte los números de la matriz, según el impreso del laboratorio.
+    celular: '096 382 0177',
+    celularE164: '+593963820177',
     horarioSemanal: horarioLaboratorio1,
     horarios: horariosLegibles(horarioLaboratorio1),
     servicios: ['Toma de muestra general', 'Toma de muestra a domicilio'],
@@ -229,6 +262,8 @@ export const sedes: Sede[] = [
     provincia: 'Tungurahua',
     telefono: '03 2826128',
     telefonoE164: '+59332826128',
+    celular: '096 317 0978',
+    celularE164: '+593963170978',
     horarioSemanal: horarioLaboratorio2,
     horarios: horariosLegibles(horarioLaboratorio2),
     servicios: ['Toma de muestra general', 'Toma de muestra a domicilio'],
@@ -245,6 +280,8 @@ export const sedes: Sede[] = [
     provincia: 'Tungurahua',
     telefono: '03 2830445',
     telefonoE164: '+59332830445',
+    celular: '096 263 0297',
+    celularE164: '+593962630297',
     horarioSemanal: horarioPelileo,
     horarios: horariosLegibles(horarioPelileo),
     servicios: [

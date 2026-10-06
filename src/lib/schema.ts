@@ -228,3 +228,16 @@ export function articleSchema(post: {
     mainEntityOfPage: abs(`/noticias/${post.slug}`),
   };
 }
+
+
+/**
+ * Serializa un bloque para `<script type="application/ld+json">`.
+ *
+ * `JSON.stringify` no neutraliza `</script>`, así que un dato que lo
+ * contuviera cerraría la etiqueta y lo que viniera detrás se interpretaría
+ * como marcado. Hoy está limpio —lo comprobé sobre las 583 páginas— pero los
+ * nombres de examen salen de un Excel del laboratorio, no de código revisado.
+ */
+export function serializarSchema(bloque: Record<string, unknown>): string {
+  return JSON.stringify(bloque).replace(/</g, '\u003c');
+}

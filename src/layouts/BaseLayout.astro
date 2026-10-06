@@ -9,7 +9,7 @@ import SpriteIconos from '@/components/SpriteIconos.astro';
 import { ClientRouter } from 'astro:transitions';
 import { site } from '@/lib/site';
 import { fotoOg, FOTO_POR_DEFECTO } from '@/lib/fotos';
-import { medicalBusinessSchema, webSiteSchema } from '@/lib/schema';
+import { medicalBusinessSchema, webSiteSchema, serializarSchema } from '@/lib/schema';
 import type { SeccionWhatsApp } from '@/lib/whatsapp';
 
 interface Props {
@@ -36,9 +36,29 @@ const {
   schema = [],
 } = Astro.props;
 
+/*
+  Título para la pestaña y para Google.
+
+  El sufijo era `| ExamLab · Laboratorio clínico de alta complejidad en Ambato`:
+  60 caracteres él solo, así que 582 de las 583 páginas pasaban del límite que
+  Google muestra y el recorte se comía justo lo que hay que leer. Ahora el
+  sufijo es la marca y la ciudad, y la frase larga vive donde sí se lee entera:
+  en la descripción y en el H1 de la portada.
+
+  Si aun así se pasa, se recorta el nombre de la página y no el sufijo, que es
+  lo que identifica al laboratorio en una lista de resultados.
+*/
+const SUFIJO = ` | ${site.nombre} ${site.ciudad}`;
+const MAXIMO = 60;
+
 const tituloCompleto = titulo.includes(site.nombre)
   ? titulo
-  : `${titulo} | ${site.nombre} · Laboratorio clínico de alta complejidad en ${site.ciudad}`;
+  : (() => {
+      const disponible = MAXIMO - SUFIJO.length;
+      const nombre =
+        titulo.length <= disponible ? titulo : `${titulo.slice(0, disponible - 1).trimEnd()}…`;
+      return `${nombre}${SUFIJO}`;
+    })();
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).toString();
 const imagenAbsoluta = new URL(imagen, Astro.site ?? site.url).toString();
 
@@ -51,7 +71,17 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/*
+      El WebP de 96 px pesa 7 KB frente a los 15 del PNG de 192, y lo entienden
+      todos los navegadores actuales; el PNG queda de respaldo para los viejos.
+      El de 180 es el que usa iOS al guardar la página en la pantalla de
+      inicio: sin él, el iPhone pone una captura borrosa en vez del logo, y
+      este sitio se comparte sobre todo por WhatsApp.
+    */}
+    <link rel="icon" type="image/webp" href="/images/favicon-96.webp" />
     <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
 
@@ -76,20 +106,31 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
     <meta name="twitter:description" content={descripcion} />
     <meta name="twitter:image" content={imagenAbsoluta} />
 
-    <!--
-      Tipografías de marca (Montserrat - web equivalent Gotham Book).
+    {/* Tipografías de marca (Montserrat - web equivalent Gotham Book).
       Solo los cuatro pesos que el sitio usa: se cargaban seis más la itálica,
-      y ni el 800 ni la cursiva aparecían en ninguna página.
-    -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      y ni el 800 ni la cursiva aparecían en ninguna página. */}
+    {/*
+      Las tipografías se sirven desde el propio dominio (ver styles/fuentes.css).
+      Se precargan los dos pesos que aparecen en la primera pantalla —el texto
+      corrido y los titulares— para que no haya un salto de tipografía al
+      cargar. Los otros dos llegan cuando el CSS los pide.
+    */}
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="preload"
+      href="/fuentes/montserrat-400-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fuentes/montserrat-700-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
 
-    <!--
-      Marca que hay JS antes del primer pintado. Todas las animaciones dependen
+    {/* Marca que hay JS antes del primer pintado. Todas las animaciones dependen
       de la clase `js`, así que si el script falla el contenido se ve igual.
 
       Hay que reponerla en cada navegación: el router de Astro copia los
@@ -99,8 +140,7 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
       salir al moverse por el sitio hasta recargar.
 
       `astro:after-swap` es el momento correcto: el DOM nuevo ya está puesto,
-      pero todavía no se ha pintado.
-    -->
+      pero todavía no se ha pintado. */}
     <script is:inline>
       document.documentElement.classList.add('js');
 
@@ -113,13 +153,13 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
       }
     </script>
 
-    <!-- Transiciones suaves entre páginas (nativo de Astro, sin dependencias) -->
+    {/* Transiciones suaves entre páginas (nativo de Astro, sin dependencias) */}
     <ClientRouter />
 
-    <!-- Datos estructurados Schema.org -->
+    {/* Datos estructurados Schema.org */}
     {
       bloques.map((bloque) => (
-        <script is:inline type="application/ld+json" set:html={JSON.stringify(bloque)} />
+        <script is:inline type="application/ld+json" set:html={serializarSchema(bloque)} />
       ))
     }
 
@@ -142,11 +182,31 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
     </main>
 
     <Footer />
-    <WhatsAppFloat seccion={whatsapp} />
     {/* Va en el layout para que la lista siga visible al entrar en una ficha
         del catálogo y volver. */}
     <ListaExamenes />
-    <CookieBanner />
+
+    {/*
+      Pila inferior: el botón de WhatsApp se apoya sobre el banner de cookies.
+
+      Van juntos en una columna para que los coloque el navegador y no haya que
+      medir nada. Antes cada uno era `fixed` por su cuenta y el botón se
+      apartaba una distancia fija —12,5rem en móvil, 7,5 en escritorio—, que era
+      una suposición: medido en el sitio publicado, el banner ocupa 101 px a
+      1440 px de ancho pero 286 en un teléfono de 375, porque el mismo texto se
+      reparte en muchas más líneas. El botón subía 200 y quedaba 86 px por
+      debajo del borde del banner, que va por encima en el apilado y lo tapaba
+      entero justo en el móvil, que es de donde llega la mayoría de pacientes.
+
+      El contenedor cubre todo el ancho, así que no puede interceptar clics:
+      `pointer-events` se apaga aquí y se reactiva en cada hijo.
+    */}
+    <div
+      class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-end"
+    >
+      <WhatsAppFloat seccion={whatsapp} />
+      <CookieBanner />
+    </div>
 
     <script>
       // Selector único: elementos marcados a mano + todas las secciones
@@ -261,6 +321,42 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
 
       revelarConSeguridad();
       document.addEventListener('astro:page-load', revelarConSeguridad);
+
+      /*
+        Pausa las animaciones de fondo que quedan fuera de pantalla.
+
+        Las gotas y el pulso del electro son bucles infinitos: en `/servicios`
+        hay dieciséis a la vez y seguían corriendo con su sección a tres
+        pantallas de distancia. El observador se crea una sola vez y se le van
+        añadiendo los bloques nuevos de cada página; no se desconecta porque
+        vive lo mismo que la pestaña.
+      */
+      const observadorFondos = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            (entry.target as HTMLElement).dataset.fuera = String(!entry.isIntersecting);
+          }
+        },
+        { threshold: 0, rootMargin: '100px' },
+      );
+
+      const observarFondos = () => {
+        for (const el of document.querySelectorAll<HTMLElement>('[data-anim-fondo]')) {
+          if (el.dataset.observadoFondo === 'true') continue;
+          el.dataset.observadoFondo = 'true';
+
+          // Estado de partida, sin esperar al primer aviso del observador: en
+          // una página larga la mayoría nace fuera de pantalla y no tiene
+          // sentido dejarla animándose hasta que el observador despierte.
+          const caja = el.getBoundingClientRect();
+          el.dataset.fuera = String(caja.bottom < -100 || caja.top > window.innerHeight + 100);
+
+          observadorFondos.observe(el);
+        }
+      };
+
+      observarFondos();
+      document.addEventListener('astro:page-load', observarFondos);
     </script>
   </body>
 </html>

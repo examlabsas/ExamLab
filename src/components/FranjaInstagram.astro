@@ -80,7 +80,27 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
         La franja sale del contenedor a propósito: al ocupar todo el ancho se
         entiende que sigue más allá del borde y que hay más publicaciones.
       */}
-      <div class="franja-ig relative mt-9" data-franja-ig>
+      {/*
+        Control de pausa. El criterio 2.2.2 de las WCAG (nivel A) pide poder
+        detener cualquier movimiento automático que dure más de cinco segundos,
+        y pausar con el cursor no sirve: ni existe en un teléfono, ni ayuda a
+        quien se marea con el movimiento pero no tiene activado
+        `prefers-reduced-motion`, que es casi todo el mundo.
+      */}
+      <div class="mt-6 flex justify-end">
+        <button
+          type="button"
+          data-ig-pausa
+          hidden
+          aria-pressed="false"
+          class="inline-flex min-h-11 items-center gap-2 rounded-lg border-[1.5px] border-line-strong bg-white px-4 py-2.5 text-sm font-semibold text-brand transition-colors hover:border-accent-dark"
+        >
+          <Icon name="reproducir" size={15} class="text-accent-dark" />
+          <span data-ig-pausa-texto>Pausar</span>
+        </button>
+      </div>
+
+      <div class="franja-ig relative mt-3" data-franja-ig>
         <div class="franja-ig-pista" data-pista>
           {[0, 1].map((copia) => (
             <ul
@@ -89,11 +109,19 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
               inert={copia === 1 ? true : undefined}
             >
               {base.map((post) => (
+                /*
+                  `tabindex={-1}` en la copia es el respaldo de `inert`, que no
+                  existe en Safari anterior al 15.5 ni en Firefox anterior al
+                  112. Sin él, en esos navegadores los enlaces duplicados
+                  siguen siendo tabulables **y** están marcados `aria-hidden`:
+                  contenido enfocable fuera del árbol de accesibilidad.
+                */
                 <li>
                   <a
                     href={post.url}
                     target="_blank"
                     rel="noopener"
+                    tabindex={copia === 1 ? -1 : undefined}
                     class="group relative block aspect-[3/4] w-[15rem] overflow-hidden rounded-xl border border-line bg-surface transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-accent-dark hover:shadow-[0_16px_36px_rgb(0_90_140/0.16)] focus-visible:-translate-y-1 motion-reduce:hover:translate-y-0"
                   >
                     <img
@@ -181,6 +209,10 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
   }
 
   /* Detenida mientras se mira. */
+  .franja-ig[data-pausada='true'] .franja-ig-pista {
+    animation-play-state: paused;
+  }
+
   .franja-ig:hover .franja-ig-pista {
     animation-play-state: paused;
   }
@@ -276,12 +308,39 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
   };
 
   const initFranjaIg = () => {
-    if (document.querySelector('[data-franja-ig]') === null) return;
+    const franja = document.querySelector<HTMLElement>('[data-franja-ig]');
+    if (!franja) return;
     medirFranja();
-    // Las imágenes pueden llegar después y cambiar el ancho del grupo.
-    window.addEventListener('load', medirFranja, { once: true });
-    window.addEventListener('resize', medirFranja);
+
+    const boton = document.querySelector<HTMLButtonElement>('[data-ig-pausa]');
+    const texto = document.querySelector<HTMLElement>('[data-ig-pausa-texto]');
+    if (!boton || boton.dataset.iniciado === 'true') return;
+    boton.dataset.iniciado = 'true';
+    // Nace oculto: sin JavaScript no habría nada que pausar.
+    boton.hidden = false;
+
+    boton.addEventListener('click', () => {
+      const pausada = franja.dataset.pausada !== 'true';
+      franja.dataset.pausada = String(pausada);
+      boton.setAttribute('aria-pressed', String(pausada));
+      if (texto) texto.textContent = pausada ? 'Reanudar' : 'Pausar';
+    });
   };
+
+  /*
+    Los oyentes van fuera del arranque, registrados una sola vez.
+
+    `initFranjaIg` corre en cada `astro:page-load`, así que ahí dentro se
+    sumaba un oyente de `resize` por cada vuelta a la portada y ninguno se
+    quitaba. `medirFranja` ya recorre las franjas que haya en la página, de
+    modo que un único oyente sirve para todas. El de `load` con `{once:true}`
+    tampoco hacía nada al registrarse después de que la página ya había
+    cargado: lo que hace falta es esperar a las imágenes, y para eso está
+    `document.fonts`/`load` en la primera evaluación del módulo.
+  */
+  window.addEventListener('resize', medirFranja);
+  if (document.readyState === 'complete') medirFranja();
+  else window.addEventListener('load', medirFranja, { once: true });
 
   initFranjaIg();
   document.addEventListener('astro:page-load', initFranjaIg);
