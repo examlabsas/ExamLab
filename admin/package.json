@@ -1,0 +1,28 @@
+{
+  "name": "examlab-panel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Panel de administración de ExamLab. Worker aparte, mismo repositorio.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tipos": "wrangler types",
+    "admin:crear": "node scripts/crear-admin.mjs",
+    "check": "tsc --noEmit",
+    "pruebas:github": "node pruebas/github-falso.mjs",
+    "pruebas:usuario": "node pruebas/usuario.mjs",
+    "pruebas:codigo": "node pruebas/codigo.mjs",
+    "pruebas:hoja": "node pruebas/hoja-de-ejemplo.mjs",
+    "tarifario:cargar": "node scripts/tarifario.mjs cargar",
+    "tarifario:guardar": "node scripts/tarifario.mjs guardar"
+  },
+  "dependencies": {
+    "hono": "^4.6.14",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "wrangler": "^4.148.0"
+  }
+}

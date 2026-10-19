@@ -19,13 +19,30 @@ import { whatsappLink } from '@/lib/whatsapp';
 import { getCollection } from 'astro:content';
 import especialidadesData from '@/data/especialidades.json';
 import perfiles from '@/data/perfiles.json';
+import { examenes } from '@/lib/examenes';
 import type { IconName } from '@/lib/iconos';
 
 const noticias = (await getCollection('noticias', ({ data }) => !data.borrador))
   .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime())
   .slice(0, 3);
 
-const especialidades = especialidadesData.filter((e) => e.enPortada);
+/*
+  El número de cada tarjeta se cuenta del catálogo, no se escribe a mano.
+
+  Estaba escrito en especialidades.json y se quedó viejo: la tarjeta de
+  Hematología decía «128 exámenes» cuando hay 48, y las cuatro estaban mal —y
+  cada una enlaza al catálogo filtrado, que enseñaba otra cifra al llegar. El
+  campo `conteo` se quitó del archivo para que no vuelva a haber dos versiones
+  del mismo número.
+*/
+const cuantosPorEspecialidad = examenes.reduce<Record<string, number>>((cuenta, examen) => {
+  cuenta[examen.especialidad] = (cuenta[examen.especialidad] ?? 0) + 1;
+  return cuenta;
+}, {});
+
+const especialidades = especialidadesData
+  .filter((e) => e.enPortada)
+  .map((e) => ({ ...e, conteo: `${cuantosPorEspecialidad[e.nombre] ?? 0} exámenes` }));
 
 /*
   Las cifras salen de los datos reales del sitio donde se puede: el número de

@@ -9,10 +9,15 @@
  * Como el sitio es estático, el cálculo va en el navegador. Sin JavaScript se
  * muestra el horario resumido, que sigue siendo información útil.
  */
-import { ZONA_HORARIA, type HorarioSemanal } from '@/lib/site';
+import { ZONA_HORARIA, type HorarioSemanal, type FechaEspecial } from '@/lib/site';
 
 interface Props {
   horario: HorarioSemanal;
+  /**
+   * Feriados y jornadas distintas que afectan a esta sede. Sin ellas el
+   * indicador anuncia «Abierto» un día en que el laboratorio está cerrado.
+   */
+  fechasEspeciales?: FechaEspecial[];
   /** Texto de reserva mientras no hay JavaScript. */
   respaldo: string;
   /** `true` sobre fondo azul (barra superior). */
@@ -20,13 +25,20 @@ interface Props {
   class?: string;
 }
 
-const { horario, respaldo, oscuro = false, class: className } = Astro.props;
+const {
+  horario,
+  fechasEspeciales = [],
+  respaldo,
+  oscuro = false,
+  class: className,
+} = Astro.props;
 ---
 
 <span
   class:list={['inline-flex items-center gap-2', className]}
   data-apertura
   data-horario={JSON.stringify(horario)}
+  data-especiales={JSON.stringify(fechasEspeciales)}
   data-zona={ZONA_HORARIA}
 >
   {/* Cuando el laboratorio está abierto, el punto late (ver `.punto-vivo` en global.css). */}
@@ -56,6 +68,7 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
   */
   type Tramo = { abre: string; cierra: string };
   type Franja = Tramo[] | null;
+  type FechaEspecial = { fecha: string; motivo: string; franja: Franja };
 
   const aMinutos = (hhmm: string) => {
     const [h, m] = hhmm.split(':').map(Number);
@@ -67,6 +80,9 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
     const partes = new Intl.DateTimeFormat('en-US', {
       timeZone: zona,
       weekday: 'short',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
@@ -77,14 +93,39 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
     // A las 24:00 algunos navegadores devuelven "24"; se normaliza a 0.
     const hora = Number(buscar('hour')) % 24;
 
-    return { dia: dias[buscar('weekday')] ?? 0, minutos: hora * 60 + Number(buscar('minute')) };
+    return {
+      dia: dias[buscar('weekday')] ?? 0,
+      minutos: hora * 60 + Number(buscar('minute')),
+      fecha: `${buscar('year')}-${buscar('month')}-${buscar('day')}`,
+    };
   };
 
   const nombreDia = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 
-  const calcular = (semana: Franja[], zona: string) => {
-    const { dia, minutos } = ahoraEnZona(zona);
-    const hoy = semana[dia] ?? null;
+  /** Suma días a una fecha `AAAA-MM-DD` sin que la zona del visitante estorbe. */
+  const sumarDias = (fecha: string, dias: number) => {
+    const [a, m, d] = fecha.split('-').map(Number);
+    const t = new Date(Date.UTC(a!, m! - 1, d!));
+    t.setUTCDate(t.getUTCDate() + dias);
+    return t.toISOString().slice(0, 10);
+  };
+
+  const calcular = (semana: Franja[], especiales: FechaEspecial[], zona: string) => {
+    const { dia, minutos, fecha } = ahoraEnZona(zona);
+
+    /*
+      Una excepción manda sobre el patrón semanal: puede cerrar un día que
+      normalmente abre, o cambiarle el horario. Si no hay ninguna para esa
+      fecha, rige la semana de siempre.
+    */
+    const franjaDe = (f: string, diaSemana: number): Franja => {
+      const excepcion = especiales.find((e) => e.fecha === f);
+      return excepcion ? excepcion.franja : (semana[diaSemana] ?? null);
+    };
+
+    const motivoDe = (f: string) => especiales.find((e) => e.fecha === f)?.motivo;
+
+    const hoy = franjaDe(fecha, dia);
 
     if (hoy) {
       for (const tramo of hoy) {
@@ -107,15 +148,26 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
       }
     }
 
-    // Cerrado: se busca el próximo día con atención.
-    for (let i = 1; i <= 7; i++) {
-      const indice = (dia + i) % 7;
-      const franja = semana[indice];
+    /*
+      Cerrado: se busca el próximo día con atención, saltándose también los
+      feriados. Se miran 14 días y no 7 porque un puente puede encadenar varios
+      cierres seguidos y dejar la próxima apertura fuera de la semana.
+    */
+    const motivoHoy = motivoDe(fecha);
+    for (let i = 1; i <= 14; i++) {
+      const otraFecha = sumarDias(fecha, i);
+      const franja = franjaDe(otraFecha, (dia + i) % 7);
       if (!franja || franja.length === 0) continue;
-      const cuando = i === 1 ? 'mañana' : `el ${nombreDia[indice]}`;
-      return { abierto: false, texto: `Cerrado · abre ${cuando} ${franja[0]!.abre}` };
+
+      const cuando = i === 1 ? 'mañana' : `el ${nombreDia[(dia + i) % 7]}`;
+      const cola = `abre ${cuando} ${franja[0]!.abre}`;
+      // Si hoy es feriado se dice, que es lo que explica el cierre.
+      return {
+        abierto: false,
+        texto: motivoHoy ? `Cerrado por ${motivoHoy} · ${cola}` : `Cerrado · ${cola}`,
+      };
     }
-    return { abierto: false, texto: 'Cerrado' };
+    return { abierto: false, texto: motivoHoy ? `Cerrado por ${motivoHoy}` : 'Cerrado' };
   };
 
   /** Repinta todos los indicadores que haya ahora mismo en la página. */
@@ -128,7 +180,18 @@ const { horario, respaldo, oscuro = false, class: className } = Astro.props;
         continue;
       }
 
-      const { abierto, texto } = calcular(semana, nodo.dataset.zona ?? 'America/Guayaquil');
+      let especiales: FechaEspecial[] = [];
+      try {
+        especiales = JSON.parse(nodo.dataset.especiales ?? '[]');
+      } catch {
+        especiales = [];
+      }
+
+      const { abierto, texto } = calcular(
+        semana,
+        especiales,
+        nodo.dataset.zona ?? 'America/Guayaquil',
+      );
       const punto = nodo.querySelector<HTMLElement>('[data-punto]');
       const etiqueta = nodo.querySelector<HTMLElement>('[data-texto]');
 

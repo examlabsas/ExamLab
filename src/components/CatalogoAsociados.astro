@@ -174,7 +174,12 @@ const dinero = (v: number | null) =>
                   )}
                 </td>
                 <td class="px-4 py-3 align-top whitespace-nowrap text-neutral" data-col="entrega">
-                  {p.entrega ?? 'Consultar'}
+                  {/*
+                    Una sola prueba de las 277 no trae plazo. «Consultar» a
+                    secas suena a campo sin rellenar; esto dice qué hacer, que
+                    es lo que la palabra pretendía decir.
+                  */}
+                  {p.entrega ?? 'Lo confirmamos'}
                 </td>
                 {
                   mostrarPrecios && (

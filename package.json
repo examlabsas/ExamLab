@@ -17,7 +17,10 @@
     "qr": "node scripts/generar-qr.mjs",
     "imagenes": "node scripts/optimizar-imagenes.mjs",
     "instagram": "node scripts/importar-instagram.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "check:panel": "npm --prefix admin run check",
+    "qr:comprobar": "node scripts/comprobar-qr.mjs",
+    "emblema": "node scripts/generar-emblema.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

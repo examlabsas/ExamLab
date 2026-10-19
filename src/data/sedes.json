@@ -1,0 +1,262 @@
+[
+  {
+    "slug": "ambato-matriz",
+    "nombre": "Matriz Ficoa",
+    "etiqueta": "Matriz",
+    "direccion": "Av. Rodrigo Pachano y Reina Claudia",
+    "referencia": "Junto a Salas de Velación Parques del Recuerdo, sector Ficoa",
+    "ciudad": "Ambato",
+    "provincia": "Tungurahua",
+    "telefono": "03 2425081",
+    "celular": "096 382 0177",
+    "horarioSemanal": [
+      null,
+      [
+        {
+          "abre": "06:30",
+          "cierra": "20:00"
+        }
+      ],
+      [
+        {
+          "abre": "06:30",
+          "cierra": "20:00"
+        }
+      ],
+      [
+        {
+          "abre": "06:30",
+          "cierra": "20:00"
+        }
+      ],
+      [
+        {
+          "abre": "06:30",
+          "cierra": "20:00"
+        }
+      ],
+      [
+        {
+          "abre": "06:30",
+          "cierra": "20:00"
+        }
+      ],
+      [
+        {
+          "abre": "07:30",
+          "cierra": "17:00"
+        }
+      ]
+    ],
+    "servicios": [
+      "Toma de muestra general",
+      "Exámenes urgentes",
+      "Toma de muestra a domicilio",
+      "Atención pediátrica"
+    ],
+    "geo": {
+      "lat": -1.2423638,
+      "lng": -78.6349171
+    },
+    "mapsUrl": "https://maps.app.goo.gl/QfQRWBftLTQin8TY7",
+    "foto": "matriz-ficoa-fachada"
+  },
+  {
+    "slug": "ambato-laboratorio-1",
+    "nombre": "Laboratorio 1 · Castillo",
+    "etiqueta": "Laboratorio 1",
+    "direccion": "Castillo y Rocafuerte, altos de la Coop. CACPECO",
+    "referencia": "Edificio Thomas Crammer",
+    "ciudad": "Ambato",
+    "provincia": "Tungurahua",
+    "telefono": "03 2425081",
+    "celular": "096 382 0177",
+    "horarioSemanal": [
+      null,
+      [
+        {
+          "abre": "07:00",
+          "cierra": "13:00"
+        },
+        {
+          "abre": "14:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "13:00"
+        },
+        {
+          "abre": "14:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "13:00"
+        },
+        {
+          "abre": "14:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "13:00"
+        },
+        {
+          "abre": "14:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "13:00"
+        },
+        {
+          "abre": "14:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:30",
+          "cierra": "13:00"
+        }
+      ]
+    ],
+    "servicios": [
+      "Toma de muestra general",
+      "Toma de muestra a domicilio"
+    ],
+    "geo": {
+      "lat": -1.2414923,
+      "lng": -78.6303705
+    },
+    "mapsUrl": "https://maps.app.goo.gl/Nkugtu3jRxZLeKDVA"
+  },
+  {
+    "slug": "ambato-laboratorio-2",
+    "nombre": "Laboratorio 2 · Av. Cevallos",
+    "etiqueta": "Laboratorio 2",
+    "direccion": "Av. Cevallos 12-24 entre Espejo y Mariano Egüez",
+    "referencia": "Junto al C.C. Teófilo López",
+    "ciudad": "Ambato",
+    "provincia": "Tungurahua",
+    "telefono": "03 2826128",
+    "celular": "096 317 0978",
+    "horarioSemanal": [
+      null,
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:30",
+          "cierra": "13:00"
+        }
+      ]
+    ],
+    "servicios": [
+      "Toma de muestra general",
+      "Toma de muestra a domicilio"
+    ],
+    "geo": {
+      "lat": -1.2404654,
+      "lng": -78.6259428
+    },
+    "mapsUrl": "https://maps.app.goo.gl/CeMHepkG76KUwn5r5"
+  },
+  {
+    "slug": "pelileo",
+    "nombre": "Laboratorio 3 · Pelileo",
+    "etiqueta": "Pelileo",
+    "direccion": "Club Chacaritas y Antonio Clavijo",
+    "referencia": "Frente al Mercado 10 de Agosto",
+    "ciudad": "Pelileo",
+    "provincia": "Tungurahua",
+    "telefono": "03 2830445",
+    "celular": "096 263 0297",
+    "horarioSemanal": [
+      null,
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:00",
+          "cierra": "18:30"
+        }
+      ],
+      [
+        {
+          "abre": "07:30",
+          "cierra": "13:00"
+        }
+      ]
+    ],
+    "servicios": [
+      "Toma de muestra general",
+      "Toma de muestra a domicilio",
+      "Chequeos preventivos"
+    ],
+    "geo": {
+      "lat": -1.3289029,
+      "lng": -78.5413766
+    },
+    "mapsUrl": "https://maps.app.goo.gl/YQcBWuneKEYe5mkPA"
+  }
+]

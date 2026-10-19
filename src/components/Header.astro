@@ -2,7 +2,7 @@
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
 import EstadoApertura from './EstadoApertura.astro';
-import { site, sedes, navPrincipal } from '@/lib/site';
+import { site, sedes, navPrincipal, fechasEspecialesDe } from '@/lib/site';
 import { whatsappLink } from '@/lib/whatsapp';
 
 /*
@@ -46,7 +46,12 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
         </a>
         <span class="flex items-center gap-2">
           <Icon name="reloj" size={13} class="text-accent-light" />
-          <EstadoApertura horario={matriz.horarioSemanal} respaldo={horarioResumen} oscuro />
+          <EstadoApertura
+            horario={matriz.horarioSemanal}
+            fechasEspeciales={fechasEspecialesDe(matriz.slug)}
+            respaldo={horarioResumen}
+            oscuro
+          />
         </span>
       </div>
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">

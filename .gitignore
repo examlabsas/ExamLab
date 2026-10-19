@@ -38,9 +38,17 @@ fotos-laboratorio/
 # `node scripts/importar-catalogo-asociados.mjs <excel>` regenera los dos.
 src/data/catalogo-asociados.privado.json
 
-# Salida intermedia de `scripts/importar-catalogo-publico.mjs`. El sitio no lo
-# importa en ningún sitio: solo sirve para revisar la importación a mano.
-src/data/catalogo-info.json
+# `src/data/catalogo-info.json` SÍ se versiona, aunque el sitio no lo importe.
+#
+# Estuvo aquí ignorado mientras era solo salida intermedia del importador. Dejó de
+# serlo con el panel de administración: es la copia buena de lo que una persona
+# escribió —especialidad, para qué sirve, preparación, muestra, plazo, técnica y
+# sinónimos—, y lo que impide que reimportar el Excel borre ese trabajo.
+# `src/data/examenes.json` es el archivo derivado de los dos.
+#
+# El panel lo lee y lo escribe en el repositorio, así que fuera de git la fase 4
+# no funciona. No lleva precios ni nada reservado: es el mismo texto que ya se
+# publica en las 559 fichas.
 
 # Sistema y editores
 .DS_Store
@@ -49,3 +57,9 @@ Thumbs.db
 npm-debug.log*
 .vscode/
 .idea/
+
+# Dependencias y estado local del panel de administración. El panel se instala
+# con `npm install` dentro de admin/ y wrangler guarda ahí su KV de pruebas.
+admin/node_modules/
+admin/.wrangler/
+admin/.dev.vars

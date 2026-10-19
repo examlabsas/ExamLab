@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 import Header from '@/components/Header.astro';
+import AvisoTemporal from '@/components/AvisoTemporal.astro';
 import Footer from '@/components/Footer.astro';
 import WhatsAppFloat from '@/components/WhatsAppFloat.astro';
 import CookieBanner from '@/components/CookieBanner.astro';
@@ -55,8 +56,18 @@ const tituloCompleto = titulo.includes(site.nombre)
   ? titulo
   : (() => {
       const disponible = MAXIMO - SUFIJO.length;
-      const nombre =
-        titulo.length <= disponible ? titulo : `${titulo.slice(0, disponible - 1).trimEnd()}…`;
+      // Se corta por la última palabra entera, igual que `descripcionMeta()`
+      // en lib/examenes-comun.ts. Cortando a ciegas salían títulos como
+      // «Borrelia Burgdorferi (LYME) Antic. IgG e I…», que en una lista de
+      // resultados parece un error del sitio y no un nombre largo.
+      const recortar = (texto: string) => {
+        const trozo = texto.slice(0, disponible - 1);
+        const corte = trozo.lastIndexOf(' ');
+        // Una primera palabra más larga que el hueco no deja dónde cortar; se
+        // prefiere partirla a dejar el título vacío.
+        return `${(corte > 0 ? trozo.slice(0, corte) : trozo).trimEnd()}…`;
+      };
+      const nombre = titulo.length <= disponible ? titulo : recortar(titulo);
       return `${nombre}${SUFIJO}`;
     })();
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).toString();
@@ -175,6 +186,7 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
       Saltar al contenido
     </a>
 
+    <AvisoTemporal />
     <Header />
 
     <main id="contenido">

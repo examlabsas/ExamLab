@@ -6,75 +6,52 @@
  * FASE 1 (diseño): los valores marcados como PROVISIONAL son de maquetación y
  * deben reemplazarse con los datos reales que entregue el laboratorio.
  */
+import datosFeriados from '@/data/feriados.json';
+import datosSitio from '@/data/sitio.json';
+import datosSedes from '@/data/sedes.json';
 
 import type { NombreFoto } from './fotos';
 
+/**
+ * Número en formato internacional, derivado del que se muestra.
+ *
+ * Antes se guardaban los dos y podían discrepar: una corrección en uno y no en
+ * el otro deja un botón de llamada que marca un número distinto al que se lee.
+ * Ecuador descarta el cero inicial y antepone +593, y eso vale igual para los
+ * fijos («03 2425081») que para los celulares («096 382 0177»).
+ */
+export const aE164 = (numero: string): string =>
+  `+593${numero.replace(/\D/g, '').replace(/^0/, '')}`;
+
+/*
+  Lo editable vive en `src/data/sitio.json` para que el panel pueda escribirlo.
+  Lo que se queda aquí es lo que no se cambia sin tocar también el diseño o la
+  configuración del despliegue: el nombre, el claim, la descripción y la URL
+  —esta última tiene que coincidir con la de astro.config.mjs, de donde salen
+  el sitemap y las etiquetas canónicas.
+*/
 export const site = {
   nombre: 'ExamLab',
   razonSocial: 'ExamLab S.A.S.',
   claim: 'Laboratorio clínico de innovación y desarrollo',
   descripcion:
     'Laboratorio clínico de alta complejidad en Ambato y Pelileo: análisis de rutina y pruebas especializadas, con personal profesional y resultados en línea.',
-  // Debe coincidir con `site` de astro.config.mjs: de ahí salen el sitemap,
-  // las etiquetas canonical y el QR impreso de /preparacion.
-  url: 'https://examlabsas.com', // Confirmado por Netlife: dominio del laboratorio.
-  /**
-   * Buzones reales del laboratorio (Netlife). El Dr. Silva pidió que cada uno
-   * aparezca donde corresponde: el de laboratorio para pacientes, médicos y
-   * laboratorios asociados; el de administración para asuntos legales y de
-   * datos personales. `email` es el de contacto general.
-   */
-  email: 'laboratorio@examlabsas.com',
-  emails: {
-    laboratorio: 'laboratorio@examlabsas.com',
-    administracion: 'administracion@examlabsas.com',
-    facturacion: 'facturacion@examlabsas.com',
-  },
-  // Número que consta en el manual para pacientes entregado por el laboratorio.
-  telefono: '096 382 0177',
-  telefonoE164: '+593963820177',
-  /*
-    Urgencias. El laboratorio confirmó que sí existe una línea aparte —la del
-    Dr. Silva— pero todavía no entregó el número, así que aquí sigue el general
-    mientras tanto. No es falso: ese número llega al laboratorio y la tarjeta
-    no promete una línea exclusiva. En cuanto manden el del doctor, se cambia
-    solo aquí y se actualiza en las cinco páginas que lo muestran.
-  */
-  emergencias: '096 382 0177', // PENDIENTE: pedir el número del Dr. Silva.
-  emergenciasE164: '+593963820177',
+  url: 'https://examlabsas.com',
   ciudad: 'Ambato',
   provincia: 'Tungurahua',
   pais: 'Ecuador',
-  /*
-    El laboratorio abrió en 2001 con el nombre Pasteur y se constituyó como
-    ExamLab S.A.S. en 2023. Para `foundingDate` se usa 2001, que es cuando
-    empieza la trayectoria real del laboratorio: es lo mismo que hace cualquier
-    empresa que cambia de nombre sin interrumpir su actividad, y encaja con el
-    «nueva imagen, la misma trayectoria» de la portada.
 
-    El dato llegó del laboratorio con reservas («me parece que desde el 2023»),
-    así que el año de la constitución conviene contrastarlo antes de publicarlo
-    en ningún texto visible.
-  */
-  fundacion: '2001',
-  /** Año en que el laboratorio pasó a ser ExamLab S.A.S. Sin usar todavía. */
-  constituidaSas: '2023',
-  // Confirmadas por el Dr. Silva (7 sep 2026). @examlab_s.a.s es la cuenta oficial.
-  redes: {
-    facebook: 'https://www.facebook.com/share/1HqUjdUXC6/',
-    instagram: 'https://www.instagram.com/examlab_s.a.s',
-    tiktok: 'https://www.tiktok.com/@examlab_s.a.s',
-  },
-  /**
-   * Sistema del laboratorio (proveedor externo), donde viven las órdenes y los
-   * resultados. En septiembre de 2026 el laboratorio cambió Avalab por Saluto;
-   * la URL la entregó el laboratorio. Los pacientes, los médicos y los
-   * laboratorios asociados entran por la misma puerta.
-   */
-  sistema: {
-    nombre: 'Saluto',
-    url: 'https://erp.salutoapps.com/',
-  },
+  email: datosSitio.email,
+  emails: datosSitio.emails,
+  telefono: datosSitio.telefono,
+  telefonoE164: aE164(datosSitio.telefono),
+  /** PENDIENTE: el laboratorio confirmó que hay línea aparte, falta el número. */
+  emergencias: datosSitio.emergencias,
+  emergenciasE164: aE164(datosSitio.emergencias),
+  fundacion: datosSitio.fundacion,
+  constituidaSas: datosSitio.constituidaSas,
+  redes: datosSitio.redes,
+  sistema: datosSitio.sistema,
 } as const;
 
 /** Zona horaria del laboratorio. Ecuador continental no cambia de hora. */
@@ -91,6 +68,46 @@ export type Franja = Tramo[] | null;
 
 /** Horario de la semana. El índice es el día de JavaScript: 0 = domingo. */
 export type HorarioSemanal = [Franja, Franja, Franja, Franja, Franja, Franja, Franja];
+
+/**
+ * Excepción al horario semanal para una fecha concreta: un feriado, un día que
+ * se cierra antes, una jornada especial.
+ *
+ * Hacía falta porque el horario era un patrón semanal fijo y el sitio ya
+ * anuncia en la página de sedes que «en feriados atendemos únicamente urgencias
+ * coordinadas por teléfono». Sin esto, el indicador decía «Abierto» un 24 de
+ * mayo y mandaba a un paciente en ayunas a una puerta cerrada.
+ */
+export type FechaEspecial = {
+  /** `AAAA-MM-DD` en la hora de Ecuador. */
+  fecha: string;
+  motivo: string;
+  /** `null` cierra el día; con tramos, abre con ese horario. */
+  franja: Franja;
+  /** Slugs de las sedes afectadas. Si falta, aplica a todas. */
+  sedes?: string[];
+};
+
+export const fechasEspeciales: FechaEspecial[] = (datosFeriados.fechas as FechaEspecial[])
+  .slice()
+  .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+/** Las que afectan a una sede, de hoy en adelante. */
+export function fechasEspecialesDe(slug: string, desde = hoyEnEcuador()): FechaEspecial[] {
+  return fechasEspeciales.filter(
+    (f) => f.fecha >= desde && (!f.sedes || f.sedes.includes(slug)),
+  );
+}
+
+/** `AAAA-MM-DD` de hoy en la hora del laboratorio, no en la del visitante. */
+export function hoyEnEcuador(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: ZONA_HORARIA,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
 
 const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 /** Orden de lectura: la semana se muestra empezando el lunes. */
@@ -161,138 +178,21 @@ export type Sede = {
   foto?: NombreFoto;
 };
 
-// Horarios estructurados. Índice 0 = domingo, 6 = sábado.
-// Confirmados por el Dr. Silva (7 sep 2026).
-const horarioMatriz: HorarioSemanal = [
-  null, // domingo
-  [{ abre: '06:30', cierra: '20:00' }],
-  [{ abre: '06:30', cierra: '20:00' }],
-  [{ abre: '06:30', cierra: '20:00' }],
-  [{ abre: '06:30', cierra: '20:00' }],
-  [{ abre: '06:30', cierra: '20:00' }],
-  [{ abre: '07:30', cierra: '17:00' }], // sábado
-];
+/** Lo que trae `sedes.json`: la sede sin los campos que se calculan. */
+type RegistroSede = Omit<Sede, 'telefonoE164' | 'celularE164' | 'horarios'>;
 
-// Laboratorio 1 (Castillo) cierra al mediodía.
-const horarioLaboratorio1: HorarioSemanal = [
-  null,
-  [{ abre: '07:00', cierra: '13:00' }, { abre: '14:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '13:00' }, { abre: '14:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '13:00' }, { abre: '14:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '13:00' }, { abre: '14:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '13:00' }, { abre: '14:00', cierra: '18:30' }],
-  [{ abre: '07:30', cierra: '13:00' }],
-];
-
-const horarioLaboratorio2: HorarioSemanal = [
-  null,
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:30', cierra: '13:00' }],
-];
-
-const horarioPelileo: HorarioSemanal = [
-  null,
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:00', cierra: '18:30' }],
-  [{ abre: '07:30', cierra: '13:00' }],
-];
-
-export const sedes: Sede[] = [
-  {
-    slug: 'ambato-matriz',
-    nombre: 'Matriz Ficoa',
-    etiqueta: 'Matriz',
-    // Confirmada por el Dr. Silva (7 sep 2026).
-    direccion: 'Av. Rodrigo Pachano y Reina Claudia',
-    referencia: 'Junto a Salas de Velación Parques del Recuerdo, sector Ficoa',
-    ciudad: 'Ambato',
-    provincia: 'Tungurahua',
-    telefono: '03 2425081', // Línea fija de la sede.
-    telefonoE164: '+59332425081',
-    celular: '096 382 0177',
-    celularE164: '+593963820177',
-    horarioSemanal: horarioMatriz,
-    horarios: horariosLegibles(horarioMatriz),
-    servicios: [
-      'Toma de muestra general',
-      'Exámenes urgentes',
-      'Toma de muestra a domicilio',
-      'Atención pediátrica',
-    ],
-    // Coordenadas exactas, extraídas del propio enlace de Google Maps que
-    // entregó el laboratorio (las anteriores eran una estimación a ojo y
-    // caían a unos 2 km de la sede).
-    geo: { lat: -1.2423638, lng: -78.6349171 },
-    mapsUrl: 'https://maps.app.goo.gl/QfQRWBftLTQin8TY7',
-    foto: 'matriz-ficoa-fachada',
-  },
-  {
-    slug: 'ambato-laboratorio-1',
-    nombre: 'Laboratorio 1 · Castillo',
-    etiqueta: 'Laboratorio 1',
-    direccion: 'Castillo y Rocafuerte, altos de la Coop. CACPECO',
-    referencia: 'Edificio Thomas Crammer',
-    ciudad: 'Ambato',
-    provincia: 'Tungurahua',
-    telefono: '03 2425081',
-    telefonoE164: '+59332425081',
-    // Comparte los números de la matriz, según el impreso del laboratorio.
-    celular: '096 382 0177',
-    celularE164: '+593963820177',
-    horarioSemanal: horarioLaboratorio1,
-    horarios: horariosLegibles(horarioLaboratorio1),
-    servicios: ['Toma de muestra general', 'Toma de muestra a domicilio'],
-    geo: { lat: -1.2414923, lng: -78.6303705 },
-    mapsUrl: 'https://maps.app.goo.gl/Nkugtu3jRxZLeKDVA',
-  },
-  {
-    slug: 'ambato-laboratorio-2',
-    nombre: 'Laboratorio 2 · Av. Cevallos',
-    etiqueta: 'Laboratorio 2',
-    direccion: 'Av. Cevallos 12-24 entre Espejo y Mariano Egüez',
-    referencia: 'Junto al C.C. Teófilo López',
-    ciudad: 'Ambato',
-    provincia: 'Tungurahua',
-    telefono: '03 2826128',
-    telefonoE164: '+59332826128',
-    celular: '096 317 0978',
-    celularE164: '+593963170978',
-    horarioSemanal: horarioLaboratorio2,
-    horarios: horariosLegibles(horarioLaboratorio2),
-    servicios: ['Toma de muestra general', 'Toma de muestra a domicilio'],
-    geo: { lat: -1.2404654, lng: -78.6259428 },
-    mapsUrl: 'https://maps.app.goo.gl/CeMHepkG76KUwn5r5',
-  },
-  {
-    slug: 'pelileo',
-    nombre: 'Laboratorio 3 · Pelileo',
-    etiqueta: 'Pelileo',
-    direccion: 'Club Chacaritas y Antonio Clavijo',
-    referencia: 'Frente al Mercado 10 de Agosto',
-    ciudad: 'Pelileo',
-    provincia: 'Tungurahua',
-    telefono: '03 2830445',
-    telefonoE164: '+59332830445',
-    celular: '096 263 0297',
-    celularE164: '+593962630297',
-    horarioSemanal: horarioPelileo,
-    horarios: horariosLegibles(horarioPelileo),
-    servicios: [
-      'Toma de muestra general',
-      'Toma de muestra a domicilio',
-      'Chequeos preventivos',
-    ],
-    geo: { lat: -1.3289029, lng: -78.5413766 },
-    mapsUrl: 'https://maps.app.goo.gl/YQcBWuneKEYe5mkPA',
-  },
-];
+/*
+  Las sedes salen de `src/data/sedes.json` para que el panel pueda editarlas.
+  Aquí solo se completan los campos derivados: el número internacional y las
+  líneas legibles del horario, que se calculan del propio `horarioSemanal` y no
+  se escriben a mano — así no pueden quedar desincronizados.
+*/
+export const sedes: Sede[] = (datosSedes as unknown as RegistroSede[]).map((s) => ({
+  ...s,
+  telefonoE164: aE164(s.telefono),
+  celularE164: aE164(s.celular),
+  horarios: horariosLegibles(s.horarioSemanal),
+}));
 
 /**
  * URL del mapa embebido de Google Maps (no requiere API key).

@@ -1,0 +1,55 @@
+---
+/**
+ * Franja de aviso que el laboratorio enciende y apaga desde el panel.
+ *
+ * Para cosas que duran poco y no justifican una noticia: «el 24 de mayo
+ * atendemos solo en la matriz», «esta semana Pelileo cierra a las 13:00».
+ * Hasta ahora, para avisar de algo así había que llamar a alguien.
+ *
+ * `hasta` es la fecha en que deja de mostrarse. Se comprueba al compilar y
+ * también en el navegador: el sitio es estático, así que sin lo segundo un
+ * aviso caducado seguiría a la vista hasta la siguiente publicación.
+ */
+import Icon from './Icon.astro';
+import aviso from '@/data/aviso.json';
+import { hoyEnEcuador } from '@/lib/site';
+
+const vigente = aviso.activo && aviso.texto.trim() !== '' && (!aviso.hasta || aviso.hasta >= hoyEnEcuador());
+---
+
+{
+  vigente && (
+    <div class="aviso-temporal bg-accent-soft text-brand" data-aviso data-hasta={aviso.hasta}>
+      <p class="container-page flex items-start gap-3 py-3 text-sm leading-relaxed">
+        <Icon name="alerta" size={18} class="mt-0.5 flex-none text-accent-dark" />
+        <span>{aviso.texto}</span>
+      </p>
+    </div>
+  )
+}
+
+<script>
+  /*
+    El sitio se compila una vez al día como mucho, así que un aviso que venció
+    anoche seguiría visible esta mañana. Se vuelve a comprobar aquí, con la
+    fecha de Ecuador y no con la del visitante.
+  */
+  const revisarAviso = () => {
+    for (const franja of document.querySelectorAll<HTMLElement>('[data-aviso]')) {
+      const hasta = franja.dataset.hasta;
+      if (!hasta) continue;
+
+      const hoy = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Guayaquil',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date());
+
+      if (hoy > hasta) franja.remove();
+    }
+  };
+
+  revisarAviso();
+  document.addEventListener('astro:page-load', revisarAviso);
+</script>

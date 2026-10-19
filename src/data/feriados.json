@@ -1,0 +1,65 @@
+{
+  "nota": "Excepciones al horario semanal. Una fecha con 'franja': null está cerrada; con tramos, abre con ese horario. Si no se indica 'sedes', aplica a todas. Fuente de los feriados: calendario nacional de Ecuador. Que el laboratorio cierre en ellos se desprende de lo que el propio sitio publica en la página de sedes: en feriados solo se atienden urgencias coordinadas por teléfono. CONVIENE CONFIRMARLO con el laboratorio, y añadir Carnaval y Viernes Santo, que cambian de fecha cada año.",
+  "fechas": [
+    {
+      "fecha": "2026-10-09",
+      "motivo": "Independencia de Guayaquil",
+      "franja": null
+    },
+    {
+      "fecha": "2026-11-02",
+      "motivo": "Día de los Difuntos",
+      "franja": null
+    },
+    {
+      "fecha": "2026-11-03",
+      "motivo": "Independencia de Cuenca",
+      "franja": null
+    },
+    {
+      "fecha": "2026-12-25",
+      "motivo": "Navidad",
+      "franja": null
+    },
+    {
+      "fecha": "2027-01-01",
+      "motivo": "Año Nuevo",
+      "franja": null
+    },
+    {
+      "fecha": "2027-05-01",
+      "motivo": "Día del Trabajo",
+      "franja": null
+    },
+    {
+      "fecha": "2027-05-24",
+      "motivo": "Batalla de Pichincha",
+      "franja": null
+    },
+    {
+      "fecha": "2027-08-10",
+      "motivo": "Primer Grito de Independencia",
+      "franja": null
+    },
+    {
+      "fecha": "2027-10-09",
+      "motivo": "Independencia de Guayaquil",
+      "franja": null
+    },
+    {
+      "fecha": "2027-11-02",
+      "motivo": "Día de los Difuntos",
+      "franja": null
+    },
+    {
+      "fecha": "2027-11-03",
+      "motivo": "Independencia de Cuenca",
+      "franja": null
+    },
+    {
+      "fecha": "2027-12-25",
+      "motivo": "Navidad",
+      "franja": null
+    }
+  ]
+}

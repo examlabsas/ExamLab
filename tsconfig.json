@@ -4,9 +4,13 @@
     ".astro/types.d.ts",
     "**/*"
   ],
+  // `admin` tiene su propia configuración: es un Worker, con los tipos de
+  // Cloudflare y sin nada de Astro. Revisarlo desde aquí daría errores falsos.
+  // Se comprueba con `npm run check` dentro de esa carpeta.
   "exclude": [
     "dist",
-    "design"
+    "design",
+    "admin"
   ],
   "compilerOptions": {
     "baseUrl": ".",

@@ -1,0 +1,22 @@
+{
+  "nota": "Datos del negocio que el panel puede editar. Lo que NO está aquí (nombre, razón social, claim, descripción, url) vive en src/lib/site.ts porque cambiarlo toca el diseño o la configuración del despliegue.",
+  "email": "laboratorio@examlabsas.com",
+  "emails": {
+    "laboratorio": "laboratorio@examlabsas.com",
+    "administracion": "administracion@examlabsas.com",
+    "facturacion": "facturacion@examlabsas.com"
+  },
+  "telefono": "096 382 0177",
+  "emergencias": "096 382 0177",
+  "fundacion": "2001",
+  "constituidaSas": "2023",
+  "redes": {
+    "facebook": "https://www.facebook.com/share/1HqUjdUXC6/",
+    "instagram": "https://www.instagram.com/examlab_s.a.s",
+    "tiktok": "https://www.tiktok.com/@examlab_s.a.s"
+  },
+  "sistema": {
+    "nombre": "Saluto",
+    "url": "https://erp.salutoapps.com/"
+  }
+}

@@ -1,0 +1,6 @@
+# Copie este archivo a .dev.vars para probar el panel en local.
+#
+# Con GITHUB_API apuntando al GitHub simulado, el panel no toca el repositorio
+# de verdad y no hace falta ningun token. En produccion esta variable va vacia.
+GITHUB_TOKEN = "token-de-mentira"
+GITHUB_API = "http://127.0.0.1:8799"

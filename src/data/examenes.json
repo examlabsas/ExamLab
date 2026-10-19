@@ -535,7 +535,7 @@
  {
   "codigo": "",
   "slug": "aldosterona-post-reposo-1h-ria",
-  "nombre": "ALDOSTERONA (POST-REPOSO 1H)  RIA",
+  "nombre": "ALDOSTERONA (POST-REPOSO 1H) RIA",
   "especialidad": "Hormonas y marcadores",
   "utilidad": "Mide la aldosterona tras una hora de reposo acostado. La postura cambia mucho el valor, por eso se estandariza.",
   "condicionesClinicas": "Debe permanecer acostado una hora antes de la toma. Informe los medicamentos que toma.",
@@ -658,7 +658,7 @@
  {
   "codigo": "",
   "slug": "amilasuria-24h",
-  "nombre": "AMILASURIA  24H",
+  "nombre": "AMILASURIA 24H",
   "especialidad": "Orina y heces",
   "utilidad": "Mide la amilasa eliminada en un día. Se mantiene elevada más tiempo que en la sangre, lo que ayuda cuando el paciente consulta tarde.",
   "condicionesClinicas": "Recoja la orina de 24 horas completa y anote el volumen total recolectado.",
@@ -1073,7 +1073,7 @@
  {
   "codigo": "",
   "slug": "anti-centromero-ifi",
-  "nombre": "ANTI-CENTROMERO  (IFI)",
+  "nombre": "ANTI-CENTROMERO (IFI)",
   "especialidad": "Inmunología",
   "utilidad": "Anticuerpo asociado a una forma limitada de esclerodermia. Suele acompañarse del fenómeno de Raynaud.",
   "condicionesClinicas": "No requiere ayuno.",
@@ -1289,7 +1289,7 @@
  {
   "codigo": "",
   "slug": "anti-factor-intrinsico-eia",
-  "nombre": "ANTI-FACTOR INTRINSICO  EIA",
+  "nombre": "ANTI-FACTOR INTRINSICO EIA",
   "especialidad": "Inmunología",
   "utilidad": "Busca anticuerpos contra la proteína necesaria para absorber la vitamina B12. Confirma la anemia perniciosa.",
   "condicionesClinicas": "No requiere ayuno. No reciba inyecciones de B12 en los días previos.",
@@ -1366,7 +1366,7 @@
  {
   "codigo": "",
   "slug": "anti-gliadina-iga-eia",
-  "nombre": "ANTI-GLIADINA IGA  EIA",
+  "nombre": "ANTI-GLIADINA IGA EIA",
   "especialidad": "Inmunología",
   "utilidad": "Anticuerpo contra una proteína del gluten. Forma parte del estudio de la enfermedad celíaca.",
   "condicionesClinicas": "No suspenda el gluten antes de la prueba: podría dar un falso negativo.",
@@ -1383,7 +1383,7 @@
  {
   "codigo": "",
   "slug": "anti-gliadina-igg-eia",
-  "nombre": "ANTI-GLIADINA IGG   EIA",
+  "nombre": "ANTI-GLIADINA IGG EIA",
   "especialidad": "Inmunología",
   "utilidad": "Variante IgG del anticuerpo contra el gluten. Útil sobre todo en personas con déficit de IgA.",
   "condicionesClinicas": "No suspenda el gluten antes de la prueba.",
@@ -1560,7 +1560,7 @@
  {
   "codigo": "",
   "slug": "anti-lkm-ifi",
-  "nombre": "ANTI-LKM   (IFI)",
+  "nombre": "ANTI-LKM (IFI)",
   "especialidad": "Inmunología",
   "utilidad": "Anticuerpo asociado a un tipo de hepatitis autoinmune que aparece sobre todo en niños y jóvenes.",
   "condicionesClinicas": "No requiere ayuno.",
@@ -1609,7 +1609,7 @@
  {
   "codigo": "",
   "slug": "anti-musculo-estriado-ifi",
-  "nombre": "ANTI-MUSCULO ESTRIADO  IFI",
+  "nombre": "ANTI-MUSCULO ESTRIADO IFI",
   "especialidad": "Inmunología",
   "utilidad": "Anticuerpo asociado a la miastenia gravis, sobre todo cuando existe además un tumor del timo.",
   "condicionesClinicas": "No requiere ayuno.",
@@ -1782,7 +1782,7 @@
  {
   "codigo": "",
   "slug": "anti-transglutaminasa-iga-eia",
-  "nombre": "ANTI-TRANSGLUTAMINASA  IGA  EIA",
+  "nombre": "ANTI-TRANSGLUTAMINASA IGA EIA",
   "especialidad": "Inmunología",
   "utilidad": "Es la prueba de primera línea para detectar la enfermedad celíaca, la intolerancia permanente al gluten.",
   "condicionesClinicas": "No suspenda el gluten antes de la prueba: si deja de comerlo, el resultado puede salir falsamente negativo.",
@@ -1800,7 +1800,7 @@
  {
   "codigo": "",
   "slug": "anti-transglutaminasa-igg-eia",
-  "nombre": "ANTI-TRANSGLUTAMINASA  IGG  EIA",
+  "nombre": "ANTI-TRANSGLUTAMINASA IGG EIA",
   "especialidad": "Inmunología",
   "utilidad": "Variante IgG de la prueba de celiaquía. Se usa cuando el paciente tiene déficit de IgA.",
   "condicionesClinicas": "No suspenda el gluten antes de la prueba.",
@@ -2563,7 +2563,7 @@
  {
   "codigo": "",
   "slug": "catecolaminas-diferencias-en-plasma",
-  "nombre": "CATECOLAMINAS DIFERENCIAS  EN PLASMA",
+  "nombre": "CATECOLAMINAS DIFERENCIAS EN PLASMA",
   "especialidad": "Hormonas y marcadores",
   "utilidad": "Mide por separado las hormonas del estrés en la sangre. Se usa en el estudio de tumores suprarrenales que causan hipertensión.",
   "condicionesClinicas": "Permanezca en reposo y acostado 30 minutos antes de la toma. Evite café, té, chocolate y tabaco desde el día previo.",
@@ -3736,7 +3736,7 @@
  {
   "codigo": "",
   "slug": "curva-de-insulina-glu75",
-  "nombre": "CURVA DE INSULINA  ( GLU75)",
+  "nombre": "CURVA DE INSULINA ( GLU75)",
   "especialidad": "Hormonas y marcadores",
   "utilidad": "Mide la insulina varias veces tras tomar una carga de azúcar. Muestra cómo responde el páncreas a lo largo del tiempo.",
   "condicionesClinicas": "Ayuno de 8 a 12 horas. La prueba dura varias horas: permanezca en el laboratorio sin comer, fumar ni hacer esfuerzo.",
@@ -5144,7 +5144,7 @@
   "utilidad": "Observa la muestra recién emitida al microscopio, sin teñir. Permite ver microorganismos móviles y elementos que se alteran con el tiempo.",
   "condicionesClinicas": "Entregue la muestra de inmediato tras recogerla. Haga aseo genital previo si es de orina.",
   "tiempoEntrega": "El mismo día",
-  "tipoMuestra": "Consultar",
+  "tipoMuestra": "Distintas Muestras",
   "tecnica": "Microscopia Simple",
   "sinonimos": [
    "gota fresca",
@@ -5332,7 +5332,7 @@
  {
   "codigo": "",
   "slug": "helicobacter-pylori-en-heces-ag",
-  "nombre": "Helicobacter pylori  EN HECES (Ag)",
+  "nombre": "Helicobacter pylori EN HECES (Ag)",
   "especialidad": "Orina y heces",
   "utilidad": "Detecta en las heces la bacteria que causa gastritis y úlceras. Sirve tanto para diagnosticar como para confirmar que el tratamiento la eliminó.",
   "condicionesClinicas": "Suspenda los inhibidores de la bomba de protones dos semanas antes, y los antibióticos cuatro semanas antes, siempre bajo indicación de su médico.",
@@ -5611,7 +5611,7 @@
  {
   "codigo": "",
   "slug": "herpes-2-cuantitativo-igg",
-  "nombre": "HERPES 2  CUANTITATIVO IGG",
+  "nombre": "HERPES 2 CUANTITATIVO IGG",
   "especialidad": "Infecciosas",
   "utilidad": "Indica contacto previo con el herpes tipo 2, asociado principalmente al herpes genital.",
   "condicionesClinicas": "No requiere ayuno.",
@@ -7400,7 +7400,7 @@
  {
   "codigo": "",
   "slug": "plasmodium-gota-gruesa",
-  "nombre": "PLASMODIUM  (GOTA GRUESA)",
+  "nombre": "PLASMODIUM (GOTA GRUESA)",
   "especialidad": "Hematología",
   "utilidad": "Busca al microscopio el parásito de la malaria en una gota de sangre concentrada. Es la prueba de referencia para el diagnóstico.",
   "condicionesClinicas": "Idealmente la muestra se toma durante el episodio de fiebre.",
@@ -7784,7 +7784,7 @@
  {
   "codigo": "",
   "slug": "psa-libre-ag-prostatico-libre",
-  "nombre": "PSA LIBRE  AG PROSTATICO LIBRE",
+  "nombre": "PSA LIBRE AG PROSTATICO LIBRE",
   "especialidad": "Hormonas y marcadores",
   "utilidad": "Mide la fracción libre del antígeno prostático. Su proporción respecto al total ayuda a interpretar mejor un valor elevado.",
   "condicionesClinicas": "No requiere ayuno. Evite las relaciones sexuales, el ciclismo y el tacto rectal durante las 48 horas previas.",
@@ -8851,7 +8851,7 @@
  {
   "codigo": "",
   "slug": "vitamina-b1-tiamina",
-  "nombre": "VITAMINA B1  (TIAMINA)",
+  "nombre": "VITAMINA B1 (TIAMINA)",
   "especialidad": "Química clínica",
   "utilidad": "Mide la vitamina B1, necesaria para el sistema nervioso y el corazón. Su falta se asocia al alcoholismo y a la desnutrición.",
   "condicionesClinicas": "Ayuno de 8 horas. Suspenda los suplementos vitamínicos 24 horas antes, salvo indicación médica.",

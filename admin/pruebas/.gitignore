@@ -1,0 +1,4 @@
+# La hoja de ejemplo se genera con `npm run pruebas:hoja`, no se versiona:
+# saldría vieja en cuanto cambie el catálogo.
+hoja-de-ejemplo.csv
+usuario-temporal.json

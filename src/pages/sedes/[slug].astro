@@ -7,7 +7,7 @@ import EstadoApertura from '@/components/EstadoApertura.astro';
 import MapaSede from '@/components/MapaSede.astro';
 import FondoGotas from '@/components/FondoGotas.astro';
 import PulsoEcg from '@/components/PulsoEcg.astro';
-import { sedes, mapaEnlace, site } from '@/lib/site';
+import { sedes, mapaEnlace, site, fechasEspecialesDe } from '@/lib/site';
 import { foto, fotoOg, SIZES_MEDIA_COLUMNA } from '@/lib/fotos';
 import { breadcrumbSchema, sedeSchema } from '@/lib/schema';
 import { whatsappSede, whatsappLink } from '@/lib/whatsapp';
@@ -109,6 +109,7 @@ const schema = [
             <EstadoApertura
               horario={sede.horarioSemanal}
               respaldo={sede.horarios[0]!.horas}
+              fechasEspeciales={fechasEspecialesDe(sede.slug)}
               class="text-xs font-semibold text-brand"
             />
           </div>

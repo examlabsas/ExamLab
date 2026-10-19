@@ -1,0 +1,40 @@
+{
+  // Panel de administración de ExamLab.
+  //
+  // Worker aparte del sitio a propósito: si el panel se rompe, el sitio sigue
+  // publicándose. Comparten repositorio para que el panel pueda importar los
+  // tipos de `src/lib` y no se desincronicen.
+  //
+  // Antes del primer despliegue hay que rellenar el `id` del espacio de KV y
+  // cargar los secretos. Los pasos están en admin/README.md.
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "examlab-panel",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-06",
+
+  // Datos de usuarios, sesiones, invitaciones y contador de intentos.
+  // El `id` lo devuelve `wrangler kv namespace create PANEL`.
+  "kv_namespaces": [
+    {
+      "binding": "PANEL",
+      "id": "PEGAR_AQUI_EL_ID_DEL_ESPACIO_KV"
+    }
+  ],
+
+  "vars": {
+    // Repositorio donde el panel escribirá. Aún no se usa: entra en la fase 2.
+    "REPO": "examlabsas/ExamLab",
+    "RAMA": "main"
+  },
+
+  // Secretos — NO van aquí. Se cargan con `wrangler secret put`:
+  //   GITHUB_TOKEN   token de permisos mínimos: solo Contents, solo este repositorio
+  //
+  // Es el único. Aquí figuró un `FIRMA_SESION` «para firmar las cookies» que
+  // nunca se usó: la sesión es un testigo opaco en KV, no un token firmado.
+  // Pedirlo mandaba a ejecutar un paso inútil y hacía creer que la cookie
+  // llevaba una firma que no lleva.
+  "observability": {
+    "enabled": true
+  }
+}

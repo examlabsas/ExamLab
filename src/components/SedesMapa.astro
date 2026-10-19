@@ -17,7 +17,7 @@
 import Icon from './Icon.astro';
 import MapaSede from './MapaSede.astro';
 import EstadoApertura from './EstadoApertura.astro';
-import { sedes, mapaEmbed, mapaEnlace, site } from '@/lib/site';
+import { sedes, mapaEmbed, mapaEnlace, site, fechasEspecialesDe } from '@/lib/site';
 import { whatsappSede } from '@/lib/whatsapp';
 
 const inicial = sedes[0]!;
@@ -95,6 +95,7 @@ const datos = sedes.map((sede) => ({
               <span class="mt-2 block text-sm leading-snug text-neutral">{sede.direccion}</span>
               <EstadoApertura
                 horario={sede.horarioSemanal}
+                fechasEspeciales={fechasEspecialesDe(sede.slug)}
                 respaldo={sede.horarios[0]!.horas}
                 class="mt-2.5 text-xs font-semibold text-brand"
               />

@@ -5,8 +5,16 @@
  * subtipo adicional), declarado en todas las páginas desde BaseLayout.
  * Las páginas de detalle añaden su propio bloque (MedicalTest, Article…).
  */
-import { site, sedes, mapaEnlace, type Sede, type HorarioSemanal, type Tramo } from './site';
-import type { Examen } from './examenes';
+import {
+  site,
+  sedes,
+  mapaEnlace,
+  fechasEspecialesDe,
+  type Sede,
+  type HorarioSemanal,
+  type Tramo,
+} from './site';
+import { tieneDato, type Examen } from './examenes';
 import { fotoOg, FOTO_POR_DEFECTO } from './fotos';
 
 const abs = (ruta: string) => new URL(ruta, site.url).toString();
@@ -55,6 +63,33 @@ function horarioSchema(semana: HorarioSemanal) {
   );
 }
 
+/**
+ * Feriados y jornadas distintas, en el campo que Schema.org reserva para eso.
+ *
+ * Sin esto, Google sigue anunciando el horario normal un día que el
+ * laboratorio está cerrado. Un día cerrado se declara con `opens` y `closes`
+ * iguales, que es como la especificación indica el cierre.
+ */
+function fechasEspecialesSchema(slug: string) {
+  return fechasEspecialesDe(slug).map((f) =>
+    f.franja && f.franja.length > 0
+      ? {
+          '@type': 'OpeningHoursSpecification',
+          validFrom: f.fecha,
+          validThrough: f.fecha,
+          opens: f.franja[0]!.abre,
+          closes: f.franja[f.franja.length - 1]!.cierra,
+        }
+      : {
+          '@type': 'OpeningHoursSpecification',
+          validFrom: f.fecha,
+          validThrough: f.fecha,
+          opens: '00:00',
+          closes: '00:00',
+        },
+  );
+}
+
 function sucursal(sede: Sede) {
   return {
     '@type': 'MedicalBusiness',
@@ -75,6 +110,7 @@ function sucursal(sede: Sede) {
     },
     telephone: sede.telefonoE164,
     openingHoursSpecification: horarioSchema(sede.horarioSemanal),
+    specialOpeningHoursSpecification: fechasEspecialesSchema(sede.slug),
     hasMap: mapaEnlace(sede),
     ...(sede.foto && { image: abs(fotoOg(sede.foto)) }),
   };
@@ -116,6 +152,7 @@ export function medicalBusinessSchema() {
     },
     hasMap: mapaEnlace(matriz),
     openingHoursSpecification: horarioSchema(matriz.horarioSemanal),
+    specialOpeningHoursSpecification: fechasEspecialesSchema(matriz.slug),
     areaServed: [
       { '@type': 'City', name: 'Ambato' },
       { '@type': 'City', name: 'Pelileo' },
@@ -181,13 +218,23 @@ export function medicalTestSchema(examen: Examen) {
     name: examen.nombre,
     alternateName: examen.sinonimos,
     description: examen.utilidad,
-    code: {
-      '@type': 'MedicalCode',
-      codeValue: examen.codigo,
-      codingSystem: 'ExamLab',
-    },
+    /*
+      Los dos campos de abajo se omiten cuando no hay dato, en vez de publicar
+      el relleno. `JSON.stringify` descarta las claves `undefined`, así que
+      desaparecen del bloque.
+
+      Es el mismo error que se corrigió en la descripción que lee Google
+      —«Entrega en consultar»— y que aquí seguía: 495 de los 559 exámenes
+      declaraban `usesDevice: "Consultar"`, o sea que el aparato con el que se
+      procesan se llama «Consultar», y los 559 un `codeValue` vacío dentro de
+      un `MedicalCode` con sistema propio. Un código vacío afirma que existe y
+      no vale nada; no declararlo dice la verdad.
+    */
+    code: examen.codigo
+      ? { '@type': 'MedicalCode', codeValue: examen.codigo, codingSystem: 'ExamLab' }
+      : undefined,
     preparation: examen.condicionesClinicas,
-    usesDevice: examen.tecnica,
+    usesDevice: tieneDato(examen.tecnica) ? examen.tecnica : undefined,
     relevantSpecialty: { '@type': 'MedicalSpecialty', name: examen.especialidad },
     availableService: { '@id': abs('/#organizacion') },
     provider: { '@id': abs('/#organizacion') },
