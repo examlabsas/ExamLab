@@ -6,23 +6,16 @@
  * buscar. Los datos salen de `catalogo-asociados.json`, que genera
  * `scripts/importar-catalogo-asociados.mjs` a partir del Excel del laboratorio.
  *
- * Sobre el precio: es el tarifario mayorista. Cuando `mostrarPrecios` es falso
- * la columna no se renderiza en absoluto — no se oculta con CSS ni se filtra en
- * el navegador. El dato no sale del servidor, así que no está en el código
- * fuente de la página ni al alcance de quien la inspeccione.
+ * Esta tabla tuvo una columna de precios, que solo se renderizaba con un
+ * permiso que nunca se activó. Se quitó entera cuando el laboratorio sacó los
+ * precios del sistema: lo que no existe no se puede publicar por descuido.
+ * Quien necesite el tarifario lo pide, y eso lo dice el aviso del pie.
  *
  * Las 272 filas se pintan en el servidor y el script solo las muestra u oculta.
  * Sin JavaScript el catálogo se ve entero: se pierde el filtro, no el contenido.
  */
 import Icon from './Icon.astro';
 import catalogo from '@/data/catalogo-asociados.json';
-
-interface Props {
-  /** Tarifario mayorista. Solo con acceso restringido. */
-  mostrarPrecios?: boolean;
-}
-
-const { mostrarPrecios = false } = Astro.props;
 
 const { pruebas, notas, avisos } = catalogo;
 
@@ -34,9 +27,6 @@ const sinTildes = (s: string) =>
 
 const indice = (p: (typeof pruebas)[number]) =>
   sinTildes([p.nombre, p.incluye, p.metodo, p.muestra, p.especialidad].filter(Boolean).join(' '));
-
-const dinero = (v: number | null) =>
-  v === null ? null : v.toLocaleString('es-EC', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 ---
 
 <section class="bg-surface py-section">
@@ -104,13 +94,6 @@ const dinero = (v: number | null) =>
             <th class="px-4 py-3 text-left text-[11px] font-bold tracking-wide text-neutral uppercase">
               Entrega
             </th>
-            {
-              mostrarPrecios && (
-                <th class="px-4 py-3 text-right text-[11px] font-bold tracking-wide text-neutral uppercase">
-                  Convenio
-                </th>
-              )
-            }
           </tr>
         </thead>
         <tbody>
@@ -181,16 +164,6 @@ const dinero = (v: number | null) =>
                   */}
                   {p.entrega ?? 'Lo confirmamos'}
                 </td>
-                {
-                  mostrarPrecios && (
-                    <td
-                      class="px-4 py-3 text-right align-top font-semibold tabular-nums text-brand whitespace-nowrap"
-                      data-col="precio"
-                    >
-                      {dinero(p.precio) ? `$ ${dinero(p.precio)}` : 'Consultar'}
-                    </td>
-                  )
-                }
               </tr>
             ))
           }
@@ -206,7 +179,7 @@ const dinero = (v: number | null) =>
       Ficha de la prueba. Se usa <dialog> nativo: trae el foco atrapado, cierre
       con Esc y devolución del foco al botón que la abrió, sin depender de nada.
       El contenido se rellena desde la propia fila, así que no se duplica el
-      catálogo en el HTML ni viaja el precio cuando está desactivado.
+      catálogo en el HTML.
     */}
     {/*
       `m-auto` es imprescindible: el navegador centra un <dialog> modal con
@@ -250,10 +223,6 @@ const dinero = (v: number | null) =>
             <dt class="text-[11px] font-bold tracking-wide text-neutral uppercase">Muestra</dt>
             <dd class="mt-1 text-sm leading-relaxed" data-ficha-muestra></dd>
           </div>
-          <div data-ficha-bloque-precio hidden>
-            <dt class="text-[11px] font-bold tracking-wide text-neutral uppercase">Convenio</dt>
-            <dd class="mt-1 text-sm font-bold tabular-nums" data-ficha-precio></dd>
-          </div>
         </dl>
 
         {/* El texto de la nota se trae aquí para no mandar al pie de página. */}
@@ -266,14 +235,10 @@ const dinero = (v: number | null) =>
       </div>
     </dialog>
 
-    {
-      !mostrarPrecios && (
-        <p class="mt-4 flex items-start gap-2 text-sm text-neutral">
-          <Icon name="alerta" size={16} class="mt-0.5 flex-none text-accent-dark" />
-          El tarifario de convenio no se muestra en esta vista. Solicítelo al laboratorio.
-        </p>
-      )
-    }
+    <p class="mt-4 flex items-start gap-2 text-sm text-neutral">
+      <Icon name="alerta" size={16} class="mt-0.5 flex-none text-accent-dark" />
+      El tarifario de convenio no se muestra en esta vista. Solicítelo al laboratorio.
+    </p>
 
     {/* ── Condiciones generales ─────────────────────────────────── */}
     <div class="mt-9 grid grid-cols-1 gap-x-9 gap-y-8 lg:grid-cols-2">
@@ -399,13 +364,6 @@ const dinero = (v: number | null) =>
           incluye.hidden = !textoIncluye;
         }
 
-        // El precio solo existe si el servidor lo renderizó.
-        const bloquePrecio = ficha.querySelector<HTMLElement>('[data-ficha-bloque-precio]');
-        const precio = leer(fila, 'precio');
-        if (bloquePrecio) {
-          bloquePrecio.hidden = !precio;
-          pon('[data-ficha-precio]', precio);
-        }
 
         const numeros = (fila.dataset.notas ?? '').split(',').filter(Boolean);
         const caja = ficha.querySelector<HTMLElement>('[data-ficha-notas]');

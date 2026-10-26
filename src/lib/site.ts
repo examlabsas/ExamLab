@@ -35,7 +35,7 @@ export const site = {
   razonSocial: 'ExamLab S.A.S.',
   claim: 'Laboratorio clínico de innovación y desarrollo',
   descripcion:
-    'Laboratorio clínico de alta complejidad en Ambato y Pelileo: análisis de rutina y pruebas especializadas, con personal profesional y resultados en línea.',
+    'Laboratorio clínico de alta complejidad en la provincia de Tungurahua, con sedes en Ambato y Pelileo: análisis de rutina y pruebas especializadas, con personal profesional y resultados en línea.',
   url: 'https://examlabsas.com',
   ciudad: 'Ambato',
   provincia: 'Tungurahua',
@@ -45,7 +45,7 @@ export const site = {
   emails: datosSitio.emails,
   telefono: datosSitio.telefono,
   telefonoE164: aE164(datosSitio.telefono),
-  /** PENDIENTE: el laboratorio confirmó que hay línea aparte, falta el número. */
+  /** Línea de urgencias, distinta de la general. La entregó el Dr. Silva. */
   emergencias: datosSitio.emergencias,
   emergenciasE164: aE164(datosSitio.emergencias),
   fundacion: datosSitio.fundacion,
@@ -313,7 +313,7 @@ export const navPrincipal: NavLink[] = [
   { label: 'Noticias', href: '/noticias' },
   // «Sedes» salió del menú a pedido del Dr. Silva, para dar más espacio al
   // botón de resultados. Sigue en Soy Paciente → Puntos de atención, en la
-  // barra superior («Ambato y Pelileo») y en el pie.
+  // barra superior («Provincia de Tungurahua») y en el pie.
 ];
 
 export const footerEnlaces: NavLink[] = [

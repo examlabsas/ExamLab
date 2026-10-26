@@ -95,7 +95,20 @@ const {
 </div>
 
 <style>
-  .mapa-sede iframe {
+  /*
+    `:global` en el iframe, y no es un capricho.
+
+    Astro acota un `<style>` añadiendo un atributo a los elementos **de la
+    plantilla**. Este iframe no está en la plantilla: lo crea
+    `document.createElement` cuando el visitante pulsa, así que nunca recibe ese
+    atributo. La regla compilaba a `iframe[data-astro-cid-…]`, no encontraba
+    nada, y el mapa salía con el tamaño por defecto de un iframe —300×150— en
+    una caja mucho mayor: una esquina de mapa arriba a la izquierda y el resto
+    en blanco, en todas las pantallas.
+
+    El contenedor conserva su acotación; solo el iframe sale de ella.
+  */
+  .mapa-sede :global(iframe) {
     display: block;
     width: 100%;
     height: 100%;

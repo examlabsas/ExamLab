@@ -1,7 +1,12 @@
-/** Pantallas de acceso: entrar, aceptar una invitación y la portada del panel. */
+/**
+ * Pantallas de acceso: entrar, aceptar una invitación y la portada del panel.
+ *
+ * Hubo una tercera pantalla, la del código QR del segundo factor, que salía
+ * una sola vez al aceptar una invitación. Desapareció con el código de
+ * verificación: sin segundo factor no hay nada que escanear.
+ */
 import { pagina, cabecera, esc, seccionesDe, type Sesion } from './plantilla';
 import { HORAS_DE_INVITACION } from '../usuarios';
-import { generar } from '../qr';
 
 export function paginaAcceso(opciones: { error?: string; correo?: string } = {}) {
   return pagina(
@@ -17,10 +22,6 @@ export function paginaAcceso(opciones: { error?: string; correo?: string } = {})
       <label for="contrasena">Contraseña</label>
       <input id="contrasena" name="contrasena" type="password" required
              autocomplete="current-password">
-
-      <label for="codigo">Código de su aplicación</label>
-      <input id="codigo" name="codigo" type="text" inputmode="numeric" pattern="[0-9]*"
-             maxlength="6" required autocomplete="one-time-code" placeholder="6 dígitos">
 
       ${opciones.error ? `<p class="error">${esc(opciones.error)}</p>` : ''}
 
@@ -64,50 +65,6 @@ export function paginaInvitacion(opciones: {
   );
 }
 
-/**
- * Se muestra una única vez, justo tras crear la contraseña. El secreto no se
- * vuelve a enseñar: si se pierde el teléfono, un administrador reinicia el
- * acceso.
- */
-export function paginaCodigoQr(opciones: { uri: string; secreto: string }) {
-  /*
-    El código se dibuja aquí dentro.
-
-    Antes se le pedía a un servicio de fuera pasándole la dirección `otpauth://`
-    en la URL — y esa dirección **lleva el secreto del segundo factor**. Es
-    decir: la clave que protege el panel viajaba entera a un tercero, y quedaba
-    en sus registros. El Worker ya sabe generar códigos QR, así que no hay nada
-    que pedir afuera.
-  */
-  const codigo = generar(opciones.uri);
-
-  return pagina(
-    'Su código',
-    `<div class="caja">
-      <h1>Un paso más</h1>
-      <p class="sub">
-        Escanee este código con Google Authenticator, Authy o la aplicación de
-        autenticación que use. Le dará un número de 6 dígitos que cambia cada
-        30 segundos, y es lo que le pediremos al entrar.
-      </p>
-
-      <div class="vista-qr" style="max-width:15rem;margin:1.25rem auto 0" role="img"
-           aria-label="Código para la aplicación de autenticación">${codigo.svg}</div>
-
-      <p class="pista">
-        ¿No puede escanearlo? Escriba esta clave a mano en la aplicación:<br>
-        <code>${esc(opciones.secreto)}</code>
-      </p>
-
-      <p class="error">
-        Esta pantalla no se vuelve a mostrar. Compruebe que la aplicación ya le
-        da un código antes de continuar.
-      </p>
-
-      <form method="get" action="/"><button type="submit">Ya lo escaneé, entrar</button></form>
-    </div>`,
-  );
-}
 
 /**
  * La portada.

@@ -1,5 +1,5 @@
 /** Pantallas de noticias, aviso temporal y estado del último cambio. */
-import { pagina, cabecera, esc, type Sesion } from './plantilla';
+import { pagina, cabecera, esc, icono, type Sesion } from './plantilla';
 import { FOTOS, atributosDeFoto, type Noticia } from '../noticias';
 import type { Commit } from '../github';
 import { diaDe, nombreDelDia, SECCIONES, seccionDe, type Seccion } from '../historial';
@@ -20,6 +20,9 @@ export function paginaNoticias(o: {
           <br><span class="pista">${esc(n.categoria)} · ${esc(n.fecha)}</span>
         </td>
         <td>${n.borrador ? 'Borrador' : 'Publicada'}${n.destacado ? '<br><span class="pista">Destacada</span>' : ''}</td>
+        <td class="accion">
+          <a class="boton suave chico" href="/noticias/${esc(n.slug)}">${icono('editar')}<span class="solo-ancho">Editar</span></a>
+        </td>
       </tr>`,
     )
     .join('');
@@ -30,18 +33,20 @@ export function paginaNoticias(o: {
       ${o.aviso ? `<p class="error">${esc(o.aviso)}</p>` : ''}
       ${o.guardado ? `<p class="error bien">Guardado. En uno o dos minutos se ve en el sitio.</p>` : ''}
 
-      <p><a href="/noticias/nueva"><strong>Escribir una noticia</strong></a></p>
+      <p class="acciones">
+        <a class="boton" href="/noticias/nueva">${icono('mas')}Escribir una noticia</a>
+      </p>
 
       <table>
-        <thead><tr><th>Título</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Título</th><th>Estado</th><th></th></tr></thead>
         <tbody>${
           // Con un aviso de por medio no se sabe qué hay: la lista llegó vacía
           // porque falló la lectura, no porque no haya noticias. Decir «todavía
           // no hay ninguna» ahí es afirmar que se borraron.
           filas ||
           (o.aviso
-            ? '<tr><td colspan="2">No se pudo leer la lista.</td></tr>'
-            : '<tr><td colspan="2">Todavía no hay ninguna.</td></tr>')
+            ? '<tr><td colspan="3">No se pudo leer la lista.</td></tr>'
+            : '<tr><td colspan="3">Todavía no hay ninguna.</td></tr>')
         }</tbody>
       </table>
 `,

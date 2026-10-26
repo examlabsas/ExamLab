@@ -45,13 +45,19 @@ const especialidades = especialidadesData
   .map((e) => ({ ...e, conteo: `${cuantosPorEspecialidad[e.nombre] ?? 0} exámenes` }));
 
 /*
-  Las cifras salen de los datos reales del sitio donde se puede: el número de
-  especialidades viene de especialidades.json y el de sedes de site.ts. Así no
-  quedan desactualizadas cuando esos datos cambien.
+  Las cuatro cifras se cuentan de los datos reales. Ninguna se escribe a mano.
+
+  Dos estaban mal y por el mismo motivo: eran números escritos una vez y nunca
+  revisados. Decía «400+ análisis» cuando el catálogo tiene 559, y «5
+  especialidades» —que era el número de tarjetas de esta misma página— cuando
+  hay 10. Contarlas aquí cuesta lo mismo y no se puede volver a desfasar.
 */
 const cifras: Cifra[] = [
-  { valor: 400, sufijo: '+', etiqueta: 'Análisis clínicos disponibles' },
-  { valor: especialidadesData.length, etiqueta: 'Especialidades de laboratorio' },
+  { valor: examenes.length, etiqueta: 'Análisis clínicos disponibles' },
+  {
+    valor: Object.keys(cuantosPorEspecialidad).length,
+    etiqueta: 'Especialidades de laboratorio',
+  },
   { valor: sedes.length, etiqueta: `Sedes en ${sedes[0]!.provincia}` },
   { valor: 24, sufijo: ' h', etiqueta: 'Entrega en exámenes de rutina' },
 ];
@@ -142,8 +148,8 @@ const ventajas = [
         </h1>
 
         <p class="entrada entrada-3 mt-4 max-w-[540px] text-lead text-neutral leading-relaxed">
-          Uno de los dos laboratorios de la región con este nivel de complejidad. Análisis de
-          rutina y pruebas especializadas en Ambato y Pelileo, con toma de muestra en sede o a
+          Uno de los pocos laboratorios de la región con este nivel de complejidad. Análisis de
+          rutina y pruebas especializadas en la provincia de Tungurahua, con toma de muestra en sede o a
           domicilio y resultados en línea.
         </p>
 
@@ -195,7 +201,7 @@ const ventajas = [
       <ServiceCard
         icono="documento"
         titulo="Resultados en línea"
-        descripcion="Consulte y descargue sus informes con su cédula y código de orden."
+        descripcion="Consulte y descargue sus informes con su cédula y su contraseña."
         cta="Ingresar"
         href="/soy-paciente/resultados"
       />
@@ -216,7 +222,7 @@ const ventajas = [
       <ServiceCard
         icono="pin"
         titulo="Nuestras sedes"
-        descripcion="Puntos de atención en Ambato y Pelileo con horarios extendidos."
+        descripcion="Puntos de atención en la provincia de Tungurahua con horarios extendidos."
         cta="Ver mapa"
         href="/sedes"
       />

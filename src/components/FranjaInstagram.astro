@@ -50,7 +50,12 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
   publicaciones.length > 0 && (
     <section class="relative overflow-hidden bg-white py-section">
       <div class="container-page reveal">
-        <div class="flex flex-wrap items-end justify-between gap-4">
+        {/*
+          El botón va debajo del texto y pegado a la izquierda, no al otro
+          extremo de la fila: allí quedaba flotando en medio del blanco, lejos
+          de la frase que lo explica y sin nada con qué alinearse.
+        */}
+        <div class="flex flex-col items-start gap-5">
           <div>
             <span class="block text-xs font-bold tracking-[1.8px] text-accent-dark uppercase">
               Síganos en Instagram
@@ -80,26 +85,6 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
         La franja sale del contenedor a propósito: al ocupar todo el ancho se
         entiende que sigue más allá del borde y que hay más publicaciones.
       */}
-      {/*
-        Control de pausa. El criterio 2.2.2 de las WCAG (nivel A) pide poder
-        detener cualquier movimiento automático que dure más de cinco segundos,
-        y pausar con el cursor no sirve: ni existe en un teléfono, ni ayuda a
-        quien se marea con el movimiento pero no tiene activado
-        `prefers-reduced-motion`, que es casi todo el mundo.
-      */}
-      <div class="mt-6 flex justify-end">
-        <button
-          type="button"
-          data-ig-pausa
-          hidden
-          aria-pressed="false"
-          class="inline-flex min-h-11 items-center gap-2 rounded-lg border-[1.5px] border-line-strong bg-white px-4 py-2.5 text-sm font-semibold text-brand transition-colors hover:border-accent-dark"
-        >
-          <Icon name="reproducir" size={15} class="text-accent-dark" />
-          <span data-ig-pausa-texto>Pausar</span>
-        </button>
-      </div>
-
       <div class="franja-ig relative mt-3" data-franja-ig>
         <div class="franja-ig-pista" data-pista>
           {[0, 1].map((copia) => (
@@ -208,25 +193,19 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
     animation: ig-desplaza var(--ig-duracion, 60s) linear infinite;
   }
 
-  /* Detenida mientras se mira. */
-  .franja-ig[data-pausada='true'] .franja-ig-pista {
-    animation-play-state: paused;
-  }
-
-  .franja-ig:hover .franja-ig-pista {
-    animation-play-state: paused;
-  }
-
   /*
-    También detenida mientras se recorre con el teclado, pero NO tras un clic
-    de ratón: el enlace se abre en otra pestaña y conserva el foco, así que
-    con `:focus-within` la franja se quedaba congelada al volver. `:focus-visible`
-    solo se activa cuando el foco llegó por teclado, que es cuando pausar sirve.
+    Se para al pasar el ratón por encima, que es como lo pidió el laboratorio:
+    quien quiere mirar una publicación la detiene sin pulsar nada.
 
-    Va en una regla aparte a propósito: un navegador sin `:has()` descarta
-    solo esta y la pausa al pasar el cursor sigue funcionando.
+    Aquí hubo además un botón de «Pausar» por el criterio 2.2.2 de las WCAG,
+    que pide poder detener el movimiento automático. Se quitó porque flotaba al
+    borde del bloque y se veía mal. Queda cubierto a medias: el ratón para la
+    franja, el teclado también (la regla de abajo), y quien tenga activado
+    «reducir movimiento» en su sistema no la ve moverse en absoluto. Lo que no
+    hay es un control explícito para quien va con el dedo en un teléfono y no
+    ha tocado esa preferencia. Fue una decisión del laboratorio, consciente.
   */
-  .franja-ig:has(:focus-visible) .franja-ig-pista {
+  .franja-ig:hover .franja-ig-pista {
     animation-play-state: paused;
   }
 
@@ -262,6 +241,23 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
   .franja-ig-borde--der {
     right: 0;
     background: linear-gradient(to left, #fff, transparent);
+  }
+
+  /*
+    También detenida mientras se recorre con el teclado, pero NO tras un clic
+    de ratón: el enlace se abre en otra pestaña y conserva el foco, así que con
+    `:focus-within` la franja se quedaba congelada al volver. `:focus-visible`
+    solo se activa cuando el foco llegó por teclado, que es cuando pausar sirve.
+
+    **Va lejos de la regla del ratón a propósito.** Las dos declaran lo mismo, y
+    pegadas el minificador las fusiona en un solo selector — con lo que un
+    navegador que no entienda `:has()` descartaría las dos y la franja no se
+    pararía ni con el cursor encima, que es justo lo que el laboratorio pidió.
+    Separadas, cada una se evalúa por su cuenta. Comprobado en el CSS compilado:
+    tienen que salir como dos reglas, no como una lista de selectores.
+  */
+  .franja-ig:has(:focus-visible) .franja-ig-pista {
+    animation-play-state: paused;
   }
 
   /*
@@ -307,41 +303,22 @@ const iconoPorTipo = { reel: 'reproducir', carrusel: 'carrusel' } as const;
     }
   };
 
-  const initFranjaIg = () => {
-    const franja = document.querySelector<HTMLElement>('[data-franja-ig]');
-    if (!franja) return;
-    medirFranja();
-
-    const boton = document.querySelector<HTMLButtonElement>('[data-ig-pausa]');
-    const texto = document.querySelector<HTMLElement>('[data-ig-pausa-texto]');
-    if (!boton || boton.dataset.iniciado === 'true') return;
-    boton.dataset.iniciado = 'true';
-    // Nace oculto: sin JavaScript no habría nada que pausar.
-    boton.hidden = false;
-
-    boton.addEventListener('click', () => {
-      const pausada = franja.dataset.pausada !== 'true';
-      franja.dataset.pausada = String(pausada);
-      boton.setAttribute('aria-pressed', String(pausada));
-      if (texto) texto.textContent = pausada ? 'Reanudar' : 'Pausar';
-    });
-  };
-
   /*
-    Los oyentes van fuera del arranque, registrados una sola vez.
+    Los oyentes van registrados una sola vez.
 
-    `initFranjaIg` corre en cada `astro:page-load`, así que ahí dentro se
-    sumaba un oyente de `resize` por cada vuelta a la portada y ninguno se
-    quitaba. `medirFranja` ya recorre las franjas que haya en la página, de
-    modo que un único oyente sirve para todas. El de `load` con `{once:true}`
-    tampoco hacía nada al registrarse después de que la página ya había
-    cargado: lo que hace falta es esperar a las imágenes, y para eso está
-    `document.fonts`/`load` en la primera evaluación del módulo.
+    Aquí hubo un `initFranjaIg` que además encendía el botón de pausa. Sin
+    botón se quedó llamando a `medirFranja` y nada más, así que se llama
+    directamente. `medirFranja` recorre todas las franjas de la página, de modo
+    que un único oyente sirve para todas. El de `load` con `{once:true}` no
+    hacía nada si se registraba con la página ya cargada: lo que hace falta es
+    esperar a las imágenes, y para eso está la comprobación de `readyState`.
+
+    Se vuelve a medir en cada `astro:page-load` porque el ancho del grupo
+    depende de la base tipográfica, que cambia entre tamaños de pantalla.
   */
   window.addEventListener('resize', medirFranja);
   if (document.readyState === 'complete') medirFranja();
   else window.addEventListener('load', medirFranja, { once: true });
 
-  initFranjaIg();
-  document.addEventListener('astro:page-load', initFranjaIg);
+  document.addEventListener('astro:page-load', medirFranja);
 </script>

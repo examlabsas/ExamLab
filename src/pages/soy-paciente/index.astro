@@ -82,7 +82,7 @@ const pasos: { titulo: string; texto: string }[] = [
   {
     titulo: 'Descargue su resultado',
     texto:
-      'Le avisamos cuando esté listo y lo descarga en línea con su cédula y el código de orden.',
+      'Le avisamos cuando esté listo y lo descarga en línea con su cédula y su contraseña.',
   },
 ];
 
@@ -288,7 +288,7 @@ const schema = [
   <section id="preguntas-frecuentes" class="scroll-mt-24 bg-surface py-section">
     <div class="container-page">
       <SectionHeading eyebrow="Preguntas frecuentes" titulo="Las dudas más comunes" />
-      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         {
           preguntas.map((item) => (
             <details class="group rounded-xl border border-line bg-white open:border-accent">

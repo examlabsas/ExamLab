@@ -10,6 +10,7 @@
  */
 import { pagina, cabecera, esc, type Sesion } from './plantilla';
 import { DOMINIO, type Qr } from '../qr';
+import { EMBLEMAS, emblemaPara, SIN_EMBLEMA } from '../emblemas';
 
 const EJEMPLOS = [
   ['https://examlabsas.com/', 'la portada'],
@@ -22,9 +23,33 @@ export function paginaQr(o: {
   sesion: Sesion;
   direccion: string;
   nombre: string;
+  /** Lo elegido en el desplegable; vacío significa «el que toque al destino». */
+  emblema?: string;
   qr?: Qr;
   error?: string;
 }) {
+  /*
+    Qué emblema aparece marcado. Si ya hay un código generado, el que se usó;
+    si no, el que le tocaría al destino escrito. Así el desplegable nunca
+    contradice lo que se está viendo.
+  */
+  let elegido = o.emblema || '';
+  if (!elegido && o.qr) elegido = o.qr.emblema;
+  if (!elegido && o.direccion) {
+    try {
+      elegido = emblemaPara(new URL(o.direccion).hostname);
+    } catch {
+      /* dirección a medio escribir: se deja sin marcar y manda el destino */
+    }
+  }
+
+  const opcionesEmblema = [
+    ...Object.entries(EMBLEMAS).map(
+      ([clave, e]) =>
+        `<option value="${esc(clave)}" ${elegido === clave ? 'selected' : ''}>${esc(e.etiqueta)}</option>`,
+    ),
+    `<option value="${SIN_EMBLEMA}" ${elegido === SIN_EMBLEMA ? 'selected' : ''}>Sin emblema</option>`,
+  ].join('');
   return pagina(
     'Códigos QR',
     `    ${cabecera('Códigos QR', `Para frascos, afiches y recetarios. Salen en SVG, que la imprenta amplía
@@ -38,6 +63,15 @@ export function paginaQr(o: {
         <p class="pista">
           La dirección completa, empezando por <code>https://</code>. Por ejemplo
           ${EJEMPLOS.map(([u, q]) => `<code>${esc(u)}</code> para ${esc(q)}`).join(', ')}.
+        </p>
+
+        <label for="emblema">Emblema del centro</label>
+        <select id="emblema" name="emblema">${opcionesEmblema}</select>
+        <p class="pista">
+          Se propone solo el que corresponde al destino: WhatsApp para un enlace
+          de <code>wa.me</code>, ExamLab para el sitio. <strong>Sin emblema</strong>
+          es una opción buena cuando el código va muy pequeño o impreso en una
+          sola tinta: se lee en más sitios.
         </p>
 
         <label for="nombre">Nombre del archivo</label>
@@ -72,6 +106,7 @@ export function paginaQr(o: {
         <form method="post" action="/qr/descargar">
           <input type="hidden" name="direccion" value="${esc(o.direccion)}">
           <input type="hidden" name="nombre" value="${esc(o.nombre)}">
+          <input type="hidden" name="emblema" value="${esc(o.qr.emblema)}">
           <button type="submit">Descargar ${esc(o.qr.archivo)}.svg</button>
         </form>
 

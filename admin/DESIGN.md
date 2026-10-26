@@ -163,10 +163,10 @@ persona reinventa con otro valor parecido.
 | `#9cc4dd` | Rótulo «PANEL» bajo la marca | Dos pasos por debajo: es una etiqueta, no contenido |
 | `#a9c9de` | Correo del pie del raíl | Mismo peso que las etiquetas |
 | `#8fd6e8` | «Cerrar sesión», en el pie | Tira al `--marca-viva`: es lo único pulsable del pie |
-| `#aebecb` | Borde de un campo con el puntero encima | `--linea` oscurecida lo justo para notarse sin parecer foco |
+| `#aebecb` | Borde de un campo —y de un botón perfilado— con el puntero encima | `--linea` oscurecida lo justo para notarse sin parecer foco |
 | `#93a9b9` | Borde de un filtro con el puntero encima | Igual, sobre el fondo del lienzo |
 | `#65727c` | Texto de sugerencia dentro de los campos | `--tinta-suave` oscurecida hasta llegar a 4,94:1, el par más bajo de todo el panel |
-| `#005b6e` | Botón primario pulsado | `--accion` oscurecida: el botón se hunde al tocarlo |
+| `#005b6e` | Botón primario pulsado, sea `button` o enlace-botón | `--accion` oscurecida: el botón se hunde al tocarlo |
 | `#24323d` | Texto de la barra móvil activa sobre fondo claro | `--tinta` con un punto más de contraste |
 | `#f1c9c4` | Borde de los mensajes de error y de la marca «mal» | `--alerta-fondo` con borde propio, para que el aviso tenga contorno |
 | `#b6dfe7` | Borde del mensaje de guardado | Lo mismo, del lado de `--bien` |
@@ -236,7 +236,7 @@ delata una interfaz generada, y el panel lo tuvo hasta que se quitó.
 (`margin-top:auto`). La sección activa se rellena con `--rail-hondo` y su icono
 se pinta de `--marca-viva`; nunca se marca con un filete lateral.
 
-**Iconos.** Once, dibujados a mano en `ICONOS`, todos sobre retícula de 24 con
+**Iconos.** Dieciocho, dibujados a mano en `ICONOS`, todos sobre retícula de 24 con
 trazo 1,75 y extremos redondeados. No hay librería —la cabecera de seguridad no
 deja cargar nada de fuera— y tampoco caracteres Unicode haciendo de icono: los
 mensajes y el desplegable usan el mismo trazo, incrustado como SVG.
@@ -257,6 +257,36 @@ El icono entra por CSS con una máscara SVG del mismo juego.
 se acaba de escribir: «Ahora entiende: Ayuno de 8 horas». Es la pieza más útil de
 la interfaz. Su énfasis va en el peso, no en color — el acento solo marca lo que
 se puede pulsar.
+
+**Acciones (`.boton`, `.acciones`).** Un enlace que *hace* algo —«Añadir un
+examen», «Escribir una noticia»— se dibuja como botón, porque se decide igual
+que un «Guardar» aunque técnicamente lleve a otra pantalla. Van en una fila
+justo debajo del título, **nunca al pie**: ahí estaban antes, debajo de sesenta
+registros, y no las encontraba nadie.
+
+Dos pesos y solo dos: **lleno** para la acción de todos los días (añadir uno
+suelto) y **`.suave`**, perfilado, para la ocasional (cargar la lista entera).
+Si todo fuera lleno, no habría jerarquía; si todo fuera suave, no habría
+entrada. Altura mínima **44 px**, que es lo que pide un dedo.
+
+**Fila que se abre (`.lista .renglon`).** En las listas largas la fila entera es
+el enlace, con el nombre a la izquierda y **«Editar ›» a la derecha**. Antes solo
+el nombre era pulsable y nada decía que detrás hubiera una ficha: en una tabla,
+un nombre parece una etiqueta. El área de toque pasó de las letras del nombre a
+los 323×95 px de la fila.
+
+**Acción de tabla (`.boton.chico`).** Donde hay tabla en vez de lista, la acción
+es un botón perfilado en su propia celda a la derecha. Debajo de 34rem se queda
+solo el lápiz —44×44 y con su nombre accesible intacto— porque la palabra le
+robaba el ancho al contenido: «FROTIS DE SANGRE PERIFERICA (BH + FROTIS)» se
+partía en tres líneas.
+
+**Columnas que sobran (`.solo-amplio` / `.solo-estrecho`).** Una tabla de cuatro
+columnas no cabe en un teléfono y lo que se cae por el borde es la última, que
+es justo donde está el botón. En Usuarios, el rol baja a marca bajo el correo y
+el estado lo dice el propio botón —«Desactivar» solo aparece sobre alguien
+activo—, así que en móvil quedan dos columnas y los siete botones se alcanzan.
+La regla general: **antes de dejar que una tabla se corte, quitarle columnas.**
 
 **Formularios.** Siempre sobre un panel. Etiqueta encima, ayuda debajo. El foco
 es un borde de `--accion-viva` más un anillo de 3px.

@@ -1,5 +1,5 @@
 /** Pantallas de datos del sitio: contacto, sedes y fechas especiales. */
-import { pagina, cabecera, esc, type Sesion } from './plantilla';
+import { pagina, cabecera, esc, icono, type Sesion } from './plantilla';
 import { DIAS, resumenSemana, type DatosSitio, type Sede, type FechaEspecial } from '../sitio';
 
 const guardado = (si?: boolean) =>
@@ -53,6 +53,9 @@ export function paginaSedes(o: { sesion: Sesion; sedes: Sede[]; ok?: boolean }) 
         <td><a href="/sedes/${esc(s.slug)}"><strong>${esc(s.nombre)}</strong></a>
             <br><span class="pista">${esc(s.direccion)}</span></td>
         <td>${esc(s.telefono)}<br><span class="pista">${esc(s.celular)}</span></td>
+        <td class="accion">
+          <a class="boton suave chico" href="/sedes/${esc(s.slug)}">${icono('editar')}<span class="solo-ancho">Editar</span></a>
+        </td>
       </tr>`,
     )
     .join('');
@@ -61,7 +64,7 @@ export function paginaSedes(o: { sesion: Sesion; sedes: Sede[]; ok?: boolean }) 
     'Sedes',
     `    ${cabecera('Sedes', `Direcciones, teléfonos y horarios de atención.`)}
       ${guardado(o.ok)}
-      <table><thead><tr><th>Sede</th><th>Teléfonos</th></tr></thead><tbody>${filas}</tbody></table>
+      <table><thead><tr><th>Sede</th><th>Teléfonos</th><th></th></tr></thead><tbody>${filas}</tbody></table>
 `,
     { sesion: o.sesion, activa: '/sedes' },
   );

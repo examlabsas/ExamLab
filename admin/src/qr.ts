@@ -20,7 +20,7 @@
  * que es la prueba que de verdad importa.
  */
 import crear from 'qrcode/lib/core/qrcode.js';
-import { EMBLEMA } from './emblema';
+import { EMBLEMAS, emblemaPara, SIN_EMBLEMA } from './emblemas';
 
 /** El dominio del laboratorio, para los textos de la pantalla. */
 export const DOMINIO = 'examlabsas.com';
@@ -52,7 +52,14 @@ const MARGEN = 4;
 const PROPORCION_EMBLEMA = 0.2;
 const PROPORCION_DISCO = 0.26;
 
-export type Qr = { svg: string; modulos: number; archivo: string; esDefinitiva: boolean };
+export type Qr = {
+  svg: string;
+  modulos: number;
+  archivo: string;
+  esDefinitiva: boolean;
+  /** El emblema que se usó, para que la pantalla marque la opción elegida. */
+  emblema: string;
+};
 
 /**
  * Nombre del archivo a partir de la dirección.
@@ -72,9 +79,20 @@ export function nombreDeArchivo(url: URL, pedido?: string): { archivo: string; e
   return { archivo: `qr-${base || 'inicio'}${esDefinitiva ? '' : '-pruebas'}`, esDefinitiva };
 }
 
-export function generar(direccion: string, nombrePedido?: string): Qr {
+export function generar(direccion: string, nombrePedido?: string, emblemaPedido?: string): Qr {
   const url = new URL(direccion);
   const { archivo, esDefinitiva } = nombreDeArchivo(url, nombrePedido);
+
+  /*
+    Sin elección, el emblema lo decide el destino: un código de wa.me sale con
+    el de WhatsApp y uno del sitio con el de ExamLab. Es lo que alguien
+    elegiría, y así no hay que acordarse.
+  */
+  const emblema =
+    emblemaPedido && (emblemaPedido === SIN_EMBLEMA || emblemaPedido in EMBLEMAS)
+      ? emblemaPedido
+      : emblemaPara(url.hostname);
+  const imagen = EMBLEMAS[emblema]?.imagen;
 
   /*
     Nivel «H»: el código se sigue leyendo con hasta un 30 % oculto o dañado. Es
@@ -115,12 +133,18 @@ export function generar(direccion: string, nombrePedido?: string): Qr {
 <title>Código QR de ${esc(url.toString())}</title>
 <rect width="${total}" height="${total}" fill="#FFFFFF"/>
 <path fill="${TINTA}" d="${trazos.join('')}"/>
-<circle cx="${centro}" cy="${centro}" r="${radioDisco.toFixed(3)}" fill="#FFFFFF"/>
+${
+  // Sin emblema no se dibuja ni el disco blanco: un código limpio aprovecha
+  // toda la corrección de errores y se lee en más sitios.
+  imagen
+    ? `<circle cx="${centro}" cy="${centro}" r="${radioDisco.toFixed(3)}" fill="#FFFFFF"/>
 <clipPath id="emblema"><circle cx="${centro}" cy="${centro}" r="${(ladoEmblema / 2).toFixed(3)}"/></clipPath>
-<image href="${EMBLEMA}" x="${(centro - ladoEmblema / 2).toFixed(3)}" y="${(centro - ladoEmblema / 2).toFixed(3)}" width="${ladoEmblema.toFixed(3)}" height="${ladoEmblema.toFixed(3)}" clip-path="url(#emblema)"/>
+<image href="${imagen}" x="${(centro - ladoEmblema / 2).toFixed(3)}" y="${(centro - ladoEmblema / 2).toFixed(3)}" width="${ladoEmblema.toFixed(3)}" height="${ladoEmblema.toFixed(3)}" clip-path="url(#emblema)"/>`
+    : ''
+}
 </svg>`;
 
-  return { svg, modulos: n, archivo, esDefinitiva };
+  return { svg, modulos: n, archivo, esDefinitiva, emblema };
 }
 
 /** `shape-rendering` aparte, el único texto que entra aquí es la dirección. */

@@ -4,7 +4,7 @@ Lo que falta para dar el sitio por terminado. Nada de esto bloquea la
 publicación: el sitio funciona hoy y, donde falta un dato, lo dice en vez de
 inventarlo.
 
-Última revisión: 8 de octubre de 2026.
+Última revisión: 26 de octubre de 2026.
 
 ---
 
@@ -21,41 +21,37 @@ git rm -r --cached examlab-sitio.zip design .claude/settings.local.json
 
 - [ ] Ejecutarlo y subir
 
-El panel está terminado —las seis fases y el rediseño— y entra entero en esa
-subida: la carpeta `admin/`, `admin/DESIGN.md` y los scripts nuevos
-(`completar-catalogo-info.mjs`, `comprobar-qr.mjs`, `generar-emblema.mjs`).
+El panel ya se subió en el commit `b4bb74b`. Lo que falta son los cambios
+posteriores: precios fuera, código de verificación fuera, altas e importación en
+la cartera de asociados, emblemas de los códigos QR y los retoques del Dr.
+Silva.
 
 ---
 
 ## 2. Datos que faltan del Dr. Silva
 
+Quedan dos. Los demás los resolvió él mismo.
+
 | Dato | Estado | Dónde afecta |
 |---|---|---|
-| Número de urgencias | Confirmó que existe una línea aparte —la suya— pero no la entregó | Sale en 5 páginas. Marcado como `PENDIENTE` en `src/lib/site.ts` |
-| Fachada de Ficoa en mayor resolución | El original mide 1448 px de ancho | Es la foto de portada. En una pantalla grande se ve blanda y no tiene arreglo sin un original mayor |
 | Año de constitución como S.A.S. | Dijo «me parece que desde el 2023» | `foundingDate` usa 2001, que es cuando abrió como Pasteur. El 2023 conviene contrastarlo antes de ponerlo en un texto visible |
-| Veracidad de la noticia destacada | Sin confirmar | «Nuevos analizadores automatizados» la escribí como ejemplo y afirma que la matriz opera con equipos nuevos. Si no ocurrió, hay que quitarla |
-| Logo en SVG con fondo transparente | Sin pedir a marca | Hoy es un PNG recortado en círculo (`TODO` en `src/components/Logo.astro`) |
+| Logo en SVG con fondo transparente | Sin pedir a marca | Hoy es un PNG recortado en círculo (`TODO` en `src/components/Logo.astro`). Con el SVG, el raíl del panel tendría emblema y se podría ofrecer en los códigos QR |
+
+**Resueltos:** el **número de urgencias** (098 800 0799, distinto del general;
+hasta entonces el sitio publicaba el general bajo esa etiqueta en las 583
+páginas), la **veracidad de la noticia destacada** —confirmó que es cierta— y
+la **foto de la fachada en más resolución**, que descartó.
 
 ---
 
-## 2 bis. Feriados: confirmar con el laboratorio
+## 2 bis. Feriados · cerrado
 
-El sitio ya respeta feriados y jornadas especiales
-(`src/data/feriados.json`). Están cargados los **feriados nacionales de fecha
-fija** de lo que queda de 2026 y de 2027, todos como día cerrado.
+Están cargados los feriados nacionales de fecha fija de lo que queda de 2026 y
+de 2027, todos como día cerrado (`src/data/feriados.json`).
 
-Que el laboratorio cierre en ellos se desprende de lo que el propio sitio
-publica —«en feriados atendemos únicamente urgencias coordinadas por
-teléfono»— pero **no lo ha confirmado nadie**.
-
-- [ ] Confirmar con el laboratorio en qué feriados cierra de verdad
-- [ ] Añadir **Carnaval** y **Viernes Santo**, que cambian de fecha cada año
-- [ ] Preguntar si hay jornadas especiales propias (24 y 31 de diciembre,
-      aniversario del laboratorio)
-
-Si en algún feriado sí abren, basta con quitar esa línea del archivo, o cambiar
-`"franja": null` por los tramos reales.
+**Carnaval y Viernes Santo quedaron descartados** por el laboratorio. Son los
+dos de fecha móvil, así que esos días el indicador dirá «Abierto». Si cambian de
+idea, se añaden desde el panel en `/feriados`, sin tocar código.
 
 ---
 
@@ -86,18 +82,25 @@ Resuelve dos cosas a la vez:
 - [ ] Copiar el enlace de reseña a `src/lib/site.ts`
 - [ ] Revisar que las cuatro sedes estén dadas de alta con sus horarios
 
-### El laboratorio — correos de los asociados
+### El catálogo de asociados · cerrado, se queda abierto
 
-El catálogo de asociados es accesible para cualquiera que tenga la URL y está
-enlazado desde el menú de las 583 páginas. No muestra precios, pero sí la
-cartera de 277 pruebas con método, muestra y plazo.
+Este apartado pedía los correos de los laboratorios con convenio para cerrar
+`/laboratorios-asociados/catalogo`.
 
-- [ ] Pedir la lista de correos de los laboratorios con convenio
-- [ ] Decidir cómo se cierra `/laboratorios-asociados/catalogo`. **Cloudflare
-      Access ya no es opción**: su plan gratuito pide tarjeta y el doctor no puede
-      ponerla. Queda resolverlo con el mismo mecanismo de contraseña del panel, o
-      dejando el catálogo sin precios como está
-- [ ] Solo entonces, valorar poner `MOSTRAR_PRECIOS = true`
+**Ya no hace falta.** El motivo de cerrarlo era el tarifario mayorista, y los
+precios salieron del sistema entero: ni en el panel, ni en el dato versionado,
+ni en el componente del sitio. Lo que esa página publica ahora es especialidad,
+nombre, método, muestra y plazo — el catálogo comercial, no algo reservado. Y la
+propia tabla dice al pie que el tarifario se solicita al laboratorio.
+
+Cerrarlo costaría pedir los correos, decidir un mecanismo —Cloudflare Access
+sigue descartado por pedir tarjeta— y montarlo, para proteger lo que no hace
+falta proteger; y le cerraría la puerta a un laboratorio nuevo que quiera ver la
+cartera antes de pedir convenio.
+
+**Si algún día vuelven los precios a la web, vuelve este pendiente.**
+
+---
 
 ### El bioquímico — datos de los exámenes
 
@@ -111,11 +114,15 @@ cartera de 277 pruebas con método, muestra y plazo.
 Conviene pedirlo por especialidad y no examen por examen: hoy solo existen
 cuatro plazos distintos.
 
-**Ya no hace falta pasar por el programador.** Desde la fase 4 del panel esto se
-rellena en `/catalogo`: el recuento de arriba lleva al filtro de los que faltan, y
-cada examen se corrige y se guarda desde el móvil. Si el laboratorio prefiere
-mandar una columna de Excel, también entra por `/catalogo-importar`, enseñando
-antes qué cambia.
+**Lo hace el laboratorio, no el programador.** Así lo decidieron. Desde la fase
+4 del panel esto se rellena en `/catalogo`: el recuento de arriba lleva al filtro
+de los que faltan, y cada examen se corrige y se guarda desde el móvil. Si
+prefieren mandar una columna de Excel, entra por `/catalogo-importar`, que
+enseña qué cambiaría antes de publicar nada.
+
+Un apunte práctico: **cada guardado suelto recompila el sitio entero**. Para
+tandas grandes conviene la hoja de cálculo, que mete los 495 en una sola
+compilación.
 
 No es urgente: donde no hay dato, la página dice «Se lo confirmamos al agendar»
 y la descripción que ve Google tampoco menciona el plazo.

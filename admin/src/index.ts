@@ -10,7 +10,6 @@
 import { Hono } from 'hono';
 
 import { verificar, revisarContrasena } from './auth/password';
-import { verificarCodigo, uriParaQr } from './auth/totp';
 import {
   abrirSesion,
   leerSesion,
@@ -35,7 +34,7 @@ import {
   gastarInvitacion,
   type Rol,
 } from './usuarios';
-import { paginaAcceso, paginaInvitacion, paginaCodigoQr, paginaPanel } from './paginas/acceso';
+import { paginaAcceso, paginaInvitacion, paginaPanel } from './paginas/acceso';
 import { paginaFallo } from './paginas/plantilla';
 import { paginaUsuarios } from './paginas/usuarios';
 import {
@@ -48,6 +47,7 @@ import * as noticias from './noticias';
 import * as sitio from './sitio';
 import * as catalogo from './catalogo';
 import * as importar from './importar';
+import * as importarAsoc from './importar-asociados';
 import * as asociados from './asociados';
 import { esSeccion } from './historial';
 import * as qr from './qr';
@@ -61,6 +61,11 @@ import {
   paginaResumen,
 } from './paginas/catalogo';
 import { paginaAsociados, paginaPrueba } from './paginas/asociados';
+import {
+  paginaImportarAsociados,
+  paginaColumnasAsociados,
+  paginaResumenAsociados,
+} from './paginas/importar-asociados';
 import { leerArchivo, escribirArchivo, ultimosCommits, ErrorGitHub, type Config } from './github';
 
 type Entorno = {
@@ -183,7 +188,6 @@ app.post('/entrar', async (c) => {
   const cuerpo = await c.req.parseBody();
   const correo = String(cuerpo.correo ?? '').toLowerCase().trim();
   const contrasena = String(cuerpo.contrasena ?? '');
-  const codigo = String(cuerpo.codigo ?? '');
   const ip = ipDe(c);
 
   if (await intentosAgotados(c.env.PANEL, correo, ip)) {
@@ -199,14 +203,20 @@ app.post('/entrar', async (c) => {
   const usuario = await obtener(c.env.PANEL, correo);
 
   /*
-    Un único mensaje para todos los fallos, y se comprueban las tres cosas
-    aunque la primera ya falle. Si el panel dijera «ese correo no existe»,
-    estaría regalando la lista de quién tiene acceso.
+    Un único mensaje para todos los fallos. Si el panel dijera «ese correo no
+    existe», estaría regalando la lista de quién tiene acceso.
+
+    Aquí se pedía además un código de seis cifras de una aplicación de
+    autenticación. El laboratorio pidió quitarlo. Lo que queda protegiendo la
+    puerta es la contraseña —derivada con PBKDF2 y 310 000 iteraciones—, el
+    límite de cinco intentos por correo y por IP, y que la sesión sea un
+    testigo revocable en el KV. El secreto de cada usuario se sigue guardando,
+    así que volver a pedirlo es restaurar esta comprobación y el campo del
+    formulario, no rehacer el sistema.
   */
   const claveOk = usuario ? await verificar(contrasena, usuario.clave) : false;
-  const codigoOk = usuario ? await verificarCodigo(usuario.totp, codigo) : false;
 
-  if (!usuario || !usuario.activo || !claveOk || !codigoOk) {
+  if (!usuario || !usuario.activo || !claveOk) {
     await apuntarFallo(c.env.PANEL, correo, ip);
     return c.html(paginaAcceso({ correo, error: 'Datos incorrectos.' }), 401);
   }
@@ -268,10 +278,14 @@ app.post('/invitacion/:testigo', async (c) => {
 
   await gastarInvitacion(c.env.PANEL, testigo);
 
-  // El secreto se enseña una sola vez, aquí.
-  return c.html(
-    paginaCodigoQr({ uri: uriParaQr(usuario.correo, usuario.totp), secreto: usuario.totp }),
-  );
+  /*
+    Antes aquí venía una pantalla más: el código QR para la aplicación de
+    autenticación. Sin segundo factor no hay nada que escanear, así que la
+    persona entra directamente con la contraseña que acaba de elegir.
+  */
+  const sesion = await abrirSesion(c.env.PANEL, usuario.correo, usuario.rol);
+  c.header('Set-Cookie', cookieDeSesion(sesion, !sinCifrar(c.req.url)));
+  return c.redirect('/', 302);
 });
 
 /* ─── Usuarios ───────────────────────────────────────────────────────────── */
@@ -1227,28 +1241,21 @@ app.post('/catalogo-importar/publicar', exigirSesion, async (c) => {
 /* ─── Catálogo de laboratorios asociados ─────────────────────────────────── */
 
 /*
-  Toda la sección exige administrador, no solo el precio.
+  Toda la sección exige administrador.
 
-  Separar «ver la cartera sí, ver el importe no» obligaría a dos vistas de la
-  misma tabla y a confiar en que nadie se deja un campo. La cartera de asociados
-  tampoco es información que recepción necesite para su trabajo, así que cerrar
-  la sección entera cuesta menos y se entiende mejor.
+  Ya no por el tarifario —los precios salieron del panel— sino porque la cartera
+  de convenio es lo que ExamLab ofrece a otros laboratorios, y no es información
+  que recepción necesite para su trabajo.
 */
 
 app.get('/asociados', exigirSesion, exigirAdministrador, async (c) => {
   const catalogoAsoc = await asociados.leerCatalogo(github(c.env));
-  const tarifario = await asociados.leerTarifario(c.env.PANEL);
   const falta = c.req.query('falta') ?? '';
   const texto = c.req.query('q') ?? '';
   const especialidad = c.req.query('especialidad') ?? '';
   const filtro = asociados.esFiltro(falta) ? falta : undefined;
 
-  // El precio se pega aquí, al leer: en el archivo siempre viene `null`.
-  const pruebas = asociados
-    .conSlug(catalogoAsoc.pruebas)
-    .map((p) => ({ ...p, precio: asociados.precioDe(tarifario, p) }));
-
-  const sinTarifario = Object.keys(tarifario).length === 0;
+  const pruebas = asociados.conSlug(catalogoAsoc.pruebas);
 
   return c.html(
     paginaAsociados({
@@ -1260,11 +1267,295 @@ app.get('/asociados', exigirSesion, exigirAdministrador, async (c) => {
       especialidad,
       especialidades: asociados.especialidadesDe(pruebas),
       ok: AVISOS.get(c.req.query('ok') ?? ''),
-      aviso: sinTarifario
-        ? 'Todavía no hay ningún precio cargado. Se pueden ir poniendo uno a uno, o cargar el tarifario entero con «npm run tarifario:cargar» desde la máquina que tiene el archivo privado.'
-        : undefined,
     }),
   );
+});
+
+/*
+  Alta de una prueba suelta en la cartera de asociados.
+
+  Va **antes** de `/asociados/:slug`, igual que `/catalogo/nuevo`: Hono resuelve
+  por orden y, puesta después, el parámetro se quedaría con la palabra «nueva».
+*/
+
+const pruebaEnBlanco = (): asociados.Prueba => ({
+  especialidad: '',
+  nombre: '',
+  notas: [],
+});
+
+app.get('/asociados/nueva', exigirSesion, exigirAdministrador, async (c) => {
+  const catalogoAsoc = await asociados.leerCatalogo(github(c.env));
+  const pruebas = asociados.conSlug(catalogoAsoc.pruebas);
+  return c.html(
+    paginaPrueba({
+      sesion: c.get('sesion'),
+      prueba: { ...pruebaEnBlanco(), slug: '' },
+      especialidades: asociados.especialidadesDe(pruebas),
+      desde: {},
+      esNueva: true,
+    }),
+  );
+});
+
+app.post('/asociados/nueva', exigirSesion, exigirAdministrador, async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const t = (k: string) => String(cuerpo[k] ?? '').trim();
+
+  const { catalogo: catalogoAsoc, cabeza } = await asociados.leerTodo(github(c.env));
+  const pruebas = asociados.conSlug(catalogoAsoc.pruebas);
+
+  const prueba: asociados.Prueba = {
+    nombre: t('nombre').replace(/\s+/g, ' '),
+    especialidad: t('especialidadNueva') || t('especialidad'),
+    metodo: t('metodo') || undefined,
+    muestra: t('muestra') || undefined,
+    entrega: t('entrega') || undefined,
+    incluye: t('incluye') || undefined,
+    notas: asociados.notasDe(t('muestra')),
+  };
+
+  const responder = (mensaje: string, estado: 400 | 502) =>
+    c.html(
+      paginaPrueba({
+        sesion: c.get('sesion'),
+        prueba: { ...prueba, slug: '' },
+        especialidades: asociados.especialidadesDe(pruebas),
+        desde: {},
+        esNueva: true,
+        nueva: t('especialidadNueva') || undefined,
+        error: mensaje,
+      }),
+      estado,
+    );
+
+  const error = asociados.revisarPrueba(prueba);
+  if (error) return responder(error, 400);
+
+  /*
+    Un nombre repetido se rechaza porque el nombre es la clave con la que la
+    carga por hoja reconoce cada prueba: dos iguales dejarían a la hoja sin
+    saber a cuál corresponde cada fila.
+  */
+  const yaEsta = catalogoAsoc.pruebas.find(
+    (p) => importarAsoc.claveDePrueba(p) === importarAsoc.claveDePrueba(prueba),
+  );
+  if (yaEsta) {
+    return responder(
+      `Ya hay una prueba que se llama igual en ${yaEsta.especialidad}: «${yaEsta.nombre}». Ábrala desde la cartera para corregirla.`,
+      400,
+    );
+  }
+
+  try {
+    await asociados.guardarCatalogo(github(c.env), {
+      catalogo: { ...catalogoAsoc, pruebas: [...catalogoAsoc.pruebas, prueba] },
+      cabeza,
+      resumen: `Añade la prueba de asociados «${prueba.nombre}»`,
+      autor: c.get('sesion').correo,
+    });
+  } catch (e) {
+    return responder(motivo(e), 502);
+  }
+
+  return c.redirect('/asociados?ok=1', 302);
+});
+
+/* ─── Asociados: carga por hoja de cálculo ───────────────────────────────── */
+
+type PendienteAsoc = {
+  correo: string;
+  tabla: importar.Tabla;
+  asignacion?: importarAsoc.Asignacion;
+  commit?: string;
+};
+
+const clavePendienteAsoc = (id: string) => `importacion-asociados:${id}`;
+
+async function leerPendienteAsoc(c: any, id: string): Promise<PendienteAsoc | null> {
+  const crudo = await c.env.PANEL.get(clavePendienteAsoc(id));
+  if (!crudo) return null;
+  const pendiente = JSON.parse(crudo) as PendienteAsoc;
+  return pendiente.correo === c.get('sesion').correo ? pendiente : null;
+}
+
+const guardarPendienteAsoc = (c: any, id: string, pendiente: PendienteAsoc) =>
+  c.env.PANEL.put(clavePendienteAsoc(id), JSON.stringify(pendiente), {
+    expirationTtl: VIDA_PENDIENTE,
+  });
+
+app.get('/asociados-importar', exigirSesion, exigirAdministrador, (c) =>
+  c.html(paginaImportarAsociados({ sesion: c.get('sesion') })),
+);
+
+app.post('/asociados-importar', exigirSesion, exigirAdministrador, async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const archivo = cuerpo.archivo;
+  const pegado = String(cuerpo.pegado ?? '');
+
+  const noVale = (mensaje: string) =>
+    c.html(paginaImportarAsociados({ sesion: c.get('sesion'), error: mensaje }), 400);
+
+  let texto = pegado;
+  if (archivo instanceof File && archivo.size > 0) {
+    if (archivo.size > TOPE_ARCHIVO) {
+      return noVale('Ese archivo es demasiado grande para ser una cartera de pruebas.');
+    }
+    const bytes = await archivo.arrayBuffer();
+    const binario = importar.formatoBinario(bytes);
+    if (binario) return noVale(binario);
+    texto = importar.aTexto(bytes);
+  }
+
+  if (texto.length > TOPE_TEXTO) {
+    return noVale('Eso es demasiado texto. Pegue solo las columnas de la cartera.');
+  }
+  if (texto.trim() && !importar.pareceTexto(texto)) {
+    return noVale(
+      'Ese contenido no parece una hoja en texto. Guárdelo desde Excel como CSV UTF-8, o copie las celdas y péguelas.',
+    );
+  }
+
+  const tabla = importar.parsear(texto);
+  if (!tabla.filas.length) {
+    return noVale('No se encontró ninguna fila. Suba un archivo CSV o pegue las celdas.');
+  }
+
+  const catalogoAsoc = await asociados.leerCatalogo(github(c.env));
+  const id = crypto.randomUUID();
+  await guardarPendienteAsoc(c, id, { correo: c.get('sesion').correo, tabla });
+
+  return c.html(
+    paginaColumnasAsociados({
+      sesion: c.get('sesion'),
+      id,
+      tabla,
+      asignacion: importarAsoc.adivinar(tabla, catalogoAsoc.pruebas),
+    }),
+  );
+});
+
+function asignacionAsocDelFormulario(
+  cuerpo: Record<string, unknown>,
+  tabla: importar.Tabla,
+): importarAsoc.Asignacion {
+  const campos: importarAsoc.Asignacion['campos'] = {};
+  let nombre = -1;
+
+  for (let col = 0; col < tabla.columnas; col++) {
+    const elegido = String(cuerpo[`col${col}`] ?? '');
+    if (elegido === 'nombre') {
+      if (nombre === -1) nombre = col;
+    } else if (elegido in importarAsoc.CAMPOS) {
+      const campo = elegido as importarAsoc.Campo;
+      if (campos[campo] === undefined) campos[campo] = col;
+    }
+  }
+
+  return { nombre, campos, cabecera: cuerpo.cabecera === 'si' };
+}
+
+async function mostrarResumenAsoc(c: any, id: string, pendiente: PendienteAsoc, aviso?: string) {
+  const { catalogo: catalogoAsoc, cabeza } = await asociados.leerTodo(github(c.env));
+  const asignacion = pendiente.asignacion!;
+  const lectura = importarAsoc.leer(pendiente.tabla, asignacion);
+  const comparacion = importarAsoc.comparar(catalogoAsoc.pruebas, lectura);
+
+  await guardarPendienteAsoc(c, id, { ...pendiente, commit: cabeza.commit });
+
+  return c.html(
+    paginaResumenAsociados({
+      sesion: c.get('sesion'),
+      id,
+      comparacion,
+      total: catalogoAsoc.pruebas.length,
+      sinEspecialidad: importarAsoc.sinEspecialidad(
+        importarAsoc.aplicar(catalogoAsoc.pruebas, lectura),
+      ),
+      error: aviso,
+    }),
+  );
+}
+
+app.post('/asociados-importar/columnas', exigirSesion, exigirAdministrador, async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const id = String(cuerpo.id ?? '');
+  const pendiente = await leerPendienteAsoc(c, id);
+  if (!pendiente) {
+    return c.html(paginaImportarAsociados({ sesion: c.get('sesion'), error: CADUCADA }), 410);
+  }
+
+  const asignacion = asignacionAsocDelFormulario(cuerpo, pendiente.tabla);
+  if (asignacion.nombre === -1) {
+    return c.html(
+      paginaColumnasAsociados({
+        sesion: c.get('sesion'),
+        id,
+        tabla: pendiente.tabla,
+        asignacion: { ...asignacion, nombre: 0 },
+        error: 'Marque cuál es la columna con el nombre de la prueba: sin eso no se puede comparar.',
+      }),
+      400,
+    );
+  }
+
+  return mostrarResumenAsoc(c, id, { ...pendiente, asignacion });
+});
+
+app.post('/asociados-importar/publicar', exigirSesion, exigirAdministrador, async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const id = String(cuerpo.id ?? '');
+  const pendiente = await leerPendienteAsoc(c, id);
+  if (!pendiente?.asignacion) {
+    return c.html(paginaImportarAsociados({ sesion: c.get('sesion'), error: CADUCADA }), 410);
+  }
+
+  const { catalogo: catalogoAsoc, cabeza } = await asociados.leerTodo(github(c.env));
+
+  if (pendiente.commit && pendiente.commit !== cabeza.commit) {
+    return mostrarResumenAsoc(
+      c,
+      id,
+      pendiente,
+      'La cartera cambió mientras usted revisaba. Esta es la comparación con lo que hay ahora: vuelva a confirmarla.',
+    );
+  }
+
+  const lectura = importarAsoc.leer(pendiente.tabla, pendiente.asignacion);
+  const comparacion = importarAsoc.comparar(catalogoAsoc.pruebas, lectura);
+  const pruebas = importarAsoc.aplicar(catalogoAsoc.pruebas, lectura);
+
+  const responder = (mensaje: string, estado: 400 | 502) =>
+    c.html(
+      paginaResumenAsociados({
+        sesion: c.get('sesion'),
+        id,
+        comparacion,
+        total: catalogoAsoc.pruebas.length,
+        sinEspecialidad: importarAsoc.sinEspecialidad(pruebas),
+        error: mensaje,
+      }),
+      estado,
+    );
+
+  // Dar de baja una prueba no se nota hasta que un laboratorio no la encuentra,
+  // así que se pide decirlo aparte.
+  if (comparacion.salen.length && cuerpo.confirmaBajas !== 'si') {
+    return responder('Marque la casilla para confirmar que esas pruebas dejan de ofrecerse.', 400);
+  }
+
+  try {
+    await asociados.guardarCatalogo(github(c.env), {
+      catalogo: { ...catalogoAsoc, pruebas },
+      cabeza,
+      resumen: `Actualiza la cartera de asociados: ${importarAsoc.resumirCambio(comparacion)}`,
+      autor: c.get('sesion').correo,
+    });
+  } catch (e) {
+    return responder(motivo(e), 502);
+  }
+
+  return c.redirect('/asociados?ok=importado', 302);
 });
 
 app.get('/asociados/:slug', exigirSesion, exigirAdministrador, async (c) => {
@@ -1273,13 +1564,10 @@ app.get('/asociados/:slug', exigirSesion, exigirAdministrador, async (c) => {
   const prueba = pruebas.find((p) => p.slug === c.req.param('slug'));
   if (!prueba) return c.text('Esa prueba no existe.', 404);
 
-  const tarifario = await asociados.leerTarifario(c.env.PANEL);
-
   return c.html(
     paginaPrueba({
       sesion: c.get('sesion'),
       prueba,
-      precio: asociados.precioDe(tarifario, prueba),
       especialidades: asociados.especialidadesDe(pruebas),
       desde: {
         q: c.req.query('q'),
@@ -1314,15 +1602,13 @@ app.post('/asociados/:slug', exigirSesion, exigirAdministrador, async (c) => {
     muestra: t('muestra') || undefined,
     entrega: t('entrega') || undefined,
     incluye: t('incluye') || undefined,
-    precio: null,
   };
 
-  const responder = (mensaje: string, estado: 400 | 502, precio: number | null) =>
+  const responder = (mensaje: string, estado: 400 | 502) =>
     c.html(
       paginaPrueba({
         sesion: c.get('sesion'),
         prueba: { ...prueba, slug: anterior.slug },
-        precio,
         especialidades: asociados.especialidadesDe(pruebas),
         desde,
         error: mensaje,
@@ -1330,21 +1616,9 @@ app.post('/asociados/:slug', exigirSesion, exigirAdministrador, async (c) => {
       estado,
     );
 
-  const leido = asociados.leerPrecio(t('precio'));
-  if (leido === 'error') {
-    return responder('El precio va en dólares, con dos decimales como mucho: 12.50 o 12,50.', 400, null);
-  }
-  const precio = leido;
-
   const error = asociados.revisarPrueba(prueba);
-  if (error) return responder(error, 400, precio);
+  if (error) return responder(error, 400);
 
-  /*
-    Dos escrituras en sitios distintos, y el orden importa: primero el
-    repositorio, que es lo que puede fallar —conflictos, token, red—, y solo si
-    sale bien el tarifario en el KV. Al revés, un fallo de GitHub dejaría un
-    precio guardado para una prueba que no se llegó a cambiar.
-  */
   catalogoAsoc.pruebas[i] = prueba;
   try {
     await asociados.guardarCatalogo(github(c.env), {
@@ -1354,14 +1628,8 @@ app.post('/asociados/:slug', exigirSesion, exigirAdministrador, async (c) => {
       autor: c.get('sesion').correo,
     });
   } catch (e) {
-    return responder(motivo(e), 502, precio);
+    return responder(motivo(e), 502);
   }
-
-  const tarifario = await asociados.leerTarifario(c.env.PANEL);
-  // Si cambió de nombre o de especialidad, su precio se muda con ella.
-  delete tarifario[asociados.claveDe(anterior)];
-  if (precio !== null) tarifario[asociados.claveDe(prueba)] = precio;
-  await asociados.guardarTarifario(c.env.PANEL, tarifario);
 
   const parametros = new URLSearchParams(
     Object.entries({ ...desde, ok: '1' }).filter(([, v]) => v) as [string, string][],
@@ -1382,6 +1650,7 @@ app.post('/asociados/:slug', exigirSesion, exigirAdministrador, async (c) => {
 const qrDelFormulario = (cuerpo: Record<string, unknown>) => ({
   direccion: String(cuerpo.direccion ?? '').trim(),
   nombre: String(cuerpo.nombre ?? '').trim(),
+  emblema: String(cuerpo.emblema ?? '').trim(),
 });
 
 app.get('/qr', exigirSesion, (c) =>
@@ -1389,10 +1658,10 @@ app.get('/qr', exigirSesion, (c) =>
 );
 
 app.post('/qr', exigirSesion, async (c) => {
-  const { direccion, nombre } = qrDelFormulario(await c.req.parseBody());
+  const { direccion, nombre, emblema } = qrDelFormulario(await c.req.parseBody());
   const error = qr.revisarDireccion(direccion);
   if (error) {
-    return c.html(paginaQr({ sesion: c.get('sesion'), direccion, nombre, error }), 400);
+    return c.html(paginaQr({ sesion: c.get('sesion'), direccion, nombre, emblema, error }), 400);
   }
 
   return c.html(
@@ -1400,19 +1669,20 @@ app.post('/qr', exigirSesion, async (c) => {
       sesion: c.get('sesion'),
       direccion,
       nombre,
-      qr: qr.generar(direccion, nombre),
+      emblema,
+      qr: qr.generar(direccion, nombre, emblema),
     }),
   );
 });
 
 app.post('/qr/descargar', exigirSesion, async (c) => {
-  const { direccion, nombre } = qrDelFormulario(await c.req.parseBody());
+  const { direccion, nombre, emblema } = qrDelFormulario(await c.req.parseBody());
   const error = qr.revisarDireccion(direccion);
   if (error) {
-    return c.html(paginaQr({ sesion: c.get('sesion'), direccion, nombre, error }), 400);
+    return c.html(paginaQr({ sesion: c.get('sesion'), direccion, nombre, emblema, error }), 400);
   }
 
-  const codigo = qr.generar(direccion, nombre);
+  const codigo = qr.generar(direccion, nombre, emblema);
   c.header('Content-Type', 'image/svg+xml; charset=utf-8');
   c.header('Content-Disposition', `attachment; filename="${codigo.archivo}.svg"`);
   return c.body(codigo.svg);

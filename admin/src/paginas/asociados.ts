@@ -1,14 +1,15 @@
 /**
  * Pantallas del catálogo de laboratorios asociados.
  *
- * Se parecen a las del catálogo público, con una diferencia que conviene que se
- * note nada más entrar: **aquí se ven precios**. El aviso de arriba no es
- * decoración; es lo que recuerda a quien tiene el panel abierto en el mostrador
- * que esa pantalla no es para enseñársela a un paciente.
+ * Son casi las del catálogo público. La diferencia está en quién entra: esta
+ * sección es solo de administradores, porque es la cartera de convenio y no
+ * algo que recepción necesite.
+ *
+ * Aquí se vieron precios y ya no: el laboratorio pidió sacarlos del panel, y
+ * con ellos se fue el tarifario del KV y toda su maquinaria.
  */
-import { pagina, cabecera, esc, type Sesion } from './plantilla';
+import { pagina, cabecera, esc, icono, type Sesion } from './plantilla';
 import {
-  comoPrecio,
   contarFaltas,
   FILTROS,
   type Filtro,
@@ -20,11 +21,11 @@ export const TOPE = 60;
 
 type ConSlug = Prueba & { slug: string };
 
-const AVISO_PRECIOS = `
+const AVISO_SECCION = `
   <p class="eco">
-    <strong>Esta sección lleva el tarifario mayorista.</strong> Los precios se
-    guardan en Cloudflare, nunca en el repositorio, y el sitio no los publica.
-    Solo la ven los administradores.
+    <strong>Es la cartera que ExamLab ofrece a otros laboratorios.</strong> Solo
+    la ven los administradores. Los precios no se llevan aquí: van en el Excel
+    del laboratorio.
   </p>`;
 
 /* ─── Listado ────────────────────────────────────────────────────────────── */
@@ -55,17 +56,13 @@ export function paginaAsociados(o: {
         <td>
           <a href="/asociados/${esc(p.slug)}${contexto ? `?${contexto}` : ''}">${esc(p.nombre)}</a>
           ${(Object.keys(FILTROS) as Filtro[])
-            .filter((f) => f !== 'sin-precio' && f !== o.filtro && FILTROS[f].falta(p))
+            .filter((f) => f !== o.filtro && FILTROS[f].falta(p))
             .map((f) => `<span class="marca">${esc(FILTROS[f].etiqueta)}</span>`)
             .join('')}
           <br><span class="pista">${esc(p.especialidad)}</span>
         </td>
-        <td style="text-align:right;white-space:nowrap">
-          ${
-            p.precio === null
-              ? '<span class="marca">sin precio</span>'
-              : `<strong>${esc(comoPrecio(p.precio))}</strong>`
-          }
+        <td class="accion">
+          <a class="boton suave chico" href="/asociados/${esc(p.slug)}${contexto ? `?${contexto}` : ''}">${icono('editar')}<span class="solo-ancho">Editar</span></a>
         </td>
       </tr>`,
     )
@@ -83,9 +80,14 @@ export function paginaAsociados(o: {
   return pagina(
     'Laboratorios asociados',
     `    ${cabecera('Catálogo de asociados', `${o.pruebas.length} pruebas que ExamLab ofrece a otros laboratorios.`)}
-      ${AVISO_PRECIOS}
+      ${AVISO_SECCION}
       ${o.ok ? `<p class="error bien">${esc(o.ok)}</p>` : ''}
       ${o.aviso ? `<p class="error">${esc(o.aviso)}</p>` : ''}
+
+      <p class="acciones">
+        <a class="boton" href="/asociados/nueva">${icono('mas')}Añadir una prueba</a>
+        <a class="boton suave" href="/asociados-importar">${icono('hoja')}Cargar una hoja de cálculo</a>
+      </p>
 
       <ul class="recuento">
         <li><a href="${enlace()}" ${!o.filtro ? 'aria-current="page"' : ''}>
@@ -132,7 +134,7 @@ export function paginaAsociados(o: {
       </p>
 
       <table>
-        <thead><tr><th>Prueba</th><th style="text-align:right">Precio</th></tr></thead>
+        <thead><tr><th>Prueba</th><th></th></tr></thead>
         <tbody>${filas}</tbody>
       </table>
       </div>
@@ -146,12 +148,16 @@ export function paginaAsociados(o: {
 export function paginaPrueba(o: {
   sesion: Sesion;
   prueba: ConSlug;
-  precio: number | null;
   especialidades: string[];
   desde: { q?: string; falta?: string; especialidad?: string };
+  /** Alta de una prueba que todavía no existe: el nombre se puede escribir. */
+  esNueva?: boolean;
+  /** Lo escrito en «especialidad nueva», para no perderlo al reintentar. */
+  nueva?: string;
   error?: string;
 }) {
   const p = o.prueba;
+  const nueva = o.esNueva === true;
 
   const parametros = new URLSearchParams(
     Object.entries(o.desde).filter(([, v]) => v) as [string, string][],
@@ -167,41 +173,54 @@ export function paginaPrueba(o: {
       ? o.especialidades
       : [p.especialidad, ...o.especialidades]
   )
-    .map(
-      (n) => `<option value="${esc(n)}" ${p.especialidad === n ? 'selected' : ''}>${esc(n)}</option>`,
+    .map((n) =>
+      // En un alta la especialidad viene vacía y encabeza la lista; sin texto,
+      // el desplegable se abre en blanco y no dice que falta elegir.
+      n === ''
+        ? `<option value="" ${p.especialidad === '' ? 'selected' : ''}>— Elija una —</option>`
+        : `<option value="${esc(n)}" ${p.especialidad === n ? 'selected' : ''}>${esc(n)}</option>`,
     )
     .join('');
 
   return pagina(
-    p.nombre,
+    nueva ? 'Añadir una prueba' : p.nombre,
     `      <p class="pista" style="margin:0"><a href="${volver}">← Volver al catálogo de asociados</a></p>
-    ${cabecera(`${esc(p.nombre)}`, `${esc(p.especialidad)}`)}
+    ${
+      nueva
+        ? cabecera(
+            'Añadir una prueba',
+            `Entra en la cartera que ven los laboratorios asociados. Si el
+             laboratorio le manda la lista entera, es más rápido
+             <a href="/asociados-importar">cargarla por hoja de cálculo</a>.`,
+          )
+        : cabecera(`${esc(p.nombre)}`, `${esc(p.especialidad)}`)
+    }
       ${o.error ? `<p class="error">${esc(o.error)}</p>` : ''}
 
-      <form class="panel" method="post" action="/asociados/${esc(p.slug)}">
+      <form class="panel" method="post" action="${nueva ? '/asociados/nueva' : `/asociados/${esc(p.slug)}`}">
         ${ocultos}
 
-        <label for="precio">Precio para laboratorios</label>
-        <input id="precio" name="precio" type="text" inputmode="decimal"
-               value="${esc(comoPrecio(o.precio))}" placeholder="0.00">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" name="nombre" type="text" value="${esc(p.nombre)}" required ${nueva ? 'autofocus' : ''}>
         ${
-          o.precio === null
-            ? `<p class="eco">Esta prueba todavía no tiene precio en el tarifario.</p>`
+          nueva
+            ? `<p class="pista">
+                 Tal como lo escribe el laboratorio, que es como vendrá en la
+                 hoja: así la próxima carga reconoce esta prueba en vez de darla
+                 de alta otra vez.
+               </p>`
             : ''
         }
-        <p class="pista">
-          En dólares, con dos decimales. Se puede escribir con coma o con punto.
-          Déjelo vacío para quitarlo del tarifario. <strong>No se versiona</strong>:
-          se guarda en Cloudflare y no llega al repositorio ni al sitio.
-        </p>
-
-        <label for="nombre">Nombre</label>
-        <input id="nombre" name="nombre" type="text" value="${esc(p.nombre)}" required>
 
         <label for="especialidad">Especialidad</label>
         <select id="especialidad" name="especialidad">${opciones}</select>
+        <label for="especialidadNueva" style="font-weight:400">…o escriba una especialidad nueva</label>
+        <input id="especialidadNueva" name="especialidadNueva" type="text"
+               value="${esc(o.nueva ?? '')}" placeholder="Déjelo vacío para usar la de arriba">
         <p class="pista">
           Agrupa la prueba en la tabla que ven los laboratorios asociados.
+          Escrita de dos formas distintas se parte en dos grupos, así que
+          conviene elegir de la lista.
         </p>
 
         <div class="fila" style="margin-top:1.1rem">
@@ -233,7 +252,7 @@ export function paginaPrueba(o: {
           Déjelo vacío si la prueba es una sola determinación.
         </p>
 
-        <button type="submit">Guardar</button>
+        <button type="submit">${nueva ? 'Añadir a la cartera' : 'Guardar'}</button>
       </form>
 `,
     { sesion: o.sesion, activa: '/asociados' },

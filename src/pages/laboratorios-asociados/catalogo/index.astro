@@ -6,14 +6,12 @@ import catalogo from '@/data/catalogo-asociados.json';
 import { breadcrumbSchema } from '@/lib/schema';
 
 /*
-  El tarifario de convenio es información comercial reservada. Mientras esta
-  página siga siendo de acceso abierto queda en `false`, y así el precio no se
-  renderiza: no viaja al navegador ni aparece en el código fuente.
-
-  Se pone en `true` únicamente cuando la ruta esté detrás de control de acceso,
-  como lo estaba en el sitio anterior con los usuarios de WordPress.
+  Aquí hubo un interruptor `MOSTRAR_PRECIOS` que nunca se encendió: la página es
+  de acceso abierto y el tarifario de convenio es información reservada. Se
+  retiró junto con los precios del sistema. El catálogo enseña qué pruebas hay,
+  con su método, su muestra y su plazo; el tarifario se pide al laboratorio, y
+  eso lo dice la propia tabla al pie.
 */
-const MOSTRAR_PRECIOS = false;
 
 const schema = [
   breadcrumbSchema([
@@ -42,5 +40,5 @@ const schema = [
     ]}
   />
 
-  <CatalogoAsociados mostrarPrecios={MOSTRAR_PRECIOS} />
+  <CatalogoAsociados />
 </BaseLayout>

@@ -139,17 +139,11 @@ try {
       metodo: (c.B || '').trim(),
       muestra: (c.C || '').trim(),
       entrega: normalizarEntrega(c.D),
-      // Sin `isFinite` una celda no numérica dejaba NaN, que al serializar se
-      // vuelve null y hacía que el recuento de «sin precio» diera cero de más.
-      precio: (() => {
-        const v = parseFloat(c.E);
-        return Number.isFinite(v) ? Math.round(v * 100) / 100 : null;
-      })(),
     });
   }
 
   const salida = {
-    fuente: 'Plantilla Asociados · lista de precios para laboratorios',
+    fuente: 'Plantilla Asociados · cartera de pruebas para laboratorios',
     generado: new Date().toISOString().slice(0, 10),
     avisos,
     notas,
@@ -162,7 +156,6 @@ try {
         metodo: p.metodo || undefined,
         muestra: muestra || undefined,
         entrega: p.entrega || undefined,
-        precio: p.precio,
         // Notas de muestra que cita esta prueba, para mostrarlas en la ficha.
         notas: [...new Set([...muestra.matchAll(/nota\s*(\d+)/gi)].map((m) => +m[1]))].sort((a, b) => a - b),
       };
@@ -172,28 +165,15 @@ try {
   // Escribe directamente donde lo consume el sitio, para que reimportar el
   // Excel actualizado sea un solo comando y no haya que copiar nada a mano.
   //
-  // Son dos archivos a propósito. El despliegue va por repositorio, así que lo
-  // que se versiona acaba al alcance de cualquiera que tenga acceso a él: el
-  // tarifario mayorista no puede viajar ahí. El sitio no muestra precios
-  // (`MOSTRAR_PRECIOS = false`), así que la versión sin importes le basta para
-  // compilar igual; la que los trae se queda fuera de git (ver .gitignore).
+  // Antes eran dos archivos: este y uno privado con el tarifario, que no podía
+  // versionarse porque el despliegue va por repositorio. Ya no hace falta: los
+  // precios salieron del sistema, la columna E del Excel se ignora y lo que se
+  // genera no lleva importes. El tarifario se queda donde siempre estuvo, en el
+  // Excel del laboratorio.
   const raiz = dirname(dirname(new URL(import.meta.url).pathname.slice(1)));
   const destino = join(raiz, 'src/data/catalogo-asociados.json');
-  const destinoPrivado = join(raiz, 'src/data/catalogo-asociados.privado.json');
 
-  writeFileSync(destinoPrivado, JSON.stringify(salida, null, 1));
-  writeFileSync(
-    destino,
-    JSON.stringify(
-      {
-        ...salida,
-        fuente: 'Plantilla Asociados · cartera de pruebas para laboratorios (sin tarifario)',
-        pruebas: salida.pruebas.map((p) => ({ ...p, precio: null })),
-      },
-      null,
-      1,
-    ),
-  );
+  writeFileSync(destino, JSON.stringify(salida, null, 1));
 
   const porEsp = {};
   salida.pruebas.forEach((p) => (porEsp[p.especialidad] = (porEsp[p.especialidad] || 0) + 1));
@@ -204,7 +184,6 @@ try {
   console.log('citan nota       ' + salida.pruebas.filter((p) => p.notas.length).length);
   console.log('notas            ' + notas.length);
   console.log('avisos           ' + avisos.length);
-  console.log('sin precio       ' + salida.pruebas.filter((p) => p.precio === null).length);
   console.log('sin entrega      ' + salida.pruebas.filter((p) => !p.entrega).length);
   console.log('sin método       ' + salida.pruebas.filter((p) => !p.metodo).length);
   console.log();
@@ -212,8 +191,7 @@ try {
   console.log();
   console.log('plazos: ' + [...new Set(salida.pruebas.map((p) => p.entrega).filter(Boolean))].sort().join(' · '));
   console.log();
-  console.log('→ ' + destino + '  (se versiona, sin precios)');
-  console.log('→ ' + destinoPrivado + '  (con precios, fuera de git)');
+  console.log('→ ' + destino);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }

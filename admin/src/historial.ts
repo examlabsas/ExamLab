@@ -27,7 +27,7 @@ export type Seccion =
 
 /**
  * `soloAdmin` marca las secciones que un editor no puede abrir. El historial
- * sí le enseña la etiqueta —saber que alguien tocó el tarifario no tiene nada
+ * sí le enseña la etiqueta —saber que alguien tocó la cartera no tiene nada
  * de reservado— pero no se la pone como enlace: antes se la ponía, y al
  * pulsarla recibía «No tiene permiso.» en texto plano, sin armazón y sin
  * vuelta. Un enlace que a la mitad de la gente le responde que no puede hace

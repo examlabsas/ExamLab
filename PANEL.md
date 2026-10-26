@@ -366,6 +366,49 @@ el Worker y la cabecera de seguridad quedó sin excepciones.
 
 ---
 
+## Lo que pidió el laboratorio después · hecho
+
+Todo comprobado contra el panel arrancado, no solo con `tsc`.
+
+**Los precios salieron del sistema.** Vivían en el KV de Cloudflare, con dos
+comandos que los movían y una barrera que forzaba `precio: null` al escribir.
+Ya no existe nada de eso: ni el campo, ni el filtro «sin precio», ni el campo
+del formulario, ni la columna de la tabla pública, ni el interruptor
+`MOSTRAR_PRECIOS`, ni los 277 `"precio": null` del archivo versionado. **Lo que
+no existe no se publica por descuido.** La página pública quedó idéntica: una
+etiqueta invisible menos, 198 bytes.
+
+**El código de verificación se quitó.** Entrar es correo y contraseña. Queda
+protegiendo la puerta la contraseña con PBKDF2 y 310 000 iteraciones, el límite
+de cinco intentos por correo y por IP, y que la sesión sea un testigo revocable
+en el KV. El secreto TOTP de cada usuario se sigue guardando, así que volver a
+pedirlo es restaurar una comprobación y un campo. Se ofreció alargar la sesión a
+30 días para compensar la molestia y el Dr. Silva dijo que no: complica las
+cosas. **Se queda en 8 horas.**
+
+**La cartera de asociados ya tiene alta e importación**, igual que el catálogo
+público: `/asociados/nueva` y `/asociados-importar`, con los tres pasos y la
+casilla que obliga a confirmar las bajas.
+
+> Al probarlo apareció un fallo que no se ve leyendo: hay **dos pruebas
+> llamadas «NICKERSON»** en especialidades distintas. El importador emparejaba
+> por nombre —como el del catálogo público, donde los nombres sí son únicos— y
+> descartaba la segunda como repetida, anunciando una baja que no existía. La
+> identidad aquí es **especialidad + nombre**, y ya estaba escrito en `claveDe`.
+> Copiar la forma del hermano sin mirar su clave es como se heredan los errores.
+
+**Los códigos QR llevan emblema elegible**: ExamLab, WhatsApp o ninguno, y se
+propone solo el que corresponde al destino. El logotipo de WhatsApp no se dibujó
+de memoria — estaba ya en el repositorio, dentro de un QR que el laboratorio
+generó antes. Los tres se leen a 2048, 600, 300 y 160 px.
+
+**Botones y organización.** Las acciones principales subieron del pie al
+encabezado, cada fila dice «Editar», y los botones miden 44 px. De paso se
+arregló que **en el móvil no se podía desactivar a un usuario**: la tabla medía
+511 px dentro de 375 y el botón quedaba fuera de pantalla, sin forma de llegar.
+
+---
+
 ## Lo que el panel **no** va a hacer
 
 Conviene decirlo ahora para que nadie lo espere:

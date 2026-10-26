@@ -36,11 +36,13 @@ Cloudflare Workers. Cada `git push` a `main` compila y publica.
 
 ## 2. Estado ahora mismo
 
-Último commit: `53fee43`. **Sin subir**: 18 archivos modificados y 14 nuevos,
-entre ellos la carpeta `admin/` entera. **Las seis fases del panel están hechas**,
-el panel está rediseñado y **la revisión del 13 al 16 de octubre está cerrada**:
-once defectos encontrados y los once corregidos y comprobados. Están en la tabla
-de errores de la sección 5, cada uno con cómo se detectó.
+Último commit: `b4bb74b`, que ya lleva el panel dentro. **Sin subir**: 30
+archivos modificados y 3 nuevos. Las seis fases están hechas, el panel
+rediseñado, **la revisión del 13 al 16 de octubre cerrada** —once defectos,
+los once corregidos— y encima van los cambios que pidió el laboratorio: fuera
+los precios, fuera el código de verificación, altas e importación en la cartera
+de asociados, emblemas elegibles en los códigos QR y los ocho retoques de texto
+y maquetación del Dr. Silva.
 
 | | |
 |---|---|
@@ -166,6 +168,65 @@ habría quedado con la palabra «nuevo».
 Rechaza un nombre que ya exista comparándolo normalizado, porque el nombre es la
 clave con la que la carga por hoja reconoce cada examen y dos iguales dejarían a
 la hoja sin saber a cuál corresponde cada fila.
+
+### Cuatro cambios que pidió el laboratorio, y qué significan
+
+**Los precios salieron del sistema.** Vivían en el KV de Cloudflare, fuera del
+repositorio, con dos comandos que los movían y una barrera que forzaba
+`precio: null` al escribir. Nada de eso existe ya: ni el campo en el modelo, ni
+el filtro «sin precio», ni el campo del formulario, ni la columna en la tabla
+pública, ni el interruptor `MOSTRAR_PRECIOS`, ni los 277 `"precio": null` del
+archivo versionado. El tarifario vuelve a estar solo donde siempre estuvo de
+verdad, en el Excel del laboratorio. **Lo que no existe no se publica por
+descuido**, que era el riesgo que toda aquella maquinaria intentaba contener.
+Comprobado que la página pública no cambió: una etiqueta invisible menos, 198
+bytes.
+
+**El código de verificación se quitó.** Entrar es correo y contraseña. Dije lo
+que eso significa antes de hacerlo —sin segundo factor, una contraseña robada
+basta para entrar— y ofrecí la alternativa de alargar la sesión de 8 horas a 30
+días, que quita la molestia sin quitar la protección. Quedó pendiente de su
+respuesta. El secreto TOTP de cada usuario **se sigue guardando**, así que
+volver a pedirlo es restaurar una comprobación y un campo del formulario, no
+rehacer el sistema. `auth/totp.ts` se queda por eso.
+
+**La cartera de asociados ya tiene alta e importación**, como el catálogo
+público: `/asociados/nueva` y `/asociados-importar`, con los mismos tres pasos y
+la misma casilla que obliga a confirmar las bajas.
+
+**Los códigos QR llevan emblema elegible.** ExamLab, WhatsApp o ninguno, y se
+propone solo el que corresponde al destino. El logotipo de WhatsApp no se dibujó
+de memoria: estaba ya en el repositorio, dentro de un QR que el laboratorio
+generó antes con el script antiguo. Para añadir Instagram o Facebook hace falta
+su SVG oficial; `emblemas.ts` explica cómo se añade en una entrada.
+
+### Los ocho retoques que pidió el Dr. Silva
+
+Vinieron de verle usar el sitio, que es de donde salen los buenos:
+
+1. «Uno de **los dos** laboratorios de la región» → «uno de **los pocos**».
+2. **Provincia de Tungurahua** en lugar de «Ambato y Pelileo», empezando por el
+   nav. En la descripción que lee Google se conservó «con sedes en Ambato y
+   Pelileo» detrás: *Ambato* es por donde busca la gente y quitarlo cuesta
+   visitas.
+3. y 4. **Al sistema se entra con cédula y contraseña**, no con un «código de
+   orden» que ya no existe. Desapareció de las diez páginas donde se nombraba.
+5. **Número de urgencias**: 098 800 0799, distinto del general. Hasta entonces
+   el sitio publicaba el general bajo la etiqueta «Urgencias» en las 583
+   páginas, que es peor que no publicar ninguno.
+6. **No nombrar la marca del proveedor del sistema**: es publicidad regalada.
+   Ahora dice «nuestro sistema» o «nuestro sistema integrado». El `href` del
+   botón sigue apuntando donde apunta, que no se puede evitar; comprobado que el
+   nombre no aparece en texto, ni en `aria-label`, `title` o `alt`, ni en los
+   datos estructurados.
+7. **El cajón de preguntas que se expandía vacío.** Era de libro: los `<details>`
+   viven en una rejilla de dos columnas y las celdas de una fila se estiran a la
+   misma altura. Al abrir uno, el de al lado crecía en blanco. `items-start` lo
+   arregla, y pasaba en dos páginas, no en una.
+8. Las **cifras de la portada** dejaron de escribirse a mano: decía «400+
+   análisis» con 559 en el catálogo y «5 especialidades» —que era el número de
+   tarjetas de esa misma página— con 10 reales. Ahora se cuentan, como ya se
+   contaban las de las tarjetas.
 
 ### Estructura
 
@@ -314,6 +375,7 @@ Con nueve fotos no compensa; queda decidido que no se hace.
 | Durante esa búsqueda hice `git stash` y convertí los finales de línea de 80 archivos del sitio | `git status` pasó a listar setenta archivos modificados | `git status` marca por fecha y tamaño; **`git diff --numstat` dice si el contenido cambió de verdad**. Con `core.autocrlf=true` los finales de línea son ruido que git ignora al comparar |
 | Al limpiar ese ruido reverté `src/pages/sedes/[slug].astro`, que sí tenía un cambio real | Comprobando que los feriados seguían en los datos de Google | `grep -x "$f"` trata los corchetes del nombre como un patrón. Con nombres de archivo, `grep -Fx` |
 | Escribí `DESIGN.md` en la raíz del repositorio | El verificador empezó a marcar once cosas del **sitio público** | Un sistema de diseño gobierna el árbol donde vive. El del panel va en `admin/`; el del sitio lo fija PRODUCT.md y es intocable |
+| Escribí el importador de la cartera de asociados emparejando por nombre, como el del catálogo público. Hay **dos pruebas llamadas «NICKERSON»** en especialidades distintas: la hoja traía las dos, la segunda se descartaba como repetida y la pantalla anunciaba una baja que no existía | Probándolo con una hoja generada de la propia cartera, que debía dar 0 bajas y dio 1 | **La identidad de un registro la decide el dato, no la costumbre.** En el catálogo público los nombres son únicos y basta el nombre; en la cartera de asociados la clave es especialidad + nombre, y eso ya estaba escrito en `claveDe`. Copiar la forma del hermano sin mirar su clave es como se heredan los errores |
 | Puse `img-src 'self'` en la CSP del panel sin caer en que **`'self'` no incluye `data:`**. Quedaron bloqueadas las dos únicas imágenes que el panel tiene: la flecha de todos los desplegables y el emblema del centro de los QR | La revisión del 13 de octubre, leyendo la consola del navegador en `/usuarios` | Una política de seguridad se comprueba **pidiendo la página y mirando la consola**, no leyendo la cabecera. El campo «Rol» llevaba meses pareciendo un campo de texto |
 | El SVG del QR se incrustaba en la pantalla con su `width="2048"` de imprenta. La pantalla del segundo factor —la primera que ve quien acepta una invitación— se iba a 2433 px de ancho | Midiendo `document.documentElement.scrollWidth` en una ventana de 1024 | **Un mismo artefacto para pantalla y para imprenta necesita dos tamaños.** El archivo descargado manda sus dimensiones; en pantalla manda el contenedor |
 | Verifiqué los QR rasterizando el **archivo descargado** y di por hecho que la pantalla enseñaba lo mismo. No lo enseñaba: sin emblema, por la CSP | El mismo repaso | Verificar el artefacto que de verdad se usa. La pantalla pide «escanéelo ahora» y lo que se escaneaba no era lo que se descargaba |
@@ -439,21 +501,35 @@ diff antes.sha despues.sha
 
 ## 7. Lo siguiente
 
-**Las seis fases están hechas, el panel está rediseñado y la revisión está
-cerrada.** Lo único que queda en el panel depende de terceros:
+**Por parte del programador no queda nada.** Las seis fases, el rediseño, la
+revisión y los cambios que pidió el Dr. Silva están hechos y comprobados. Lo que
+falta es desplegar (de Juan) y rellenar datos (del laboratorio), y está en la
+sección 8.
 
-- **Cerrar el catálogo de asociados** para que solo lo vean los laboratorios con
-  convenio. Hacen falta sus correos, que el laboratorio no ha entregado, y hay
-  que decidir el mecanismo porque Cloudflare Access está descartado.
-
-Y dos huecos que se rellenan solos cuando llegue el material:
+Un hueco que se rellena solo cuando llegue el material:
 
 - **El logotipo en SVG.** El raíl del panel no lleva emblema: el PNG pesa 1,7 MB
   y no cabe en una hoja que viaja en cada respuesta, y un monograma de dos letras
   repetía la palabra de al lado sin llegar al contraste mínimo. Cuando llegue el
-  SVG, ahí va.
-- **Los 495 plazos de entrega.** Ya no dependen del programador: se rellenan
-  desde `/catalogo`, filtrando por lo que falta.
+  SVG, ahí va — y también como opción en los emblemas de los códigos QR.
+
+### Descartado, con su motivo
+
+**Cerrar el catálogo de asociados.** Era el pendiente más antiguo y dejó de
+tener sentido al sacar los precios del sistema. Lo que esa página publica ahora
+es especialidad, nombre, método, muestra y plazo: el catálogo comercial del
+laboratorio, no algo reservado. Cerrarlo costaría pedir los correos de los
+asociados, decidir un mecanismo —Cloudflare Access sigue descartado por la
+tarjeta— y montarlo, para proteger lo que no hace falta proteger; y le cerraría
+la puerta a un laboratorio nuevo que quiera ver qué se ofrece antes de pedir
+convenio. **Si algún día vuelven los precios a la web, vuelve este pendiente.**
+
+**La sesión de 30 días.** Se ofreció al quitar el código de verificación, para
+que entrar no se pidiera cada día. El Dr. Silva dijo que no: complica las cosas.
+La sesión se queda en 8 horas.
+
+**La foto de la fachada de Ficoa en más resolución** y **Carnaval y Viernes
+Santo** en los feriados: descartados por el laboratorio.
 
 ---
 
@@ -484,18 +560,15 @@ vectorial resuelve el caso.
 
 Detalle completo en [PENDIENTES.md](PENDIENTES.md). En corto:
 
-- **Doctor**: número de urgencias (confirmó que existe, no lo mandó), foto de la
-  fachada de Ficoa en más resolución (el original mide 1448 px y se ve blanda en
-  pantallas grandes), confirmar 2023 como año de constitución, y si es cierta la
-  noticia de los «nuevos analizadores» —la escribí yo de ejemplo y está
-  destacada—, y el logo en SVG.
+- **Doctor**: confirmar 2023 como año de constitución, y el logo en SVG. El
+  número de urgencias ya lo entregó (098 800 0799, distinto del general) y
+  confirmó que la noticia de los «nuevos analizadores» es cierta.
 - **Netlife**: habilitar DKIM. No existe; comprobado por DNS con 8 selectores.
 - **Luis**: acceso al perfil de Google Business. Arregla el botón de reseña y que
   Google siga mostrando Castillo como dirección principal en vez de Ficoa.
-- **Laboratorio**: correos de los asociados —y decidir cómo se cierra ese catálogo,
-  porque Cloudflare Access ya no es opción—, los 495 tiempos de entrega y 16 tipos
-  de muestra. Los plazos ya **no** dependen del programador: se rellenan desde
-  `/catalogo` en el panel.
+- **Laboratorio**: los 495 tiempos de entrega, los 495 de técnica y los 16 tipos
+  de muestra. **Se encargan ellos desde el panel**, uno a uno en `/catalogo` o
+  por hoja de cálculo en `/catalogo-importar`. Ya no pasa por el programador.
 
 ---
 

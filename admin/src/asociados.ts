@@ -1,29 +1,22 @@
 /**
  * Catálogo de laboratorios asociados: las 277 pruebas que ExamLab ofrece a
- * otros laboratorios, con su método, su muestra, su plazo — y su precio.
+ * otros laboratorios, con su método, su muestra y su plazo.
  *
- * El precio es lo que hace esta sección distinta de todo lo demás del panel.
+ * **Aquí no hay precios, y es a propósito.**
  *
- * El despliegue del sitio va por repositorio, así que cualquier cosa que se
- * versione queda al alcance de quien tenga acceso a él. El tarifario mayorista
- * no puede viajar ahí. Por eso hay dos archivos y uno está fuera de git:
+ * Los hubo: vivían en el KV de Cloudflare, fuera del repositorio, porque el
+ * despliegue del sitio va por repositorio y cualquier cosa versionada queda al
+ * alcance de quien tenga acceso a él. Funcionaba, pero significaba que el
+ * tarifario mayorista existía en un sitio más, con una copia que mantener al
+ * día y un camino por el que podía escaparse.
  *
- * - `src/data/catalogo-asociados.json` se versiona, con `precio: null` en todas.
- *   Es lo que compila el sitio, y le basta porque hoy no publica importes
- *   (`MOSTRAR_PRECIOS = false` en la página del catálogo).
- * - `src/data/catalogo-asociados.privado.json` queda en la máquina de quien
- *   importa el Excel. **El panel no puede leerlo ni escribirlo**: solo habla con
- *   GitHub, y ese archivo no está en GitHub.
+ * El laboratorio pidió quitarlos del panel. Al hacerlo desaparece toda esa
+ * maquinaria —el tarifario en el KV, los dos comandos que lo movían, la barrera
+ * que forzaba `precio: null` al escribir— y con ella el riesgo. El tarifario
+ * sigue donde siempre estuvo de verdad: en el Excel del laboratorio.
  *
- * De ahí la decisión de esta fase: **los precios viven en el KV de Cloudflare**,
- * no en el repositorio. El panel los lee y los escribe allí, y dos comandos los
- * llevan de un lado a otro para que reimportar el Excel no pierda lo que se
- * corrigió desde el panel (`npm run tarifario:cargar` y `tarifario:guardar`).
- *
- * Que el tarifario esté en el KV y no en un archivo del portátil no lo expone
- * más: lo protege la misma cuenta de Cloudflare que ya protege el panel entero.
- * Lo que no hace es publicarlo — para eso haría falta además poner
- * `MOSTRAR_PRECIOS = true`, que es una decisión aparte y del laboratorio.
+ * Si algún día hay que volver a ponerlos, está en el historial de git. No se
+ * reconstruye desde cero.
  */
 import { escribirVarios, leerCabeza, leerTexto, type Cabeza, type Config } from './github';
 import { normalizar } from '../../src/lib/examenes-comun';
@@ -39,8 +32,6 @@ export type Prueba = {
   metodo?: string;
   muestra?: string;
   entrega?: string;
-  /** Siempre `null` en el archivo versionado. El importe vive en el KV. */
-  precio: number | null;
   /** Números de las notas de muestra que cita, para enlazarlas en la ficha. */
   notas: number[];
 };
@@ -110,66 +101,17 @@ export async function guardarCatalogo(
   cfg: Config,
   opciones: { catalogo: Catalogo; cabeza: Cabeza; resumen: string; autor: string },
 ): Promise<void> {
-  /*
-    Se escribe siempre con `precio: null`, pase lo que pase. Es la última
-    barrera: si alguna vez un precio llegara hasta aquí dentro de un objeto,
-    acabaría en el repositorio y de ahí no se saca — el historial de git lo
-    conserva aunque se borre después.
-  */
-  const limpio: Catalogo = {
-    ...opciones.catalogo,
-    pruebas: opciones.catalogo.pruebas.map((p) => ({ ...p, precio: null })),
-  };
-
   await escribirVarios(cfg, {
-    archivos: [{ ruta: RUTA_ASOCIADOS, texto: aJson(limpio) }],
+    archivos: [{ ruta: RUTA_ASOCIADOS, texto: aJson(opciones.catalogo) }],
     cabeza: opciones.cabeza,
     resumen: opciones.resumen,
     autor: opciones.autor,
   });
 }
 
-/* ─── El tarifario, en el KV ─────────────────────────────────────────────── */
-
-/** Precios por `claveDe`. Nunca sale del KV hacia el repositorio. */
-export type Tarifario = Record<string, number>;
-
-const CLAVE_TARIFARIO = 'tarifario';
-
-export async function leerTarifario(kv: KVNamespace): Promise<Tarifario> {
-  return (await kv.get<Tarifario>(CLAVE_TARIFARIO, 'json')) ?? {};
-}
-
-export async function guardarTarifario(kv: KVNamespace, tarifario: Tarifario): Promise<void> {
-  await kv.put(CLAVE_TARIFARIO, JSON.stringify(tarifario));
-}
-
-/** El precio de una prueba, redondeado a céntimos. `null` si no se ha puesto. */
-export const precioDe = (tarifario: Tarifario, p: Prueba): number | null =>
-  tarifario[claveDe(p)] ?? null;
-
-/**
- * Lee un importe escrito a mano.
- *
- * Se aceptan la coma y el punto como separador decimal porque en Ecuador se
- * escriben los dos, y quien teclea cuarenta precios seguidos no va a estar
- * pendiente de cuál espera el formulario.
- */
-export function leerPrecio(texto: string): number | null | 'error' {
-  const limpio = texto.trim().replace(/\s/g, '').replace(',', '.');
-  if (!limpio) return null;
-  if (!/^\d{1,6}(\.\d{1,2})?$/.test(limpio)) return 'error';
-  const valor = Number(limpio);
-  return Number.isFinite(valor) ? Math.round(valor * 100) / 100 : 'error';
-}
-
-export const comoPrecio = (valor: number | null): string =>
-  valor === null ? '' : valor.toFixed(2);
-
 /* ─── Búsqueda y recuento ────────────────────────────────────────────────── */
 
 export const FILTROS = {
-  'sin-precio': { etiqueta: 'sin precio', falta: (p: Prueba) => p.precio === null },
   'sin-entrega': { etiqueta: 'sin plazo de entrega', falta: (p: Prueba) => !p.entrega?.trim() },
   'sin-metodo': { etiqueta: 'sin método', falta: (p: Prueba) => !p.metodo?.trim() },
   'sin-muestra': { etiqueta: 'sin tipo de muestra', falta: (p: Prueba) => !p.muestra?.trim() },
@@ -210,6 +152,19 @@ export function buscar<T extends Prueba>(
 }
 
 /* ─── Validación ─────────────────────────────────────────────────────────── */
+
+/**
+ * Las notas de condiciones de muestra que cita un texto.
+ *
+ * El laboratorio las escribe dentro de la propia muestra —«Suero. Ver nota 3»—
+ * y la ficha las enlaza. Se deducen del texto en vez de guardarse aparte, que
+ * es lo que hace el script que importa el Excel; aquí se recalculan al guardar
+ * para que no queden enlazando a una condición que ya no es la suya.
+ */
+export const notasDe = (muestra?: string): number[] =>
+  [...new Set([...(muestra ?? '').matchAll(/nota\s*(\d+)/gi)].map((m) => Number(m[1])))].sort(
+    (a, b) => a - b,
+  );
 
 export function revisarPrueba(p: Partial<Prueba>): string | null {
   if (!p.nombre?.trim()) return 'Falta el nombre de la prueba.';

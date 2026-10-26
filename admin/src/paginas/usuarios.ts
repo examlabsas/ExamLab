@@ -1,5 +1,5 @@
 /** Pantalla de gestión de usuarios. Solo para administradores. */
-import { pagina, cabecera, esc, type Sesion } from './plantilla';
+import { pagina, cabecera, esc, icono, type Sesion } from './plantilla';
 import type { UsuarioPublico } from '../usuarios';
 
 /*
@@ -23,16 +23,28 @@ export function paginaUsuarios(opciones: {
   const filas = opciones.usuarios
     .map(
       (u) => `<tr>
-        <td>${esc(u.nombre)}<br><span class="pista">${esc(u.correo)}</span></td>
-        <td>${esc(u.rol)}</td>
-        <td>${u.activo ? 'Activo' : 'Desactivado'}</td>
-        <td>${
+        <td>
+          ${esc(u.nombre)}<br><span class="pista">${esc(u.correo)}</span>
+          ${
+            /*
+              En el móvil el rol baja aquí y el estado solo se dice cuando es
+              noticia: «Activo» es lo normal y lo repite el propio botón, que
+              dice «Desactivar» justo cuando alguien lo está.
+            */ ''
+          }
+          <span class="solo-estrecho"><br><span class="marca">${esc(u.rol)}</span>${
+            u.activo ? '' : '<span class="marca mal">Desactivado</span>'
+          }</span>
+        </td>
+        <td class="solo-amplio">${esc(u.rol)}</td>
+        <td class="solo-amplio">${u.activo ? 'Activo' : 'Desactivado'}</td>
+        <td class="accion">${
           u.correo === opciones.sesion.correo
             ? '<span class="pista">Es usted</span>'
             : `<form method="post" action="/usuarios/estado" style="margin:0">
                  <input type="hidden" name="correo" value="${esc(u.correo)}">
                  <input type="hidden" name="activo" value="${u.activo ? 'no' : 'si'}">
-                 <button type="submit" style="width:auto;margin:0;padding:.35rem .7rem;font-size:.8rem">
+                 <button type="submit" class="chico ${u.activo ? 'secundario' : ''}">
                    ${u.activo ? 'Desactivar' : 'Reactivar'}
                  </button>
                </form>`
@@ -61,13 +73,17 @@ export function paginaUsuarios(opciones: {
           : ''
       }
 
+      <p class="acciones">
+        <a class="boton" href="#invitar">${icono('mas')}Invitar a alguien</a>
+      </p>
+
       <table>
-        <thead><tr><th>Persona</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr><th>Persona</th><th class="solo-amplio">Rol</th><th class="solo-amplio">Estado</th><th></th></tr></thead>
         <tbody>${filas}</tbody>
       </table>
 
-      <div class="panel" style="margin-top:2rem;max-width:none">
-        <h1 style="font-size:1.1rem">Invitar a alguien</h1>
+      <div class="panel" id="invitar" style="margin-top:2rem;max-width:none">
+        <h2 style="font-size:1.1rem;margin:0 0 1rem">Invitar a alguien</h2>
         <form method="post" action="/usuarios/invitar">
           <label for="nombre">Nombre</label>
           <input id="nombre" name="nombre" type="text" required>
@@ -83,7 +99,7 @@ export function paginaUsuarios(opciones: {
 
           <p class="pista">
             Un editor no ve el catálogo de laboratorios asociados: ahí está el
-            tarifario de convenio.
+            cartera de convenio.
           </p>
 
           <button type="submit">Crear enlace de alta</button>

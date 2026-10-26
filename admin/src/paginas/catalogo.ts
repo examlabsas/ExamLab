@@ -11,7 +11,7 @@
  * - **Cargar una hoja entera.** Tres pasos, y el del medio existe solo para que
  *   nadie publique una hoja sin ver antes qué se va a borrar.
  */
-import { pagina, cabecera, esc, type Sesion } from './plantilla';
+import { pagina, cabecera, esc, icono, type Sesion } from './plantilla';
 import {
   CAMPOS_HOJA,
   contarFaltas,
@@ -58,12 +58,17 @@ export function paginaCatalogo(o: {
   const fichas = mostrados
     .map(
       (e) => `<li>
-        <a href="/catalogo/${esc(e.slug)}${contexto ? `?${contexto}` : ''}">${esc(e.nombre)}</a>
-        ${(Object.keys(FILTROS) as Filtro[])
-          .filter((f) => f !== o.filtro && FILTROS[f].falta(e))
-          .map((f) => `<span class="marca">${esc(FILTROS[f].etiqueta)}</span>`)
-          .join('')}
-        <br><span class="pista">${esc(e.especialidad)}</span>
+        <a class="renglon" href="/catalogo/${esc(e.slug)}${contexto ? `?${contexto}` : ''}">
+          <span>
+            <strong>${esc(e.nombre)}</strong>
+            ${(Object.keys(FILTROS) as Filtro[])
+              .filter((f) => f !== o.filtro && FILTROS[f].falta(e))
+              .map((f) => `<span class="marca">${esc(FILTROS[f].etiqueta)}</span>`)
+              .join('')}
+            <br><span class="pista">${esc(e.especialidad)}</span>
+          </span>
+          <span class="renglon-accion">Editar${icono('seguir')}</span>
+        </a>
       </li>`,
     )
     .join('');
@@ -82,6 +87,23 @@ export function paginaCatalogo(o: {
     `    ${cabecera('Catálogo de exámenes', `${o.examenes.length} exámenes publicados. Los cambios tardan uno o dos
         minutos en verse en el sitio.`)}
       ${o.ok ? `<p class="error bien">${esc(o.ok)}</p>` : ''}
+
+      ${
+        /*
+          Las dos formas de meter exámenes, arriba y a la vista. Estaban al pie
+          de la página, debajo de sesenta filas y escritas como enlaces de
+          texto: para dar de alta uno había que recorrer toda la lista primero,
+          y aun así no parecían algo que se pudiera pulsar.
+
+          Añadir va en el botón lleno y cargar en el suave: el primero es el
+          gesto de todos los días, el segundo el de cuando llega la lista
+          entera del laboratorio.
+        */ ''
+      }
+      <p class="acciones">
+        <a class="boton" href="/catalogo/nuevo">${icono('mas')}Añadir un examen</a>
+        <a class="boton suave" href="/catalogo-importar">${icono('hoja')}Cargar una hoja de cálculo</a>
+      </p>
 
       <ul class="recuento">
         <li><a href="${enlace()}" ${!o.filtro ? 'aria-current="page"' : ''}>
@@ -127,26 +149,9 @@ export function paginaCatalogo(o: {
         }
       </p>
 
-      <ul class="lista">${fichas}</ul>
+      <ul class="lista con-filas">${fichas}</ul>
       </div>
 
-      <div class="panel" style="margin-top:1.5rem">
-        <h2 style="font-size:1.05rem;margin:0">Añadir un examen</h2>
-        <p class="pista" style="margin-top:.4rem">
-          Uno suelto, escribiéndolo aquí. Entra al catálogo del sitio en cuanto
-          se guarde.
-        </p>
-        <p style="margin:1rem 0 0"><a href="/catalogo/nuevo">Añadir un examen al catálogo</a></p>
-      </div>
-
-      <div class="panel" style="margin-top:1.5rem">
-        <h2 style="font-size:1.05rem;margin:0">Cargar la lista del laboratorio</h2>
-        <p class="pista" style="margin-top:.4rem">
-          Para dar de alta o de baja exámenes en bloque, o rellenar una columna
-          entera desde el Excel. Antes de publicar nada se enseña qué cambia.
-        </p>
-        <p style="margin:1rem 0 0"><a href="/catalogo-importar">Abrir la carga por hoja de cálculo</a></p>
-      </div>
 `,
     { sesion: o.sesion, activa: '/catalogo' },
   );

@@ -13,9 +13,7 @@
     "pruebas:github": "node pruebas/github-falso.mjs",
     "pruebas:usuario": "node pruebas/usuario.mjs",
     "pruebas:codigo": "node pruebas/codigo.mjs",
-    "pruebas:hoja": "node pruebas/hoja-de-ejemplo.mjs",
-    "tarifario:cargar": "node scripts/tarifario.mjs cargar",
-    "tarifario:guardar": "node scripts/tarifario.mjs guardar"
+    "pruebas:hoja": "node pruebas/hoja-de-ejemplo.mjs"
   },
   "dependencies": {
     "hono": "^4.6.14",

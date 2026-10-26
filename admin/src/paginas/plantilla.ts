@@ -51,9 +51,16 @@ const ICONOS: Record<string, string> = {
   alerta: 'M12 8.5v4.5M12 16.2v.3M12 4.5 2.8 20h18.4z',
   listo: 'M4.5 12.5l5 5 10-11',
   bajar: 'M6.5 9.5 12 15l5.5-5.5',
+  // Para las acciones: añadir, editar, seguir a la ficha y cargar una hoja.
+  // Mismo trazo y misma rejilla de 24 que los del raíl, o se notaría que
+  // vienen de otro juego.
+  mas: 'M12 5.5v13M5.5 12h13',
+  editar: 'M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 16.5zM14.5 7.5l2 2',
+  seguir: 'M9.5 6.5 15 12l-5.5 5.5',
+  hoja: 'M5 4.5h14v15H5zM5 9.5h14M10.5 9.5v10',
 };
 
-const icono = (nombre: string) =>
+export const icono = (nombre: string) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONOS[nombre] ?? ICONOS.inicio}"/></svg>`;
 
 /* ─── Secciones ──────────────────────────────────────────────────────────── */
@@ -95,7 +102,7 @@ export const SECCIONES: Seccion[] = [
     ruta: '/asociados',
     etiqueta: 'Asociados',
     icono: 'asociados',
-    de: 'La cartera para otros laboratorios, con su tarifario.',
+    de: 'La cartera de pruebas que ofrecemos a otros laboratorios.',
     soloAdmin: true,
   },
   { ruta: '/qr', etiqueta: 'Códigos QR', icono: 'qr', de: 'Para frascos, afiches y recetarios.' },
@@ -346,6 +353,63 @@ const ESTILOS = `
   button.chico { width: auto; margin: 0; padding: .42rem .8rem; font-size: .84rem; }
   button[disabled] { opacity: .55; cursor: not-allowed; }
 
+  /*
+    Un enlace que es una acción y no un destino: «Añadir un examen» lleva a otra
+    pantalla, igual que «Guardar» envía un formulario, y las dos cosas se
+    deciden igual. Antes las altas eran enlaces de texto al pie de la página,
+    debajo de sesenta filas, y no parecían algo que se pudiera pulsar.
+
+    Es un enlace de verdad, no un botón: se abre en otra pestaña, se copia la
+    dirección y el teclado lo recorre como lo que es.
+  */
+  .boton {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    /* 44 px de alto: por debajo de eso el dedo falla más de lo que acierta, y
+       esto se usa sobre todo desde el móvil. */
+    padding: .62rem .95rem;
+    font-size: .9rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    background: var(--accion);
+    border: 1px solid transparent;
+    border-radius: var(--radio-chico);
+    transition: background .18s var(--salida);
+  }
+  .boton:hover { color: #fff; background: var(--accion-viva); }
+  .boton:active { background: #005b6e; }
+  .boton svg { width: 17px; height: 17px; flex: 0 0 auto; }
+
+  .boton.suave { color: var(--accion); background: var(--superficie); border-color: var(--linea); }
+  .boton.suave:hover { color: var(--accion-viva); background: var(--fondo); border-color: #aebecb; }
+  /* Para las celdas de acción de una tabla, donde un botón entero pesa mucho. */
+  .boton.chico { padding: .35rem .65rem; font-size: .82rem; gap: .3rem; }
+  .boton.chico svg { width: 15px; height: 15px; }
+
+  /*
+    En una pantalla estrecha el rótulo del botón de una tabla le quita ancho a
+    lo que importa: con él, «FROTIS DE SANGRE PERIFERICA (BH + FROTIS)» se
+    partía en tres líneas. Debajo de 34rem queda solo el lápiz, que sigue
+    midiendo 44 px para el dedo y conserva su nombre para quien use lector de
+    pantalla. En cuanto hay sitio, vuelve la palabra.
+  */
+  @media (max-width: 34rem) {
+    .boton.chico { min-width: 44px; min-height: 44px; justify-content: center; padding: .35rem; }
+    .solo-ancho {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  /* La fila de acciones de una pantalla de lista, justo bajo el título. */
+  .acciones { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 1.5rem; }
+
   .fila { display: flex; gap: .85rem; flex-wrap: wrap; align-items: flex-end; }
   .fila > * { flex: 1 1 11rem; }
 
@@ -452,6 +516,59 @@ const ESTILOS = `
   .pista + .lista, .pista + table { margin-top: 1.1rem; }
   .lista a { font-weight: 600; text-decoration: none; }
   .lista a:hover { text-decoration: underline; }
+
+  /*
+    Fila que se abre entera.
+
+    Antes solo el nombre era pulsable: en una tabla, un nombre parece una
+    etiqueta y nada decía que detrás hubiera una ficha que editar. Ahora el
+    área de toque es la fila completa —que en un móvil es la diferencia entre
+    acertar y no— y a la derecha lleva escrito lo que va a pasar.
+  */
+  .lista.con-filas li { padding: 0; }
+  .lista a.renglon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .8rem;
+    margin: 0 -.8rem;
+    font-weight: 400;
+    color: inherit;
+    border-radius: var(--radio-chico);
+    transition: background .16s var(--salida);
+  }
+  .lista a.renglon:hover { background: var(--fondo); text-decoration: none; }
+  .lista a.renglon strong { color: var(--accion); font-weight: 600; }
+  .lista a.renglon:hover strong { color: var(--accion-viva); }
+  .renglon-accion {
+    display: inline-flex;
+    align-items: center;
+    gap: .2rem;
+    flex: 0 0 auto;
+    font-size: .84rem;
+    font-weight: 600;
+    color: var(--accion);
+    white-space: nowrap;
+  }
+  .renglon-accion svg { width: 16px; height: 16px; }
+
+  /* Celda de acción de una tabla: pegada a la derecha y sin partirse. */
+  td.accion { width: 1%; text-align: right; white-space: nowrap; }
+
+  /*
+    Columnas que sobran en una pantalla estrecha.
+
+    La tabla de usuarios medía 511 px dentro de 375 y el contenedor no
+    desplaza: el botón de desactivar quedaba **fuera de la pantalla y no había
+    forma de llegar a él desde el móvil**. El rol pasa a ser una marca bajo el
+    correo y su columna desaparece; así caben las tres que hacen falta.
+  */
+  .solo-estrecho { display: none; }
+  @media (max-width: 34rem) {
+    .solo-amplio { display: none; }
+    .solo-estrecho { display: inline; }
+  }
 
   table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .9rem; }
   th, td { padding: .62rem .55rem; text-align: left; border-bottom: 1px solid var(--linea-fina); vertical-align: top; }

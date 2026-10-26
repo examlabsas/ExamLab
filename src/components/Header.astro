@@ -6,7 +6,7 @@ import { site, sedes, navPrincipal, fechasEspecialesDe } from '@/lib/site';
 import { whatsappLink } from '@/lib/whatsapp';
 
 /*
-  El botón de la cabecera entra directo a Saluto, el sistema donde viven los
+  El botón de la cabecera entra directo al sistema donde viven los
   informes: es el acceso más usado del sitio y antes obligaba a pasar por una
   página intermedia. Los demás botones de «resultados» repartidos por el sitio
   siguen llevando a /soy-paciente/resultados, que explica qué se necesita y
@@ -15,7 +15,7 @@ import { whatsappLink } from '@/lib/whatsapp';
   Como sale del sitio, se abre en otra pestaña y se avisa en el nombre
   accesible, que conserva la palabra visible del botón.
 */
-const ETIQUETA_RESULTADOS = 'Resultados en Saluto, se abre en otra pestaña';
+const ETIQUETA_RESULTADOS = 'Resultados, se abre en otra pestaña';
 
 const ruta = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const esActivo = (href: string) => {
@@ -57,7 +57,7 @@ const horarioResumen = `${matriz.horarios[0]!.dias} · ${matriz.horarios[0]!.hor
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
         <a href="/sedes" class="flex items-center gap-2 text-white/80 transition-colors hover:text-white">
           <Icon name="pin" size={13} class="text-accent-light" />
-          Ambato y Pelileo
+          Provincia de Tungurahua
         </a>
         <a
           href="/soy-profesional"

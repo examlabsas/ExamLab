@@ -30,10 +30,10 @@ const pasos = [
     detalle: 'Para menores de edad, se usa la cédula del representante registrado.',
   },
   {
-    titulo: 'Ingrese el código de orden',
+    titulo: 'Escriba su contraseña',
     texto:
-      'Es el código que aparece en el comprobante que se le entregó al momento del pago.',
-    detalle: 'Si perdió el comprobante, escríbanos por WhatsApp y se lo reenviamos.',
+      'Es la que se le asignó al registrarse. Si no la recuerda, escríbanos por WhatsApp y la recuperamos.',
+    detalle: 'Se entra con esos dos datos: su cédula y su contraseña.',
   },
   {
     titulo: 'Descargue su informe',
@@ -50,9 +50,9 @@ const problemas = [
       'Verifique que la esté escribiendo sin puntos, guiones ni espacios. Si el problema continúa, es posible que exista un error de digitación en su registro: escríbanos por WhatsApp y lo corregimos.',
   },
   {
-    pregunta: 'Perdí mi código de orden',
+    pregunta: 'No recuerdo mi contraseña',
     respuesta:
-      'Escríbanos por WhatsApp con su nombre completo y número de cédula, y le reenviamos el código que corresponde a su última orden.',
+      'Escríbanos por WhatsApp con su nombre completo y número de cédula, y le ayudamos a recuperarla.',
   },
   {
     pregunta: 'Mi resultado todavía no aparece',
@@ -74,7 +74,7 @@ const problemas = [
 
 <BaseLayout
   titulo="Resultados en línea"
-  descripcion={`Guía paso a paso para acceder a sus resultados de laboratorio en ${site.sistema.nombre}, el sistema de ExamLab, con su cédula y código de orden.`}
+  descripcion="Guía paso a paso para acceder a sus resultados de laboratorio en el sistema de ExamLab, con su cédula y su contraseña."
   whatsapp="resultados"
   schema={schema}
 >
@@ -82,7 +82,7 @@ const problemas = [
     foto="revision-de-muestra"
     eyebrow="Resultados"
     titulo="Acceda a sus resultados en línea"
-    descripcion={`Sus informes están disponibles las 24 horas en ${site.sistema.nombre}, el sistema de resultados del laboratorio. Solo necesita su cédula y el código de orden.`}
+    descripcion="Sus informes están disponibles las 24 horas en el sistema de resultados del laboratorio. Solo necesita su cédula y su contraseña."
     migas={[
       { nombre: 'Inicio', href: '/' },
       { nombre: 'Soy paciente', href: '/soy-paciente' },
@@ -116,9 +116,9 @@ const problemas = [
           <Icon name="documento" size={21} />
         </span>
         <div>
-          <h2 class="text-lg font-bold text-brand">Su código de orden</h2>
+          <h2 class="text-lg font-bold text-brand">Su contraseña</h2>
           <p class="mt-1.5 text-sm leading-relaxed text-neutral">
-            Aparece impreso en el comprobante que se le entrega al momento del pago.
+            La que se le asignó al registrarse. Si no la recuerda, se la ayudamos a recuperar por WhatsApp.
           </p>
         </div>
       </div>
@@ -131,7 +131,7 @@ const problemas = [
       <SectionHeading
         eyebrow="Paso a paso"
         titulo="Cómo descargar su informe"
-        descripcion={`${site.sistema.nombre} es el sistema de resultados del laboratorio, administrado por su proveedor externo. Este sitio web no almacena resultados médicos.`}
+        descripcion="El sistema de resultados lo administra un proveedor externo del laboratorio. Este sitio web no almacena resultados médicos."
       />
       <ol class="reveal-stagger mt-9 flex flex-col gap-4">
         {
@@ -166,7 +166,7 @@ const problemas = [
   <section class="bg-white py-section">
     <div class="container-page">
       <SectionHeading eyebrow="Si algo no funciona" titulo="Problemas frecuentes al ingresar" />
-      <div class="reveal-stagger mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div class="reveal-stagger mt-9 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         {
           problemas.map((item) => (
             <details class="group rounded-xl border border-line bg-white open:border-accent">
@@ -196,9 +196,9 @@ const problemas = [
         <div>
           <h2 class="text-h3 font-bold text-white">Sus resultados son confidenciales</h2>
           <p class="mt-3 max-w-[680px] text-base leading-relaxed text-white/75">
-            El acceso a los informes está protegido por su cédula y su código de orden. Este sitio
+            El acceso a los informes está protegido por su cédula y su contraseña. Este sitio
             web no almacena resultados ni datos clínicos: la información reside exclusivamente en
-            {site.sistema.nombre}. Conozca más en nuestra
+            nuestro sistema integrado. Conozca más en nuestra
             <a href="/privacidad" class="font-semibold text-accent-light underline underline-offset-2">
               política de privacidad</a
             >.

@@ -67,13 +67,15 @@ tiene acceso a la cuenta de Cloudflare.
 npm run admin:crear
 ```
 
-Pide nombre, correo y contraseña, y luego imprime:
+Pide nombre, correo y contraseña, e imprime el comando `wrangler kv key put`
+que guarda el usuario. Hay que copiarlo y ejecutarlo.
 
-- el comando `wrangler kv key put` que guarda el usuario,
-- la clave para la aplicación de autenticación.
-
-Escanéala en Google Authenticator, Authy o la que uses **antes de cerrar esa
-pantalla**: el secreto no se vuelve a mostrar.
+> El panel **ya no pide un código de seis cifras** al entrar. El laboratorio
+> pidió quitarlo. Lo que protege la puerta ahora es la contraseña —derivada con
+> PBKDF2 y 310 000 iteraciones—, el límite de cinco intentos por correo y por
+> IP, y que la sesión sea un testigo revocable en el KV. El secreto de cada
+> usuario se sigue guardando, así que volver a pedirlo es restaurar una
+> comprobación y un campo, no rehacer nada.
 
 ### 5. Conectar el subdominio
 
@@ -114,9 +116,8 @@ npm run pruebas:github     # el GitHub simulado, en el 8799
 npm run dev                # el panel, en http://127.0.0.1:8787
 ```
 
-Para entrar: `prueba@examlabsas.com`, contraseña `laboratorio-2026`, y el código
-de seis cifras que imprime `npm run pruebas:codigo` — o el que dé su aplicación
-de autenticación, si escanea la clave que enseñó `pruebas:usuario`.
+Para entrar: `prueba@examlabsas.com`, contraseña `laboratorio-2026`. Ya no hace
+falta código.
 
 Para probar la carga del catálogo, `npm run pruebas:hoja` escribe una hoja con
 los 559 exámenes y veinte plazos de entrega puestos. Se genera del catálogo de
@@ -146,20 +147,22 @@ admin/
 │   ├── sitio.ts              contacto, sedes, horarios, feriados
 │   ├── catalogo.ts           los 559 exámenes
 │   ├── importar.ts           leer una hoja de cálculo y compararla
-│   ├── asociados.ts          las 277 pruebas de asociados y su tarifario
+│   ├── asociados.ts          las pruebas de la cartera de convenio
+│   ├── importar-asociados.ts la misma carga por hoja, para la cartera
 │   ├── historial.ts          de qué sección es cada cambio
 │   ├── qr.ts                 códigos QR en SVG
 │   ├── emblema.ts            el logotipo recortado (lo genera un script)
+│   ├── emblemas.ts           qué emblemas pueden ir en el centro de un QR
 │   ├── usuarios.ts           alta, invitaciones, roles
 │   ├── auth/
 │   │   ├── password.ts       PBKDF2 y reglas de la contraseña
-│   │   ├── totp.ts           códigos de la aplicación
+│   │   ├── totp.ts           sin uso: el código de verificación se quitó
 │   │   └── sesion.ts         cookies, sesiones y límite de intentos
 │   └── paginas/
 │       └── plantilla.ts      el armazón, los iconos y toda la hoja de estilos
 ├── scripts/crear-admin.mjs   primer administrador
 └── pruebas/                  solo para local: GitHub simulado, usuario de
-                              prueba, generador de códigos y hoja de ejemplo
+                              prueba y hoja de ejemplo
 ```
 
 ### Decisiones que conviene conocer
@@ -246,14 +249,21 @@ es la red mecánica antes de imprenta.
 porque lo escribe el propio panel con una fórmula fija. Preguntarle a GitHub qué
 archivos tocó cada commit serían treinta peticiones para una pantalla.
 
-**El tarifario de asociados no pasa por el repositorio.** El despliegue va por
-repositorio, así que lo que se versiona queda al alcance de quien tenga acceso a
-él — y en el historial de git aunque luego se borre. Los precios viven en el KV
-de Cloudflare; al guardar la cartera se fuerza `precio: null` en todo lo que se
-escribe, como última barrera. `npm run tarifario:cargar` y `tarifario:guardar`
-mueven el tarifario entre el KV y el archivo privado que queda fuera de git, para
-que reimportar el Excel no pierda lo corregido desde el panel. Los dos trabajan
-contra el KV local salvo que se les pase `--remoto`.
+**En la cartera de asociados no hay precios.** Los hubo: vivían en el KV de
+Cloudflare, fuera del repositorio, porque el despliegue va por repositorio y lo
+versionado queda al alcance de cualquiera con acceso — y en el historial de git
+aunque se borre después. Funcionaba, pero era una copia más que mantener y un
+camino más por el que podían escaparse. El laboratorio pidió sacarlos, y con
+ellos se fueron el tarifario del KV, los dos comandos que lo movían y la barrera
+que forzaba `precio: null` al escribir. El tarifario sigue donde siempre estuvo:
+en el Excel del laboratorio. La carga por hoja reconoce la columna de precio
+**para ignorarla**.
+
+**La identidad de una prueba de asociados es especialidad + nombre.** Hay dos
+«NICKERSON», una en MICROBIOLOGIA y otra en BACTERIOLOGIA MANUAL. Emparejando
+por nombre, la carga por hoja descartaba la segunda como repetida y anunciaba
+una baja que no existía. En el catálogo público los nombres son únicos y basta
+el nombre; aquí no, y eso lo decide el laboratorio.
 
 **Nadie publica la hoja de otra persona.** Entre un paso y otro de la carga, la
 hoja espera media hora en el KV con el correo de quien la subió. Sin eso, un
@@ -346,14 +356,11 @@ Probado contra un GitHub simulado cargado con los datos reales del sitio y con e
 
 | | |
 |---|---|
-| Abrir la sección sin tarifario cargado | 277 pruebas, todas «sin precio», y explica cómo cargarlo |
-| `npm run tarifario:cargar` | 276 precios al KV; la que falta es la que ya venía sin precio |
 | Guardar una prueba con precio nuevo | el método va al repositorio y el precio al KV |
 | **El importe en el repositorio** | `precio: null` en las 277, y el número no aparece ni en el texto del archivo |
 | Precio escrito con coma | «4,25» se guarda como 4.25 |
 | «gratis», «-5», «12.345» | cada uno rechazado, y el formulario conserva lo escrito |
 | Renombrar una prueba | su precio la sigue: la clave vieja desaparece y no se duplica |
-| `npm run tarifario:guardar` | escribe el archivo privado y avisa de los precios que quedaron sin pareja |
 | Un editor en `/asociados`, en una prueba y al guardar | 403 en los tres |
 | La portada de un editor | no le enseña el enlace: no hay forma de llegar y chocar |
 
