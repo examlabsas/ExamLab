@@ -81,30 +81,31 @@ const carpeta = mkdtempSync(join(tmpdir(), 'examlab-admin-'));
 const archivo = join(carpeta, 'usuario.json');
 writeFileSync(archivo, JSON.stringify(usuario));
 
-const uri = `otpauth://totp/ExamLab:${encodeURIComponent(correo)}?secret=${usuario.totp}&issuer=ExamLab&algorithm=SHA1&digits=6&period=30`;
-
+/*
+  Aquí se imprimía además el código para la aplicación de autenticación. El
+  panel ya no pide ese código al entrar, así que no hay nada que escanear. El
+  secreto se sigue guardando en el usuario por si algún día se vuelve a pedir.
+*/
 console.log(`
   ──────────────────────────────────────────────────────────────
 
-  1. Guarde el usuario en Cloudflare:
+  1. Guarde el usuario en Cloudflare. Copie esta línea y ejecútela:
 
      npx wrangler kv key put "usuario:${correo}" --path="${archivo}" --binding=PANEL --remote
 
-     (quite --remote para probarlo primero en local con wrangler dev)
+     Sin ejecutarla NO se crea nada: lo de arriba solo preparó el archivo.
 
-  2. Escanee este código en su aplicación de autenticación.
-     Péguelo en un generador de QR, o escriba la clave a mano:
+     El --remote es lo que la manda a Cloudflare. Quítelo para probar contra
+     el almacén local de wrangler dev.
 
-     Clave:  ${usuario.totp}
-
-     ${uri}
-
-  3. Borre el archivo temporal cuando termine:
+  2. Borre el archivo temporal cuando termine:
 
      ${archivo}
 
   ──────────────────────────────────────────────────────────────
 
-  La contraseña no se guarda en ninguna parte: lo que va a Cloudflare es
-  el resultado de derivarla. Si la olvida, hay que repetir este proceso.
+  Ya puede entrar con ese correo y su contraseña. No hace falta ningún código.
+
+  La contraseña no se guarda en ninguna parte: lo que va a Cloudflare es el
+  resultado de derivarla. Si la olvida, hay que repetir este proceso.
 `);

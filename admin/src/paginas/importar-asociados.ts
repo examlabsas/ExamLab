@@ -35,7 +35,17 @@ export function paginaImportarAsociados(o: { sesion: Sesion; error?: string }) {
         <textarea id="pegado" name="pegado" rows="6"
                   placeholder="Copie el rango en Excel y péguelo aquí"></textarea>
 
-        <button type="submit">Leer</button>
+        ${
+          /*
+            `type="reset"` vacía el formulario entero —el archivo elegido y el
+            cuadro de pegado— sin una línea de JavaScript, que aquí no cabe: la
+            cabecera de seguridad del panel no deja ejecutar guiones.
+          */ ''
+        }
+        <div class="acciones" style="margin-top:1.5rem">
+          <button type="submit" class="chico">Leer</button>
+          <button type="reset" class="chico secundario">Quitar el archivo</button>
+        </div>
       </form>
 `,
     { sesion: o.sesion, activa: '/asociados' },

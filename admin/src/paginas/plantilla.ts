@@ -384,6 +384,40 @@ const ESTILOS = `
 
   .boton.suave { color: var(--accion); background: var(--superficie); border-color: var(--linea); }
   .boton.suave:hover { color: var(--accion-viva); background: var(--fondo); border-color: #aebecb; }
+  /*
+    El campo de archivo.
+
+    El navegador lo pinta a su manera y cada uno distinto: en Chrome sale un
+    «Choose File» gris pegado al nombre, que no se parece a nada del panel. No
+    se puede estilar el botón interno directamente, pero sí con el
+    pseudoelemento file-selector-button, que es justo esa parte.
+
+    (Sin comillas invertidas en este comentario: ESTILOS es una plantilla de
+    texto y una comilla invertida la cierra. Ya pasó una vez y el Worker dejó
+    de arrancar con tsc pasando limpio.)
+  */
+  input[type='file'] {
+    padding: .5rem;
+    cursor: pointer;
+  }
+  input[type='file']::file-selector-button {
+    margin-right: .8rem;
+    padding: .45rem .85rem;
+    font: inherit;
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--accion);
+    background: var(--fondo);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-chico);
+    cursor: pointer;
+    transition: background .16s var(--salida);
+  }
+  input[type='file']:hover::file-selector-button {
+    background: var(--superficie);
+    border-color: #aebecb;
+  }
+
   /* Para las celdas de acción de una tabla, donde un botón entero pesa mucho. */
   .boton.chico { padding: .35rem .65rem; font-size: .82rem; gap: .3rem; }
   .boton.chico svg { width: 15px; height: 15px; }

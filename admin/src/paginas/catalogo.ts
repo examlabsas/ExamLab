@@ -371,7 +371,17 @@ export function paginaImportar(o: { sesion: Sesion; error?: string }) {
           columna de nombres, o varias columnas con sus títulos.
         </p>
 
-        <button type="submit">Leer</button>
+        ${
+          /*
+            `type="reset"` vacía el formulario entero —el archivo elegido y el
+            cuadro de pegado— sin una línea de JavaScript, que aquí no cabe: la
+            cabecera de seguridad del panel no deja ejecutar guiones.
+          */ ''
+        }
+        <div class="acciones" style="margin-top:1.5rem">
+          <button type="submit" class="chico">Leer</button>
+          <button type="reset" class="chico secundario">Quitar el archivo</button>
+        </div>
       </form>
 
       <div class="panel" style="margin-top:1.5rem">
@@ -440,7 +450,8 @@ export function paginaColumnas(o: {
 
   return pagina(
     'Cargar catálogo',
-    `    ${cabecera('¿Qué es cada columna?', `Paso 2 de 3. Se leyeron ${tabla.filas.length} filas y ${tabla.columnas}
+    `    <p class="pista" style="margin:0"><a href="/catalogo-importar">← Empezar de nuevo con otra hoja</a></p>
+    ${cabecera('¿Qué es cada columna?', `Paso 2 de 3. Se leyeron ${tabla.filas.length} filas y ${tabla.columnas}
         ${tabla.columnas === 1 ? 'columna' : 'columnas'}. Todavía no se publica nada.`)}
       ${o.error ? `<p class="error">${esc(o.error)}</p>` : ''}
 
