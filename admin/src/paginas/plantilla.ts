@@ -60,6 +60,8 @@ const ICONOS: Record<string, string> = {
   editar: 'M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 16.5zM14.5 7.5l2 2',
   seguir: 'M9.5 6.5 15 12l-5.5 5.5',
   hoja: 'M5 4.5h14v15H5zM5 9.5h14M10.5 9.5v10',
+  // Dos hojas, una detrás de otra. Para el botón de copiar el enlace de alta.
+  copiar: 'M9 9h10.5v10.5H9zM15 9V4.5H4.5V15H9',
   // El ojo de ver la contraseña. Tachado = ahora mismo está oculta.
   ojo: 'M2.5 12c2.4-3.6 5.6-5.5 9.5-5.5s7.1 1.9 9.5 5.5c-2.4 3.6-5.6 5.5-9.5 5.5S4.9 15.6 2.5 12zM14.5 12a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0z',
   'ojo-tachado':
@@ -438,6 +440,16 @@ const ESTILOS = `
   .ojo .ojo-ocultar, .ojo[aria-pressed="true"] .ojo-ver { display: none; }
   .ojo[aria-pressed="true"] .ojo-ocultar { display: block; }
 
+  /*
+    Sin esto, el atributo «hidden» no esconde nada.
+
+    La regla [hidden] del navegador tiene la especificidad más baja que existe,
+    y cualquier display que se escriba aquí la gana. El botón salía
+    visible antes de que el guion lo tocara, que es exactamente lo contrario de
+    lo que se buscaba: con el JavaScript bloqueado quedaba un botón muerto.
+  */
+  .ojo[hidden], .copiar[hidden] { display: none; }
+
   /* ── Formularios ───────────────────────────────────────────────────────── */
 
   label { display: block; margin-top: 1.15rem; font-size: .84rem; font-weight: 600; }
@@ -600,6 +612,40 @@ const ESTILOS = `
     word-break: break-all;
     user-select: all;
   }
+
+  /*
+    El enlace de alta y su botón de copiar.
+
+    En estrecho el botón se va debajo y ocupa el ancho: un enlace de 76
+    caracteres y un botón al lado no caben en un teléfono, y este enlace se
+    reparte casi siempre desde el teléfono.
+  */
+  .enlace-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 0;
+  }
+  .enlace-fila code { flex: 1 1 15rem; }
+
+  .copiar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    flex: 0 0 auto;
+    /* El ancho fijo evita que el botón encoja al cambiar a «Copiado». */
+    width: 8.6rem;
+    min-height: 44px;
+    margin: 0;
+    padding: .5rem .9rem;
+  }
+  .copiar svg { width: 18px; height: 18px; }
+  .copiar .copiar-listo { display: none; }
+  .copiar[data-hecho] .copiar-icono { display: none; }
+  .copiar[data-hecho] .copiar-listo { display: block; }
+  /* Verde azulado de confirmación, el mismo del mensaje de guardado. */
+  .copiar[data-hecho="si"], .copiar[data-hecho="si"]:hover { background: var(--bien); }
 
   /* ── Mensajes ──────────────────────────────────────────────────────────── */
 
@@ -823,6 +869,60 @@ const ESTILOS = `
      superficie. Un panel dentro de otro panel es siempre un error. */
   .recuadro { padding-top: 1.25rem; border-top: 1px solid var(--linea); }
   .recuadro > :first-child { margin-top: 0; }
+
+  /* ── El inicio ─────────────────────────────────────────────────────────── */
+
+  /*
+    Qué está pasando ahora mismo en el sitio. Hoy solo el aviso, que es lo
+    único que se publica desde aquí y se ve en las 583 páginas a la vez; es
+    también lo más fácil de dejarse puesto.
+
+    El icono se pinta de acento cuando hay aviso y queda gris cuando no. Sin
+    franja de color al lado ni fondo distinto: el acento marca lo que está
+    activo, que es exactamente lo que pasa aquí.
+  */
+  .ahora {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    flex-wrap: wrap;
+  }
+  .ahora > svg { width: 24px; height: 24px; flex: 0 0 auto; color: var(--tinta-suave); }
+  .ahora.puesto > svg { color: var(--accion); }
+  .ahora-texto { flex: 1 1 14rem; min-width: 0; }
+  .ahora-texto b { display: block; font-size: 15px; }
+  .ahora-texto p { margin-top: .15rem; }
+  .ahora .boton { flex: 0 0 auto; }
+
+  /*
+    Los accesos. Rejilla de destinos, que es la forma de un lanzador; no son la
+    estructura de la pantalla sino su último tercio, debajo de lo que hay que
+    hacer. Antes eran once enlaces en una lista y había que leerlos todos.
+  */
+  .accesos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: .7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .accesos a {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    height: 100%;
+    padding: .9rem 1rem;
+    text-decoration: none;
+    background: var(--superficie);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio);
+    transition: border-color .18s var(--salida), box-shadow .18s var(--salida);
+  }
+  .accesos a:hover { border-color: #aebecb; box-shadow: var(--sombra); }
+  .accesos svg { width: 22px; height: 22px; flex: 0 0 auto; margin-top: .05rem; color: var(--accion); }
+  .accesos b { display: block; font-size: 15px; font-weight: 700; color: var(--tinta); }
+  .accesos em { display: block; margin-top: .1rem; font-size: .84rem; font-style: normal; color: var(--tinta-suave); }
 
   .vacio { padding: 2rem 1rem; text-align: center; color: var(--tinta-suave); }
 

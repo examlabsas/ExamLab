@@ -270,6 +270,31 @@ trazo 1,75 y extremos redondeados. No hay librería —la cabecera de seguridad 
 deja cargar nada de fuera— y tampoco caracteres Unicode haciendo de icono: los
 mensajes y el desplegable usan el mismo trazo, incrustado como SVG.
 
+**El inicio.** Era una lista de once enlaces: servía para navegar y para nada
+más. Había que entrar al catálogo para enterarse de que faltan 495 plazos de
+entrega, y al aviso para saber si el sitio está enseñando una franja que alguien
+dejó puesta la semana pasada.
+
+Ahora el orden es el del trabajo, no el del menú:
+
+1. **Qué está pasando** (`.ahora`) — si hay aviso puesto, con su texto y su
+   fecha de caducidad, y el botón para cambiarlo. El icono va en `--accion`
+   cuando está activo y en `--tinta-suave` cuando no: el acento marca lo que
+   está activo, que es literalmente el caso. Sin franja de color al lado.
+2. **Qué falta** — los mismos contadores-filtro del catálogo, solo los que no
+   son cero y el más gordo primero, cada uno con enlace a su lista.
+3. **A dónde ir** (`.accesos`) — rejilla de destinos con icono, nombre y la
+   línea de qué hace.
+
+Una rejilla de destinos es la forma honesta de un lanzador. Lo que no vale es
+usar tarjetas iguales para fingir que una página tiene estructura, y aquí no son
+la página: son su último tercio, bajo un título que dice lo que son.
+
+**Los dos primeros bloques desaparecen si GitHub no contesta**, y el inicio se
+dibuja igual. No es un adorno de robustez: `paginaFallo` manda aquí, así que
+esta es la única pantalla que no puede caerse. Comprobado apagando el servidor:
+200, con saludo y accesos, sin bloque de faltas y sin página de error.
+
 **Contadores-filtro (`.recuento`).** Píldoras con el número en 1,05rem y cifras
 tabulares. **Son el filtro, no un adorno**: cada uno lleva a su propia lista y el
 activo va relleno de `--accion` con `aria-current`. En móvil se arrastran en una
@@ -347,12 +372,31 @@ Escribir doce caracteres a ciegas en el teclado de un teléfono es la razón de
 que la gente acabe eligiendo contraseñas cortas. **Poder mirar lo que se escribió
 protege más que esconderlo.**
 
+**Copiar el enlace de alta (`.copiar`).** El enlace de invitación mide 76
+caracteres y hay que pasárselo a la persona por WhatsApp o en mano. Marcarlo a
+dedo en un teléfono, sin pasarse ni quedarse corto, es de las cosas que se hacen
+tres veces hasta que salen.
+
+Un botón al lado, y debajo en cuanto la pantalla se estrecha. Al pulsarlo pasa a
+`--bien` con el icono de listo y dice **«Copiado»** durante 2,2 segundos: es la
+misma confirmación que el mensaje de guardado, no un color nuevo. El ancho es
+fijo para que no encoja al cambiar de palabra.
+
+Si el navegador niega el portapapeles —sin permiso, o servido sin cifrar—
+selecciona el enlace entero y dice «Seleccionado»: copiar deja de ser un toque
+pero sigue siendo un Ctrl+C. **Nunca se queda en nada.**
+
 **JavaScript.** El panel se construyó sin nada de JavaScript y sigue siendo así:
-las once pantallas funcionan con el guion bloqueado. Lo único que hay son esas
-dos ayudas sobre los campos de contraseña —el ojo y el aviso de bloqueo de
-mayúsculas—, 1 574 bytes en un archivo aparte, porque la cabecera no permite
-scripts en línea. **Si algo del panel deja de funcionar sin el guion, se rompió
-una regla.**
+las once pantallas funcionan con el guion bloqueado. Lo único que hay son tres
+ayudas —el ojo de la contraseña, el aviso de bloqueo de mayúsculas y el botón de
+copiar—, en un archivo aparte porque la cabecera no permite scripts en línea.
+**Si algo del panel deja de funcionar sin el guion, se rompió una regla.**
+
+Los dos botones que añade el guion llegan con `hidden` y **necesitan
+`.ojo[hidden], .copiar[hidden] { display: none }` escrito a mano**. `[hidden]`
+es una regla del navegador con la especificidad más baja que existe, así que el
+`display` de la propia clase la gana: sin esa línea el botón se ve, no hace nada
+y el guion ya no tiene nada que enseñar. Pasó con el ojo y estuvo así un día.
 
 ## Do's and Don'ts
 

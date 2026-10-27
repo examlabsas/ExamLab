@@ -68,7 +68,19 @@ export function paginaUsuarios(opciones: {
                  Páseselo a esa persona por un medio directo. Caduca en 24 horas
                  y sirve una sola vez. Ella elige su contraseña: usted no la verá.
                </p>
-               <p style="margin:0"><code class="enlace-alta">${esc(opciones.enlaceNuevo)}</code></p>
+               <div class="enlace-fila">
+                 <code class="enlace-alta" id="enlace-alta">${esc(opciones.enlaceNuevo)}</code>
+                 ${/*
+                   Sale dibujado y oculto; lo enseña el guion. Sin JavaScript el
+                   enlace sigue estando ahí y un toque encima lo selecciona
+                   entero, que es para lo que lleva `user-select: all`.
+                 */ ''}
+                 <button type="button" class="copiar" hidden data-enlace="enlace-alta">
+                   <span class="copiar-icono">${icono('copiar')}</span>
+                   <span class="copiar-listo">${icono('listo')}</span>
+                   <span class="copiar-texto" aria-live="polite">Copiar</span>
+                 </button>
+               </div>
              </div>`
           : ''
       }

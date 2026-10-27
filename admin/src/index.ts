@@ -34,7 +34,12 @@ import {
   gastarInvitacion,
   type Rol,
 } from './usuarios';
-import { paginaAcceso, paginaInvitacion, paginaPanel } from './paginas/acceso';
+import {
+  paginaAcceso,
+  paginaInvitacion,
+  paginaPanel,
+  type ResumenInicio,
+} from './paginas/acceso';
 import { paginaFallo } from './paginas/plantilla';
 import { ACTIVOS, MANIFIESTO } from './estatico';
 import { paginaUsuarios } from './paginas/usuarios';
@@ -212,8 +217,36 @@ app.get('/', async (c) => {
   const usuario = await obtener(c.env.PANEL, sesion.correo);
   if (!usuario?.activo) return c.html(paginaAcceso());
 
+  /*
+    Lo que el inicio enseña además de los accesos: cuántos exámenes están sin
+    completar y si el sitio tiene un aviso puesto ahora mismo.
+
+    Va dentro de un `try` sin rama de error a propósito. El inicio es la pantalla
+    a la que se vuelve cuando algo falla —el propio `paginaFallo` manda aquí—,
+    así que no puede ser una de las que se caen si GitHub no contesta: sin datos
+    se dibuja igual, solo que sin esos dos bloques.
+  */
+  let resumen: ResumenInicio = {};
+  try {
+    const [cat, archivoAviso] = await Promise.all([
+      catalogo.leerTodo(github(c.env)),
+      leerArchivo(github(c.env), RUTA_AVISO),
+    ]);
+    resumen = {
+      examenes: cat.examenes.length,
+      faltas: catalogo.contarFaltas(cat.examenes),
+      aviso: archivoAviso ? JSON.parse(archivoAviso.texto) : { activo: false, texto: '' },
+    };
+  } catch {
+    resumen = {};
+  }
+
   return c.html(
-    paginaPanel({ sesion: { correo: usuario.correo, rol: usuario.rol }, nombre: usuario.nombre }),
+    paginaPanel({
+      sesion: { correo: usuario.correo, rol: usuario.rol },
+      nombre: usuario.nombre,
+      resumen,
+    }),
   );
 });
 

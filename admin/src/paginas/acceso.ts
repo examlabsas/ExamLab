@@ -7,6 +7,7 @@
  */
 import { pagina, cabecera, esc, icono, seccionesDe, type Sesion } from './plantilla';
 import { HORAS_DE_INVITACION } from '../usuarios';
+import type { Falta } from '../catalogo';
 
 /** La cabecera de marca de la caja: hace el papel del raíl, que aquí no está. */
 const marca = `<div class="caja-marca">
@@ -116,38 +117,95 @@ export function paginaInvitacion(opciones: {
 }
 
 
+/** Lo que el inicio sabe del sitio. Vacío si GitHub no contestó. */
+export type ResumenInicio = {
+  examenes?: number;
+  faltas?: Falta[];
+  aviso?: { activo: boolean; texto: string; hasta?: string };
+};
+
 /**
  * La portada.
  *
- * En el móvil solo caben cuatro secciones en la barra de abajo, así que esta
- * pantalla es la que da acceso a las otras siete. Cada una con una línea de qué
- * hace: una lista de once enlaces sin explicar nada obliga a entrar en todas
- * para encontrar la que se buscaba.
+ * Era una lista de once enlaces. Servía para navegar y para nada más: había que
+ * entrar al catálogo para enterarse de que faltan 495 plazos de entrega, y al
+ * aviso para saber si el sitio está enseñando una franja que alguien dejó
+ * puesta la semana pasada. Las dos cosas se saben antes de pulsar nada.
+ *
+ * El orden es el del trabajo, no el del menú: **qué está pasando ahora**, luego
+ * **qué falta por hacer** —con el número, que es lo que baja cada mañana— y al
+ * final a dónde ir.
+ *
+ * Los accesos van en rejilla con su icono. Una rejilla de destinos es la forma
+ * honesta de un lanzador; lo que no vale es usar tarjetas iguales para fingir
+ * que una página tiene estructura, y aquí no son la página: son su último
+ * tercio, bajo un título que dice lo que son.
  */
-export function paginaPanel(opciones: { sesion: Sesion; nombre: string }) {
+export function paginaPanel(opciones: {
+  sesion: Sesion;
+  nombre: string;
+  resumen?: ResumenInicio;
+}) {
   const secciones = seccionesDe(opciones.sesion.rol).filter((s) => s.ruta !== '/');
+  const { examenes, faltas, aviso } = opciones.resumen ?? {};
+
+  // Solo lo que de verdad falta, y lo más gordo primero. Un «0 sin especialidad
+  // propia» ocupa el mismo sitio que un 495 y no pide nada.
+  const pendientes = (faltas ?? []).filter((f) => f.cuantos > 0).sort((a, b) => b.cuantos - a.cuantos);
+
+  const bloqueAviso = aviso
+    ? `<div class="panel ahora${aviso.activo ? ' puesto' : ''}">
+        ${icono('aviso')}
+        <div class="ahora-texto">
+          <b>${aviso.activo ? 'El sitio está mostrando un aviso' : 'No hay ningún aviso puesto'}</b>
+          ${
+            aviso.activo
+              ? `<p class="pista">«${esc(aviso.texto)}»${aviso.hasta ? ` · hasta el ${esc(aviso.hasta)}` : ''}</p>`
+              : `<p class="pista">La franja de arriba de todas las páginas está apagada.</p>`
+          }
+        </div>
+        <a class="boton suave" href="/aviso">${aviso.activo ? 'Cambiarlo' : 'Poner uno'}</a>
+      </div>`
+    : '';
+
+  const bloqueFaltas = pendientes.length
+    ? `<h2>Lo que falta por completar</h2>
+      <p class="pista">
+        De los ${examenes} exámenes del catálogo. Cada número lleva a su lista;
+        se corrigen de diez en diez desde el móvil.
+      </p>
+      <ul class="recuento">
+        ${pendientes
+          .map(
+            (f) => `<li><a href="/catalogo?falta=${esc(f.clave)}">
+              <b>${f.cuantos}</b> ${esc(f.etiqueta)}</a></li>`,
+          )
+          .join('')}
+      </ul>`
+    : '';
 
   return pagina(
     'Panel',
     `${cabecera(
       `Hola, ${esc(opciones.nombre)}`,
-      `Entró como <strong>${esc(opciones.sesion.rol)}</strong>. Todo lo que guarde aquí
-       tarda uno o dos minutos en verse en el sitio, y queda anotado con su nombre
-       y la fecha.`,
+      `Entró como <strong>${esc(opciones.sesion.rol)}</strong>. Lo que guarde aquí tarda
+       uno o dos minutos en verse en el sitio y queda anotado con su nombre.`,
     )}
 
-    <div class="panel">
-      <ul class="lista">
-        ${secciones
-          .map(
-            (s) => `<li>
-              <a href="${s.ruta}">${esc(s.etiqueta)}</a>
-              <br><span class="pista">${esc(s.de)}</span>
-            </li>`,
-          )
-          .join('')}
-      </ul>
-    </div>`,
+    ${bloqueAviso}
+    ${bloqueFaltas}
+
+    <h2>Accesos rápidos</h2>
+    <ul class="accesos">
+      ${secciones
+        .map(
+          (s) => `<li><a href="${s.ruta}">
+            ${icono(s.icono)}
+            <span><b>${esc(s.etiqueta)}</b><em>${esc(s.de)}</em></span>
+          </a></li>`,
+        )
+        .join('')}
+    </ul>`,
     { sesion: opciones.sesion, activa: '/' },
   );
 }

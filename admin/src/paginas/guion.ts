@@ -54,4 +54,51 @@ for (const campo of document.querySelectorAll('.campo-clave input')) {
   campo.addEventListener('keydown', mirar);
   campo.addEventListener('blur', () => { aviso.hidden = true; });
 }
+
+/*
+  Copiar el enlace de alta.
+
+  El enlace mide 76 caracteres y hay que pasárselo a la persona invitada por
+  WhatsApp o en mano. Seleccionarlo a dedo en un teléfono, sin pasarse de largo
+  ni quedarse corto, es la clase de cosa que se hace tres veces hasta que sale.
+
+  Sin este guion el enlace sigue ahí y el user-select: all de la hoja hace que
+  un toque lo seleccione entero; el botón ni aparece.
+*/
+for (const boton of document.querySelectorAll('.copiar')) {
+  const destino = document.getElementById(boton.dataset.enlace);
+  const rotulo = boton.querySelector('.copiar-texto');
+  if (!destino || !rotulo) continue;
+
+  boton.hidden = false;
+  let reloj = 0;
+
+  boton.addEventListener('click', async () => {
+    let copiado = true;
+    try {
+      await navigator.clipboard.writeText(destino.textContent.trim());
+    } catch (e) {
+      /*
+        El portapapeles puede negarse —sin permiso, o servido sin cifrar—. En
+        ese caso se selecciona el enlace entero: copiar deja de ser un toque
+        pero sigue siendo un Ctrl+C, y nunca se queda en nada.
+      */
+      copiado = false;
+      const rango = document.createRange();
+      rango.selectNodeContents(destino);
+      const seleccion = window.getSelection();
+      seleccion.removeAllRanges();
+      seleccion.addRange(rango);
+    }
+
+    boton.dataset.hecho = copiado ? 'si' : 'no';
+    rotulo.textContent = copiado ? 'Copiado' : 'Seleccionado';
+
+    clearTimeout(reloj);
+    reloj = setTimeout(() => {
+      delete boton.dataset.hecho;
+      rotulo.textContent = 'Copiar';
+    }, 2200);
+  });
+}
 `;
