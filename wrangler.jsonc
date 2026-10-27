@@ -10,6 +10,18 @@
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
   "name": "examlabsas",
   "compatibility_date": "2026-08-11",
+
+  // El sitio vive en examlabsas.com y www.examlabsas.com.
+  //
+  // Cloudflare lo publica además en examlabsas.<cuenta>.workers.dev y en una
+  // dirección por despliegue. No es un problema de seguridad —el sitio es
+  // público— y el `canonical` de cada página ya manda a examlabsas.com, que es
+  // lo que evita que un buscador reparta el posicionamiento entre las dos.
+  // Pero un `canonical` es una indicación, no una orden, y no hay ninguna
+  // razón para que la web del laboratorio conteste en una dirección con el
+  // nombre de una cuenta personal.
+  "workers_dev": false,
+  "preview_urls": false,
   "assets": {
     "directory": "./dist",
     // Sirve la página 404 propia del sitio en vez del error genérico.

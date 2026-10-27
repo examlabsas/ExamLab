@@ -4,7 +4,49 @@ Lo que falta para dar el sitio por terminado. Nada de esto bloquea la
 publicación: el sitio funciona hoy y, donde falta un dato, lo dice en vez de
 inventarlo.
 
-Última revisión: 26 de octubre de 2026.
+Última revisión: 27 de octubre de 2026.
+
+---
+
+## 0. El panel ya está en producción
+
+Desde el 26 de octubre de 2026 el panel vive en **https://admin.examlabsas.com**.
+Comprobado ese día: el acceso funciona, las rutas protegidas redirigen, las
+cabeceras de seguridad están puestas, y el panel escribe de verdad en el
+repositorio — commit `152d37b`, hecho desde la pantalla de Aviso.
+
+**El 27 de octubre el panel dejó de parecer de otra casa.** Lleva la Montserrat
+del sitio —servida por el propio Worker, sin pedirle nada a nadie de fuera—, el
+emblema de ExamLab en el raíl, en la pestaña del navegador y en la pantalla de
+acceso, y esa pantalla tiene ahora el ojo de ver la contraseña y el aviso de
+bloqueo de mayúsculas. De paso se arreglaron tres tablas que se salían de la
+pantalla del teléfono. Está contado en [admin/DESIGN.md](admin/DESIGN.md).
+
+El despliegue destapó un fallo que no se veía en local: `password.ts` pedía
+310 000 iteraciones de PBKDF2 y Cloudflare rechaza por encima de 100 000, así
+que entrar fallaba con cualquier contraseña. `wrangler dev` no aplica ese tope.
+Está arreglado y explicado en `admin/README.md`.
+
+Falta:
+
+- [ ] **Subir los cambios.** El arreglo de PBKDF2 está desplegado pero no en el
+      repositorio: `wrangler.jsonc`, `admin/wrangler.jsonc`,
+      `admin/src/auth/password.ts`, `admin/scripts/crear-admin.mjs`,
+      `admin/pruebas/usuario.mjs` y `admin/src/paginas/contenido.ts`. Quien
+      clone y despliegue hoy se encuentra otra vez el fallo de entrar.
+- [ ] **Desplegar el panel otra vez.** Lo del 27 de octubre —tipografía,
+      emblema, acceso nuevo— está en el código y probado en local, pero el panel
+      que corre en `admin.examlabsas.com` sigue siendo el anterior. `npm run
+      deploy` desde `admin/`.
+- [ ] **Un segundo administrador.** Hay uno solo. Si pierde la contraseña hay
+      que repetir `npm run admin:crear` y el `kv key put`, que requiere acceso a
+      Cloudflare. Se invita desde Usuarios.
+- [ ] **El token de GitHub.** Uno quedó expuesto en el historial de la terminal
+      durante la puesta en marcha. Confirmar que se borró y se regeneró.
+
+Las direcciones `.workers.dev` del panel y del sitio están cerradas con
+`workers_dev` y `preview_urls` en `false`. La del panel ya responde 404; la del
+sitio se cierra en el próximo despliegue del repositorio.
 
 ---
 

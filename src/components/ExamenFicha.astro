@@ -237,26 +237,26 @@ const partesIncluye = examen.incluye ? examen.incluye.split(' · ').filter(Boole
       */}
       <h2 class="mt-10 text-h2 font-bold text-brand">Preguntas frecuentes</h2>
       <div class="mt-4 flex flex-col gap-3">
-        <details class="group rounded-lg border border-line bg-white open:border-accent-dark">
+        <details class="group rounded-lg border border-line bg-white">
           <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-5 text-base font-bold text-brand">
             ¿Tengo que venir en ayunas?
-            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45" />
+            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-300 ease-suave group-open:rotate-45" />
           </summary>
           <p class="px-5 pb-5 text-base leading-relaxed text-neutral">{fraseAyuno(examen)}</p>
         </details>
 
-        <details class="group rounded-lg border border-line bg-white open:border-accent-dark">
+        <details class="group rounded-lg border border-line bg-white">
           <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-5 text-base font-bold text-brand">
             ¿Cuándo tengo el resultado?
-            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45" />
+            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-300 ease-suave group-open:rotate-45" />
           </summary>
           <p class="px-5 pb-5 text-base leading-relaxed text-neutral">{fraseEntrega(examen)}</p>
         </details>
 
-        <details class="group rounded-lg border border-line bg-white open:border-accent-dark">
+        <details class="group rounded-lg border border-line bg-white">
           <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-5 text-base font-bold text-brand">
             ¿Qué muestra se toma?
-            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45" />
+            <Icon name="mas" size={18} class="flex-none text-accent-dark transition-transform duration-300 ease-suave group-open:rotate-45" />
           </summary>
           <p class="px-5 pb-5 text-base leading-relaxed text-neutral">{fraseMuestra(examen)}</p>
         </details>

@@ -369,6 +369,96 @@ const bloques = [medicalBusinessSchema(), webSiteSchema(), ...schema];
 
       observarFondos();
       document.addEventListener('astro:page-load', observarFondos);
+
+      /*
+        Desplegables: que se abran, no que aparezcan de golpe.
+
+        El navegador abre y cierra un `<details>` al instante, y en una página
+        donde todo lo demás entra con una curva de frenado eso se nota: la
+        respuesta aparece de una vez y empuja de un salto lo que tiene debajo.
+
+        Esto se intentó primero solo con CSS, con `::details-content` y
+        `interpolate-size`, que es la receta que circula. Medido en Chrome 152:
+        funciona cuando el desplegable cuelga de una rejilla —las preguntas de
+        `/soy-paciente/resultados` animaban de 74 a 143 px— y **deja la caja a
+        cero para siempre** cuando cuelga de un contenedor flex, que es el caso
+        de la ficha de examen. El desplegable dejaba de abrirse. Una animación
+        que a veces esconde el contenido no se publica, así que la hace esto:
+        veinte líneas que miden el alto real y lo animan igual en todas partes.
+
+        Sin JavaScript el `<details>` sigue abriendo y cerrando por su cuenta,
+        que es como lo hacía hasta ahora.
+      */
+      const DURACION_DESPLEGABLE = 300;
+
+      const initDesplegables = () => {
+        // La preferencia del sistema es sobre el movimiento, y aquí el
+        // movimiento es justo el alto del bloque: se deja el salto nativo.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        for (const detalle of document.querySelectorAll<HTMLDetailsElement>('details')) {
+          // `astro:page-load` también corre en la carga inicial.
+          if (detalle.dataset.animado) continue;
+          detalle.dataset.animado = 'si';
+
+          const resumen = detalle.querySelector('summary');
+          if (!resumen) continue;
+
+          let animacion: Animation | null = null;
+
+          resumen.addEventListener('click', (evento) => {
+            evento.preventDefault();
+            animacion?.cancel();
+
+            const desde = detalle.offsetHeight;
+            const abriendo = !detalle.open;
+            // Hay que abrirlo antes de medir: cerrado, el contenido no existe
+            // para el navegador y `scrollHeight` solo devuelve el resumen.
+            if (abriendo) detalle.open = true;
+            const hasta = abriendo ? detalle.scrollHeight : resumen.offsetHeight;
+
+            detalle.style.overflow = 'hidden';
+            const esta = detalle.animate(
+              { height: [`${desde}px`, `${hasta}px`] },
+              { duration: DURACION_DESPLEGABLE, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+            );
+            animacion = esta;
+
+            // `animacion !== esta` significa que ya llegó otro clic y manda él:
+            // esta pasada no debe tocar ni el alto ni el estado.
+            const soltar = () => {
+              if (animacion !== esta) return;
+              detalle.style.overflow = '';
+              if (!abriendo) detalle.open = false;
+              animacion = null;
+            };
+
+            esta.onfinish = soltar;
+            esta.oncancel = () => { detalle.style.overflow = ''; };
+
+            /*
+              Red de seguridad, igual que la del revelado: mientras la animación
+              corre, el bloque lleva `overflow:hidden` y el alto lo manda ella.
+              Si su reloj no avanza —una pestaña en segundo plano o una ventana
+              tapada: comprobado, ahí `currentTime` se queda en 0— `onfinish` no
+              llega nunca y la respuesta se quedaría recortada a la altura del
+              título. Pasado su tiempo se suelta igual.
+
+              **Nunca debe perderse contenido por culpa de una animación.**
+            */
+            setTimeout(() => {
+              if (animacion !== esta) return;
+              esta.cancel();
+              detalle.style.overflow = '';
+              if (!abriendo) detalle.open = false;
+              animacion = null;
+            }, DURACION_DESPLEGABLE + 150);
+          });
+        }
+      };
+
+      initDesplegables();
+      document.addEventListener('astro:page-load', initDesplegables);
     </script>
   </body>
 </html>

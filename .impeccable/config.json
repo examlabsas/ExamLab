@@ -17,6 +17,12 @@
         "value": "cubic-bezier(0.34, 1.28, 0.64, 1)",
         "createdAt": "2026-08-14T03:25:55.882Z",
         "reason": "Rebote leve en la entrada escalonada de tarjetas, aprobado por el cliente"
+      },
+      {
+        "rule": "overused-font",
+        "value": "montserrat",
+        "createdAt": "2026-10-27T10:01:25.929Z",
+        "reason": "Montserrat es la tipografia aprobada por el cliente para el sitio publico de ExamLab; el panel la adopta justamente para no parecer de otra casa"
       }
     ]
   }

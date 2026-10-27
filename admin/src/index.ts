@@ -36,6 +36,7 @@ import {
 } from './usuarios';
 import { paginaAcceso, paginaInvitacion, paginaPanel } from './paginas/acceso';
 import { paginaFallo } from './paginas/plantilla';
+import { ACTIVOS, MANIFIESTO } from './estatico';
 import { paginaUsuarios } from './paginas/usuarios';
 import {
   paginaNoticias,
@@ -147,6 +148,38 @@ app.use('*', async (c, next) => {
 
 app.get('/robots.txt', (c) => c.text('User-agent: *\nDisallow: /\n'));
 
+/* ─── Archivos del propio panel ──────────────────────────────────────────── */
+
+/*
+  Van antes de las guardas a propósito: la pantalla de acceso necesita la
+  tipografía y el emblema, y quien todavía no ha entrado tiene que poder
+  pedirlos. No hay nada privado en ellos —son los mismos archivos que el sitio
+  público sirve— y exigir sesión para la fuente dejaría la puerta sin tipografía.
+
+  Un año de caché, que es lo que el sitio hace con los suyos. El guion lleva su
+  huella en el nombre, así que al cambiarlo cambia la ruta y nadie se queda con
+  la versión vieja.
+*/
+for (const [ruta, activo] of Object.entries(ACTIVOS)) {
+  app.get(ruta, (c) =>
+    c.body(activo.cuerpo, 200, {
+      'Content-Type': activo.tipo,
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    }),
+  );
+}
+
+/*
+  El manifiesto sí se revisa cada hora: es texto corto y es lo que cambia si
+  algún día el panel se llama de otra forma en la pantalla de inicio.
+*/
+app.get('/manifiesto.webmanifest', (c) =>
+  c.body(MANIFIESTO, 200, {
+    'Content-Type': 'application/manifest+json',
+    'Cache-Control': 'public, max-age=3600',
+  }),
+);
+
 /* ─── Guardas ────────────────────────────────────────────────────────────── */
 
 async function exigirSesion(c: any, next: () => Promise<void>) {
@@ -208,7 +241,7 @@ app.post('/entrar', async (c) => {
 
     Aquí se pedía además un código de seis cifras de una aplicación de
     autenticación. El laboratorio pidió quitarlo. Lo que queda protegiendo la
-    puerta es la contraseña —derivada con PBKDF2 y 310 000 iteraciones—, el
+    puerta es la contraseña —derivada con PBKDF2 y 100 000 iteraciones—, el
     límite de cinco intentos por correo y por IP, y que la sesión sea un
     testigo revocable en el KV. El secreto de cada usuario se sigue guardando,
     así que volver a pedirlo es restaurar esta comprobación y el campo del

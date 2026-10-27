@@ -1,0 +1,52 @@
+{
+  "//": "El gemelo legible por máquina de DESIGN.md. El encabezado de DESIGN.md declara los tokens; aquí van los tonos derivados que su tabla «Tonos derivados» explica en prosa, y que el detector no puede leer de una tabla de Markdown. Si se añade un tono allí, se añade aquí, o volverá a salir como desvío.",
+  "extensions": {
+    "colorMeta": {
+      "rail": {
+        "canonical": "#00456b",
+        "//": "La escala de grises azulados que vive sobre el raíl.",
+        "tonalRamp": ["#dbe9f2", "#c3dcec", "#9cc4dd", "#a9c9de"]
+      },
+      "marca-viva": {
+        "canonical": "#00A3C4",
+        "//": "«Cerrar sesión», lo único pulsable del pie del raíl.",
+        "tonalRamp": ["#8fd6e8"]
+      },
+      "accion": {
+        "canonical": "#00697f",
+        "//": "El botón primario pulsado se hunde.",
+        "tonalRamp": ["#005b6e"]
+      },
+      "tinta": {
+        "canonical": "#16202a",
+        "//": "Texto de la barra móvil activa, un punto más de contraste.",
+        "tonalRamp": ["#24323d"]
+      },
+      "tinta-suave": {
+        "canonical": "#51616e",
+        "//": "Texto de sugerencia dentro de los campos: 4,94:1, el par más bajo del panel.",
+        "tonalRamp": ["#65727c"]
+      },
+      "linea": {
+        "canonical": "#dbe3ea",
+        "//": "Bordes con el puntero encima: sobre superficie y sobre el lienzo.",
+        "tonalRamp": ["#aebecb", "#93a9b9"]
+      },
+      "alerta-fondo": {
+        "canonical": "#fdefed",
+        "//": "El contorno propio de los mensajes de error y de la marca «mal».",
+        "tonalRamp": ["#f1c9c4"]
+      },
+      "bien-fondo": {
+        "canonical": "#e8f6f9",
+        "//": "Lo mismo, del lado del mensaje de guardado.",
+        "tonalRamp": ["#b6dfe7"]
+      },
+      "fondo": {
+        "canonical": "#f4f7f9",
+        "//": "El tinte superior del lienzo del acceso, la única pantalla sin raíl.",
+        "tonalRamp": ["#e4eff6"]
+      }
+    }
+  }
+}

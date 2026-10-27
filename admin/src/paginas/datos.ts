@@ -86,10 +86,10 @@ export function paginaSede(o: { sesion: Sesion; sede: Sede; error?: string }) {
             ${DIAS[i]}
           </label>
         </td>
-        <td><input name="d${i}a1" type="time" value="${esc(t1?.abre ?? '')}" style="margin:0"></td>
-        <td><input name="d${i}c1" type="time" value="${esc(t1?.cierra ?? '')}" style="margin:0"></td>
-        <td><input name="d${i}a2" type="time" value="${esc(t2?.abre ?? '')}" style="margin:0"></td>
-        <td><input name="d${i}c2" type="time" value="${esc(t2?.cierra ?? '')}" style="margin:0"></td>
+        <td data-rotulo="Abre"><input name="d${i}a1" type="time" value="${esc(t1?.abre ?? '')}" style="margin:0"></td>
+        <td data-rotulo="Cierra"><input name="d${i}c1" type="time" value="${esc(t1?.cierra ?? '')}" style="margin:0"></td>
+        <td data-rotulo="Abre (tarde)"><input name="d${i}a2" type="time" value="${esc(t2?.abre ?? '')}" style="margin:0"></td>
+        <td data-rotulo="Cierra (tarde)"><input name="d${i}c2" type="time" value="${esc(t2?.cierra ?? '')}" style="margin:0"></td>
       </tr>`;
   };
 
@@ -115,12 +115,12 @@ export function paginaSede(o: { sesion: Sesion; sede: Sede; error?: string }) {
         <label for="celular">Celular</label>
         <input id="celular" name="celular" type="text" value="${esc(s.celular)}" required>
 
-        <h2 style="font-size:1.05rem;margin-top:2rem">Horario</h2>
+        <h2 style="margin-top:2rem">Horario</h2>
         <p class="pista">
           Desmarque el día para cerrarlo. La segunda pareja de horas es para las
           sedes que cierran al mediodía; déjela vacía si no aplica.
         </p>
-        <table>
+        <table class="horario">
           <thead><tr><th>Día</th><th>Abre</th><th>Cierra</th><th>Abre (tarde)</th><th>Cierra</th></tr></thead>
           <tbody>${[1, 2, 3, 4, 5, 6, 0].map(dia).join('')}</tbody>
         </table>
@@ -148,17 +148,28 @@ export function paginaFeriados(o: {
   const hoy = new Date().toISOString().slice(0, 10);
   const filas = o.fechas
     .map(
-      (f) => `<tr style="${f.fecha < hoy ? 'opacity:.5' : ''}">
+      (f) => {
+        const atencion = f.franja
+          ? esc(f.franja.map((t) => `${t.abre}–${t.cierra}`).join(' y '))
+          : 'Cerrado';
+        return `<tr style="${f.fecha < hoy ? 'opacity:.5' : ''}">
         <td>${esc(f.fecha)}</td>
-        <td>${esc(f.motivo)}</td>
-        <td>${f.franja ? esc(f.franja.map((t) => `${t.abre}–${t.cierra}`).join(' y ')) : 'Cerrado'}</td>
-        <td>
+        <td>${esc(f.motivo)}${
+          /*
+            Cuatro columnas no caben en un teléfono y la que se cae por el borde
+            es la del botón, que es justo la que hace algo. Como en Usuarios: la
+            atención baja a marca bajo el motivo y su columna desaparece.
+          */ ''
+        }<span class="solo-estrecho"><br><span class="marca">${atencion}</span></span></td>
+        <td class="solo-amplio">${atencion}</td>
+        <td class="accion">
           <form method="post" action="/feriados/quitar" style="margin:0">
             <input type="hidden" name="fecha" value="${esc(f.fecha)}">
-            <button type="submit" style="width:auto;margin:0;padding:.3rem .6rem;font-size:.78rem">Quitar</button>
+            <button type="submit" class="chico">Quitar</button>
           </form>
         </td>
-      </tr>`,
+      </tr>`;
+      },
     )
     .join('');
 
@@ -170,13 +181,13 @@ export function paginaFeriados(o: {
       ${o.error ? `<p class="error">${esc(o.error)}</p>` : ''}
 
       <table>
-        <thead><tr><th>Fecha</th><th>Motivo</th><th>Atención</th><th></th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Motivo</th><th class="solo-amplio">Atención</th><th></th></tr></thead>
         <tbody>${filas || '<tr><td colspan="4">Ninguno.</td></tr>'}</tbody>
       </table>
       <p class="pista">Las fechas ya pasadas se ven atenuadas. No estorban: se pueden dejar.</p>
 
       <div class="panel" style="margin-top:2rem">
-        <h2 style="font-size:1.05rem;margin:0">Añadir una fecha</h2>
+        <h2 style="margin:0">Añadir una fecha</h2>
         <form method="post" action="/feriados">
           <label for="fecha">Fecha</label>
           <input id="fecha" name="fecha" type="date" required>

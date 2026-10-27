@@ -10,11 +10,25 @@
  */
 
 /**
- * Recomendación de OWASP para PBKDF2-HMAC-SHA256. Se guarda junto al hash para
- * poder subirlo en el futuro sin invalidar las contraseñas existentes: al
- * verificar se usa el número con el que se derivó.
+ * Techo de Workers, no la recomendación de OWASP.
+ *
+ * OWASP pide 310 000 para PBKDF2-HMAC-SHA256, y eso figuraba aquí hasta el
+ * primer despliegue. `crypto.subtle` de Workers rechaza cualquier número por
+ * encima de 100 000 con `NotSupportedError: iteration counts above 100000 are
+ * not supported`, así que entrar fallaba con cualquier contraseña y el panel
+ * respondía 500. No se vio antes porque `wrangler dev` no aplica ese tope: el
+ * límite solo existe en producción.
+ *
+ * El número se guarda junto al hash, así que si Cloudflare lo levanta se puede
+ * subir sin invalidar las contraseñas ya creadas: al verificar se usa aquel con
+ * el que se derivó. Ese mismo rescate es lo que obliga a rehacer los usuarios
+ * creados con 310 000 — su registro pide 310 000 al verificar y vuelve a fallar
+ * aunque esta constante baje.
+ *
+ * Está repetido en `scripts/crear-admin.mjs` y en `pruebas/usuario.mjs`, que no
+ * pueden importar este módulo. Si cambia aquí, cambia en los tres.
  */
-export const ITERACIONES = 310_000;
+export const ITERACIONES = 100_000;
 
 const codificar = (texto: string) => new TextEncoder().encode(texto);
 

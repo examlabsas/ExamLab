@@ -72,7 +72,7 @@ que guarda el usuario. Hay que copiarlo y ejecutarlo.
 
 > El panel **ya no pide un código de seis cifras** al entrar. El laboratorio
 > pidió quitarlo. Lo que protege la puerta ahora es la contraseña —derivada con
-> PBKDF2 y 310 000 iteraciones—, el límite de cinco intentos por correo y por
+> PBKDF2 y 100 000 iteraciones—, el límite de cinco intentos por correo y por
 > IP, y que la sesión sea un testigo revocable en el KV. El secreto de cada
 > usuario se sigue guardando, así que volver a pedirlo es restaurar una
 > comprobación y un campo, no rehacer nada.
@@ -158,8 +158,13 @@ admin/
 │   │   ├── password.ts       PBKDF2 y reglas de la contraseña
 │   │   ├── totp.ts           sin uso: el código de verificación se quitó
 │   │   └── sesion.ts         cookies, sesiones y límite de intentos
+│   ├── estatico.ts           las fuentes, el emblema y el guion, con sus rutas
 │   └── paginas/
-│       └── plantilla.ts      el armazón, los iconos y toda la hoja de estilos
+│       ├── plantilla.ts      el armazón, los iconos y toda la hoja de estilos
+│       └── guion.ts          el único JavaScript: el ojo de ver la contraseña
+├── activos/                  Montserrat (3 pesos) y el emblema, dentro del
+│                             Worker: 192 KB que se sirven desde /fuentes y
+│                             /emblema.webp con un año de caché
 ├── scripts/crear-admin.mjs   primer administrador
 └── pruebas/                  solo para local: GitHub simulado, usuario de
                               prueba y hoja de ejemplo
@@ -168,9 +173,21 @@ admin/
 ### Decisiones que conviene conocer
 
 **Las contraseñas no se guardan.** Se guarda la sal y el resultado de derivarlas
-con PBKDF2-SHA256 y 310 000 iteraciones. Si alguien se llevara el almacén, no
+con PBKDF2-SHA256 y 100 000 iteraciones. Si alguien se llevara el almacén, no
 saca las contraseñas de ahí. La comparación es en tiempo constante: una normal
 se detiene en el primer byte distinto y ese tiempo de más es medible.
+
+> **100 000 es el techo de Workers, no una elección.** OWASP recomienda 310 000
+> y eso estuvo aquí hasta el primer despliegue: `crypto.subtle` de Cloudflare
+> rechaza cualquier número por encima de 100 000 con `NotSupportedError`, así
+> que entrar fallaba con cualquier contraseña y el panel devolvía un 500 con el
+> mensaje genérico de «no se pudo leer el repositorio», que no tenía nada que
+> ver. `wrangler dev` no aplica ese tope, de modo que en local funcionaba.
+>
+> El número se guarda dentro de cada usuario, no solo en el código. Si Cloudflare
+> lo levanta, subir la constante no arregla a los usuarios ya creados: su
+> registro sigue pidiendo el número viejo y hay que rehacerlos con
+> `npm run admin:crear`.
 
 **La sesión es un testigo opaco en KV**, no un token que se valide solo. Así,
 cerrar la sesión de alguien es borrar una clave y queda fuera en el acto.

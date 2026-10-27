@@ -16,6 +16,8 @@
  */
 
 /** Escapa para interpolar dentro del HTML sin abrir un agujero. */
+import { RUTA_GUION } from '../estatico';
+
 export const esc = (texto: unknown): string =>
   String(texto ?? '').replace(
     /[&<>"']/g,
@@ -58,6 +60,10 @@ const ICONOS: Record<string, string> = {
   editar: 'M4.5 19.5h4L19 9a2.1 2.1 0 0 0-3-3L5.5 16.5zM14.5 7.5l2 2',
   seguir: 'M9.5 6.5 15 12l-5.5 5.5',
   hoja: 'M5 4.5h14v15H5zM5 9.5h14M10.5 9.5v10',
+  // El ojo de ver la contraseña. Tachado = ahora mismo está oculta.
+  ojo: 'M2.5 12c2.4-3.6 5.6-5.5 9.5-5.5s7.1 1.9 9.5 5.5c-2.4 3.6-5.6 5.5-9.5 5.5S4.9 15.6 2.5 12zM14.5 12a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0z',
+  'ojo-tachado':
+    'M2.5 12c2.4-3.6 5.6-5.5 9.5-5.5s7.1 1.9 9.5 5.5c-2.4 3.6-5.6 5.5-9.5 5.5S4.9 15.6 2.5 12zM14.5 12a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0zM4.5 4.5l15 15',
 };
 
 export const icono = (nombre: string) =>
@@ -145,6 +151,38 @@ const estaActiva = (ruta: string, aqui: string) =>
 /* ─── Estilos ────────────────────────────────────────────────────────────── */
 
 const ESTILOS = `
+  /*
+    La Montserrat del sitio, servida por el propio Worker desde /fuentes.
+    Aquí hubo tipografía del sistema, y el panel parecía de otra casa que la
+    web que administra. El porqué del cambio y lo que cuesta están en
+    src/estatico.ts.
+
+    \`swap\`: el texto se lee desde el primer momento con el tipo del sistema y
+    cambia cuando llega el archivo. En una herramienta que se abre veinte veces
+    al día, esperar a la fuente para enseñar la pantalla sería peor.
+  */
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/fuentes/montserrat-400.woff2) format('woff2');
+  }
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url(/fuentes/montserrat-600.woff2) format('woff2');
+  }
+  @font-face {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(/fuentes/montserrat-700.woff2) format('woff2');
+  }
+
   :root {
     /* Azul de la marca. El raíl lo lleva en bloque; el resto es casi todo neutro. */
     --rail: #00456b;
@@ -164,10 +202,20 @@ const ESTILOS = `
     --bien-fondo: #e8f6f9;
     --radio: 10px;
     --radio-chico: 7px;
+    /* Para lo que mide dos letras: un fragmento de código dentro de un párrafo. */
+    --radio-menudo: 4px;
     --sombra: 0 1px 2px rgba(22,32,42,.05), 0 6px 16px -10px rgba(22,32,42,.22);
     /* Desaceleración exponencial: las cosas frenan y se paran, no rebotan. */
     --salida: cubic-bezier(.16,1,.3,1);
     --rail-ancho: 15.5rem;
+    /*
+      Los dos iconos de los mensajes, como máscara. Se pintan con el color del
+      mensaje, así que el trazo del archivo solo tiene que ser opaco. Son los
+      mismos dibujos de ICONOS —retícula de 24, trazo 1,75—: antes aquí había
+      un «!» y un «✓» de texto, que es justo lo que DESIGN.md prohíbe.
+    */
+    --icono-alerta: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.5v4.5M12 16.2v.3M12 4.5 2.8 20h18.4z'/%3E%3C/svg%3E");
+    --icono-listo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.5l5 5 10-11'/%3E%3C/svg%3E");
   }
 
   * { box-sizing: border-box; }
@@ -175,7 +223,7 @@ const ESTILOS = `
 
   body {
     margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
     font-size: 15px;
     line-height: 1.55;
     color: var(--tinta);
@@ -185,7 +233,7 @@ const ESTILOS = `
 
   a { color: var(--accion); text-underline-offset: .18em; }
   a:hover { color: var(--accion-viva); }
-  :focus-visible { outline: 2.5px solid var(--accion-viva); outline-offset: 2px; border-radius: 3px; }
+  :focus-visible { outline: 2.5px solid var(--accion-viva); outline-offset: 2px; border-radius: var(--radio-menudo); }
 
   /* ── Armazón ───────────────────────────────────────────────────────────── */
 
@@ -222,7 +270,8 @@ const ESTILOS = `
     color: #fff;
     text-decoration: none;
   }
-  .rail-marca b { font-size: 1.15rem; letter-spacing: -.015em; }
+  .rail-marca img { width: 34px; height: 34px; flex: 0 0 auto; }
+  .rail-marca b { font-size: 1.05rem; letter-spacing: -.012em; }
   .rail-marca em {
     display: block;
     font-size: .7rem;
@@ -268,8 +317,8 @@ const ESTILOS = `
 
   .cabecera-pagina { margin: 0 0 1.5rem; }
   .cabecera-pagina h1 { margin: 0; font-size: 1.45rem; line-height: 1.25; letter-spacing: -.018em; }
-  .sub { margin: .45rem 0 0; max-width: 62ch; font-size: .92rem; color: var(--tinta-suave); }
-  .volver { display: inline-block; margin: 0 0 .8rem; font-size: .88rem; }
+  .sub { margin: .45rem 0 0; max-width: 62ch; font-size: 15px; color: var(--tinta-suave); }
+  .volver { display: inline-block; margin: 0 0 .8rem; font-size: .84rem; }
 
   h2 { margin: 2.25rem 0 .75rem; font-size: 1.05rem; letter-spacing: -.012em; }
 
@@ -286,17 +335,108 @@ const ESTILOS = `
   .panel > :first-child { margin-top: 0; }
   .panel > :last-child { margin-bottom: 0; }
 
-  /* La caja centrada del acceso, que no vive dentro del armazón. */
+  /* ── La puerta ─────────────────────────────────────────────────────────── */
+
+  /*
+    El acceso es la única pantalla sin raíl, así que la cabecera de la caja hace
+    su papel: emblema y marca sobre el azul, igual que arriba del raíl. El panel
+    sigue teniendo un solo campo de color; aquí está en otro sitio porque el
+    raíl todavía no existe.
+
+    Antes era una caja blanca con un título y dos campos sobre el gris del
+    lienzo, sin una sola señal de de quién es el panel que se está abriendo.
+  */
+  .armazon:not(.con-rail) {
+    display: flex;
+    flex-direction: column;
+    /* El mismo aire lateral que el lienzo del móvil, o la caja toca los bordes. */
+    padding: 0 1.1rem;
+    background: radial-gradient(85% 50% at 50% 0%, #e4eff6 0%, var(--fondo) 62%);
+  }
+
   .caja {
-    max-width: 23rem;
-    margin: 8vh auto 2rem;
-    padding: 1.9rem;
+    width: 100%;
+    max-width: 24.5rem;
+    margin: 6vh auto 1.25rem;
     background: var(--superficie);
     border: 1px solid var(--linea);
     border-radius: 14px;
     box-shadow: var(--sombra);
+    /* La cabecera llega hasta el borde: sin esto, el azul se sale del radio. */
+    overflow: hidden;
   }
-  .caja h1 { margin: 0 0 .3rem; font-size: 1.3rem; letter-spacing: -.018em; }
+
+  .caja-marca {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 1.1rem 1.75rem;
+    background: var(--rail);
+  }
+  .caja-marca img { width: 40px; height: 40px; flex: 0 0 auto; }
+  .caja-marca b {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -.012em;
+    color: #fff;
+  }
+  .caja-marca em {
+    display: block;
+    font-size: .72rem;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #9cc4dd;
+  }
+
+  .caja-cuerpo { padding: 1.5rem 1.75rem 1.75rem; }
+  .caja h1 { margin: 0; font-size: 1.05rem; letter-spacing: -.012em; }
+
+  /* La firma de debajo: dice dónde se está y lleva de vuelta al sitio. */
+  .pie-acceso {
+    max-width: 24.5rem;
+    margin: 0 auto 2.5rem;
+    padding: 0 .25rem;
+    font-size: .84rem;
+    color: var(--tinta-suave);
+    text-align: center;
+    text-wrap: balance;
+  }
+  /* A 375px «Ir al sitio» se partía en dos líneas por la mitad. */
+  .pie-acceso a { white-space: nowrap; }
+
+  /*
+    El ojo de ver la contraseña.
+
+    Llega dibujado y oculto; lo enseña el guion. Si el guion no corre, el campo
+    se queda como estaba y no aparece un botón que no hace nada.
+  */
+  .campo-clave { position: relative; margin-top: .35rem; }
+  .campo-clave input { margin-top: 0; padding-right: 3.1rem; }
+  .ojo {
+    position: absolute;
+    top: 50%;
+    right: .25rem;
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    margin: 0;
+    padding: 0;
+    color: var(--tinta-suave);
+    background: none;
+    border: 0;
+    border-radius: var(--radio-chico);
+    transform: translateY(-50%);
+    transition: color .18s var(--salida), background .18s var(--salida);
+  }
+  .ojo:hover { color: var(--accion); background: var(--linea-fina); }
+  .ojo svg { display: block; width: 20px; height: 20px; }
+  .ojo .ojo-ocultar, .ojo[aria-pressed="true"] .ojo-ver { display: none; }
+  .ojo[aria-pressed="true"] .ojo-ocultar { display: block; }
 
   /* ── Formularios ───────────────────────────────────────────────────────── */
 
@@ -307,7 +447,7 @@ const ESTILOS = `
     margin-top: .35rem;
     padding: .62rem .7rem;
     font: inherit;
-    font-size: .95rem;
+    font-size: 15px;
     color: var(--tinta);
     background: var(--superficie);
     border: 1px solid var(--linea);
@@ -337,7 +477,7 @@ const ESTILOS = `
     margin-top: 1.5rem;
     padding: .7rem 1rem;
     font: inherit;
-    font-size: .95rem;
+    font-size: 15px;
     font-weight: 600;
     color: #fff;
     background: var(--accion);
@@ -369,7 +509,7 @@ const ESTILOS = `
     /* 44 px de alto: por debajo de eso el dedo falla más de lo que acierta, y
        esto se usa sobre todo desde el móvil. */
     padding: .62rem .95rem;
-    font-size: .9rem;
+    font-size: 15px;
     font-weight: 600;
     color: #fff;
     text-decoration: none;
@@ -404,7 +544,7 @@ const ESTILOS = `
     margin-right: .8rem;
     padding: .45rem .85rem;
     font: inherit;
-    font-size: .88rem;
+    font-size: .84rem;
     font-weight: 600;
     color: var(--accion);
     background: var(--fondo);
@@ -447,9 +587,9 @@ const ESTILOS = `
   .fila { display: flex; gap: .85rem; flex-wrap: wrap; align-items: flex-end; }
   .fila > * { flex: 1 1 11rem; }
 
-  .pista { margin: .4rem 0 0; max-width: 62ch; font-size: .83rem; color: var(--tinta-suave); }
+  .pista { margin: .4rem 0 0; max-width: 62ch; font-size: .84rem; color: var(--tinta-suave); }
 
-  code { padding: .1rem .3rem; font-size: .88em; background: var(--linea-fina); border-radius: 4px; }
+  code { padding: .1rem .3rem; font-size: .88em; background: var(--linea-fina); border-radius: var(--radio-menudo); }
 
   /* Un enlace largo que hay que copiar entero: se parte en vez de salirse, y
      un toque lo selecciona todo, que es lo que hace quien va a pegarlo. */
@@ -468,35 +608,35 @@ const ESTILOS = `
     gap: .55rem;
     margin: 1rem 0 0;
     padding: .7rem .85rem;
-    font-size: .88rem;
+    font-size: 15px;
     color: var(--alerta);
     background: var(--alerta-fondo);
     border: 1px solid #f1c9c4;
     border-radius: var(--radio-chico);
   }
   .error::before {
-    content: "!";
+    content: "";
     flex: 0 0 auto;
-    width: 1.15rem;
-    height: 1.15rem;
-    margin-top: .12rem;
-    font-size: .78rem;
-    font-weight: 700;
-    line-height: 1.15rem;
-    text-align: center;
-    color: #fff;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: .1rem;
     background: var(--alerta);
-    border-radius: 50%;
+    -webkit-mask: var(--icono-alerta) center / contain no-repeat;
+    mask: var(--icono-alerta) center / contain no-repeat;
   }
   .bien { color: var(--bien); background: var(--bien-fondo); border-color: #b6dfe7; }
-  .bien::before { content: "\\2713"; background: var(--bien); }
+  .bien::before {
+    background: var(--bien);
+    -webkit-mask-image: var(--icono-listo);
+    mask-image: var(--icono-listo);
+  }
 
   /* Lo que el sitio entiende de lo que se acaba de escribir. */
   .eco {
     margin: .45rem 0 0;
     padding: .6rem .75rem;
     max-width: 62ch;
-    font-size: .85rem;
+    font-size: .84rem;
     color: #24323d;
     background: var(--linea-fina);
     border: 1px solid var(--linea);
@@ -537,7 +677,7 @@ const ESTILOS = `
   }
   .recuento a:hover { border-color: #93a9b9; color: var(--tinta); }
   .recuento a[aria-current] { color: #fff; background: var(--accion); border-color: var(--accion); }
-  .recuento b { font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--tinta); }
+  .recuento b { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--tinta); }
   .recuento a[aria-current] b { color: #fff; }
 
   /* ── Listas y tablas ───────────────────────────────────────────────────── */
@@ -604,7 +744,49 @@ const ESTILOS = `
     .solo-estrecho { display: inline; }
   }
 
-  table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .9rem; }
+  /*
+    El horario de una sede: cinco columnas que no caben en un teléfono.
+
+    Aquí no vale quitar columnas, porque las cinco son campos que hay que poder
+    rellenar. Medido a 375 px, la tabla pedía 697 y las dos últimas horas
+    quedaban fuera de la pantalla, igual que le pasaba al botón de Usuarios.
+
+    En estrecho cada día deja de ser una fila y pasa a ser un bloque: el día
+    arriba y las cuatro horas en dos parejas, cada una con su rótulo —que en la
+    tabla lo daba la cabecera, y sin cabecera cuatro casillas de hora iguales no
+    dicen cuál es cuál.
+
+    El corte es 68rem y no los 34 del resto porque esta tabla necesita 697 px
+    de ancho propio: con el raíl puesto, el lienzo no se los da hasta pasados
+    los 1 017 px de ventana. A 736 —la tableta en vertical— se salía igual que
+    en el teléfono, solo que con menos escándalo.
+  */
+  @media (max-width: 68rem) {
+    .horario thead { display: none; }
+    .horario, .horario tbody { display: block; }
+    .horario tr {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .55rem .6rem;
+      padding: .85rem 0;
+      border-bottom: 1px solid var(--linea-fina);
+    }
+    .horario td { padding: 0; border: 0; }
+    .horario td:first-child { flex: 0 0 100%; }
+    .horario td[data-rotulo] { flex: 1 1 calc(50% - .3rem); min-width: 7.5rem; }
+    .horario td[data-rotulo]::before {
+      content: attr(data-rotulo);
+      display: block;
+      margin-bottom: .25rem;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--tinta-suave);
+    }
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 15px; }
   th, td { padding: .62rem .55rem; text-align: left; border-bottom: 1px solid var(--linea-fina); vertical-align: top; }
   th {
     font-size: .72rem;
@@ -662,7 +844,7 @@ const ESTILOS = `
     align-items: center;
     gap: .15rem;
     padding: .45rem .25rem .35rem;
-    font-size: .68rem;
+    font-size: .72rem;
     color: var(--tinta-suave);
     text-decoration: none;
     border-radius: var(--radio-chico);
@@ -745,6 +927,7 @@ export function pagina(
   const rail = sesion
     ? `<div class="rail">
       <a class="rail-marca" href="/">
+        <img src="/emblema.webp" width="34" height="34" alt="">
         <span><b>ExamLab</b><em>Panel</em></span>
       </a>
       <nav aria-label="Secciones">
@@ -779,7 +962,22 @@ export function pagina(
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light">
+<meta name="theme-color" content="#00456b">
 <title>${esc(titulo)} · Panel ExamLab</title>
+<!--
+  El emblema de la pestaña. Es el mismo archivo que el sitio usa de icono: 96
+  píxeles, fondo transparente y 7,6 KB. Hasta aquí la pestaña enseñaba la hoja
+  en blanco del navegador, y con cinco pestañas abiertas no había forma de
+  distinguir el panel de cualquier otra cosa.
+
+  El PNG va detrás por si algún navegador no acepta WebP de icono, y el de 180
+  es el que se lleva iOS a la pantalla de inicio: ese no puede ser transparente
+  o sale sobre negro.
+-->
+<link rel="icon" type="image/webp" sizes="96x96" href="/emblema.webp">
+<link rel="icon" type="image/png" sizes="192x192" href="/emblema-192.png">
+<link rel="apple-touch-icon" href="/emblema-180.png">
+<link rel="manifest" href="/manifiesto.webmanifest">
 <style>${ESTILOS}</style>
 </head>
 <body>
@@ -792,6 +990,14 @@ ${cuerpo}
 </main>
 </div>
 ${barraMovil}
+<!--
+  Lo único que el panel carga de JavaScript, y es opcional: enseña el ojo de
+  ver la contraseña y avisa del bloqueo de mayúsculas. Todas las pantallas
+  funcionan con este archivo bloqueado. Va aparte porque la cabecera de
+  seguridad no permite scripts en línea, y lleva su huella en el nombre para
+  poder cachearlo un año sin quedarse con la versión vieja.
+-->
+<script src="${RUTA_GUION}" defer></script>
 </body>
 </html>`;
 }

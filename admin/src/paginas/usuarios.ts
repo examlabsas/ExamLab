@@ -83,7 +83,7 @@ export function paginaUsuarios(opciones: {
       </table>
 
       <div class="panel" id="invitar" style="margin-top:2rem;max-width:none">
-        <h2 style="font-size:1.1rem;margin:0 0 1rem">Invitar a alguien</h2>
+        <h2 style="margin:0 0 1rem">Invitar a alguien</h2>
         <form method="post" action="/usuarios/invitar">
           <label for="nombre">Nombre</label>
           <input id="nombre" name="nombre" type="text" required>

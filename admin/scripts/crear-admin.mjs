@@ -18,7 +18,9 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { webcrypto as crypto } from 'node:crypto';
 
-const ITERACIONES = 310_000;
+// Tope de Workers: crypto.subtle rechaza por encima de 100 000. Si cambia,
+// cambia también en src/auth/password.ts, donde está el porqué.
+const ITERACIONES = 100_000;
 const BASE32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
 const aBase64 = (datos) => Buffer.from(datos).toString('base64');

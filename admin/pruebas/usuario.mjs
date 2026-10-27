@@ -19,7 +19,9 @@ export const CONTRASENA = 'laboratorio-2026';
 /** Fijo a propósito, para poder generar el código desde `pruebas/codigo.mjs`. */
 export const SECRETO = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
 
-const ITERACIONES = 310_000;
+// Tope de Workers: crypto.subtle rechaza por encima de 100 000. Si cambia,
+// cambia también en src/auth/password.ts, donde está el porqué.
+const ITERACIONES = 100_000;
 const aBase64 = (datos) => Buffer.from(datos).toString('base64');
 
 const sal = crypto.getRandomValues(new Uint8Array(16));

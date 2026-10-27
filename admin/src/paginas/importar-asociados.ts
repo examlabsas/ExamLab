@@ -161,7 +161,7 @@ export function paginaResumenAsociados(o: {
 
   const bloque = (id: string, titulo: string, cuerpo: string, alerta = false) =>
     `<div class="panel" id="${id}" style="margin-top:1.5rem${alerta ? ';border-color:var(--alerta)' : ''}">
-      <h2 style="font-size:1.05rem;margin:0${alerta ? ';color:var(--alerta)' : ''}">${titulo}</h2>
+      <h2 style="margin:0${alerta ? ';color:var(--alerta)' : ''}">${titulo}</h2>
       ${cuerpo}
     </div>`;
 

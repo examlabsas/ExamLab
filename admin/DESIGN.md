@@ -19,36 +19,43 @@ colors:
   bien-fondo: "#e8f6f9"
 typography:
   display:
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontFamily: "'Montserrat', ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.7rem"
     fontWeight: 700
     lineHeight: 1.25
     letterSpacing: "-0.018em"
+  display-movil:
+    fontFamily: "'Montserrat', ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.45rem"
+    fontWeight: 700
+    lineHeight: 1.25
+    letterSpacing: "-0.018em"
   title:
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontFamily: "'Montserrat', ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.05rem"
     fontWeight: 700
     lineHeight: 1.35
     letterSpacing: "-0.012em"
   body:
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontFamily: "'Montserrat', ui-sans-serif, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.55
     letterSpacing: "normal"
   label:
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontFamily: "'Montserrat', ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.84rem"
     fontWeight: 600
     lineHeight: 1.4
     letterSpacing: "normal"
   overline:
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontFamily: "'Montserrat', ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.72rem"
     fontWeight: 700
     lineHeight: 1.4
     letterSpacing: "0.05em"
 rounded:
+  menudo: "4px"
   control: "7px"
   panel: "10px"
   caja: "14px"
@@ -170,20 +177,41 @@ persona reinventa con otro valor parecido.
 | `#24323d` | Texto de la barra móvil activa sobre fondo claro | `--tinta` con un punto más de contraste |
 | `#f1c9c4` | Borde de los mensajes de error y de la marca «mal» | `--alerta-fondo` con borde propio, para que el aviso tenga contorno |
 | `#b6dfe7` | Borde del mensaje de guardado | Lo mismo, del lado de `--bien` |
+| `#e4eff6` | Tinte superior del lienzo del acceso | `--fondo` tirando al azul de marca. Solo en la pantalla sin raíl, que es la única que no tiene ningún otro color |
 
 ## Typography
 
-Tipografía del sistema, sin excepciones. Es una herramienta que se abre veinte
-veces al día desde un móvil con datos: una fuente propia costaría unos 60 KB en
-cada respuesta a cambio de nada que el trabajo necesite.
+**Montserrat, la del sitio, servida por el propio Worker.** Tres pesos del
+subconjunto latino —400, 600 y 700— desde `/fuentes`, declarados en `ESTILOS` y
+despachados por `src/estatico.ts`.
+
+Aquí hubo tipografía del sistema, y el argumento escrito era que una fuente
+propia costaría «unos 60 KB en cada respuesta». Eso era falso de dos maneras: no
+viaja en cada respuesta sino una vez al año —`Cache-Control: immutable`— y lo que
+costaba de verdad era lo otro, que el panel pareciera de otra casa que la web que
+administra. Lo usan las mismas personas el mismo día.
+
+Medido: **113 868 bytes** las tres fuentes, una sola vez. El HTML del acceso son
+9 403 bytes comprimidos, y de eso la hoja de estilos es casi todo, porque viaja
+dentro de cada respuesta.
+
+El español entero cabe en el subconjunto `latin` —ñ, tildes, ¿ y ¡ están por
+debajo de U+00FF—, así que no se trae `latin-ext`, que pesa el doble.
 
 | Rol | Tamaño | Peso | Dónde |
 |---|---|---|---|
 | Display | 1,7rem (1,45 en móvil) | 700 | El `h1` de cada pantalla |
-| Title | 1,05rem | 700 | Subtítulos dentro de una pantalla |
-| Body | 15px / 1,55 | 400 | Todo el cuerpo |
-| Label | 0,84rem | 600 | Etiquetas de campo |
-| Overline | 0,72rem, +0,05em, versalita | 700 | Cabeceras de tabla y la palabra «PANEL» del raíl |
+| Title | 1,05rem | 700 | Subtítulos, el nombre de la marca y la cifra de un contador-filtro |
+| Body | 15px / 1,55 | 400 | Todo el cuerpo, los campos, los botones y las tablas |
+| Label | 0,84rem | 600 | Etiquetas de campo, pistas y el pie del acceso |
+| Overline | 0,72rem, +0,05em, versalita | 700 | Cabeceras de tabla, la barra del móvil y la palabra «PANEL» |
+
+**Cinco pasos y ni uno más.** La hoja había acumulado nueve tamaños entre 0,68 y
+1,15rem —`.88`, `.95`, `.92`, `.85`, `.83`, `.78`, `.68`, `1`, `1.1`, `1.15`—,
+casi todos a menos de un píxel de un paso que ya existía. Eso no es una escala,
+es una lista de decisiones que nadie tomó. Están todos ajustados al paso más
+cercano; el único cambio que se nota es el de los mensajes de error, que suben a
+cuerpo de texto porque son lo que hay que poder leer.
 
 Los textos de ayuda y los párrafos se cortan a **62ch** para que la línea no se
 alargue en escritorio.
@@ -222,6 +250,7 @@ con una regla (`.recuadro`), no con otra superficie.
 
 | Radio | Valor | Dónde |
 |---|---|---|
+| Menudo | 4px | Lo que mide dos letras: un fragmento de código dentro de un párrafo y el anillo de foco |
 | Control | 7px | Campos, botones, elementos del raíl |
 | Panel | 10px | Superficies |
 | Caja | 14px | La tarjeta centrada del acceso |
@@ -241,7 +270,7 @@ trazo 1,75 y extremos redondeados. No hay librería —la cabecera de seguridad 
 deja cargar nada de fuera— y tampoco caracteres Unicode haciendo de icono: los
 mensajes y el desplegable usan el mismo trazo, incrustado como SVG.
 
-**Contadores-filtro (`.recuento`).** Píldoras con el número en 1rem y cifras
+**Contadores-filtro (`.recuento`).** Píldoras con el número en 1,05rem y cifras
 tabulares. **Son el filtro, no un adorno**: cada uno lleva a su propia lista y el
 activo va relleno de `--accion` con `aria-current`. En móvil se arrastran en una
 sola fila; apilados ocupaban cinco antes de llegar al primer examen.
@@ -291,6 +320,40 @@ La regla general: **antes de dejar que una tabla se corte, quitarle columnas.**
 **Formularios.** Siempre sobre un panel. Etiqueta encima, ayuda debajo. El foco
 es un borde de `--accion-viva` más un anillo de 3px.
 
+**La puerta (`.caja`).** El acceso y la invitación son las dos únicas pantallas
+sin raíl, así que la cabecera de la caja hace su papel: emblema y marca sobre
+`--rail`, con el mismo bloque `<b>ExamLab</b><em>Panel</em>` que lleva el raíl
+arriba. El panel sigue teniendo **un solo campo de color**; aquí está en otro
+sitio porque el raíl todavía no existe.
+
+Antes era una caja blanca con un título, dos campos y nada que dijera de quién
+es el panel que se está abriendo. Debajo, una firma: para quién es esto y un
+enlace de vuelta al sitio.
+
+El lienzo lleva un tinte del azul de marca que cae a `--fondo` antes de la mitad
+de la pantalla. Es el único degradado del panel y existe porque la puerta no es
+una pantalla de trabajo: conviene que se note que es otra cosa.
+
+**El ojo (`.ojo`).** Dentro del campo, a la derecha, 2,6rem de área de toque.
+Llega dibujado desde el servidor y **oculto**; lo enseña el guion. Al revés
+—dibujarlo con JavaScript o dejarlo visible— quien tenga el script bloqueado se
+quedaría con un botón que no hace nada.
+
+El icono dice la acción, no el estado: ojo abierto cuando la contraseña está
+oculta («ver»), ojo tachado cuando está a la vista («ocultar»). `aria-pressed` y
+el nombre accesible cambian con él.
+
+Escribir doce caracteres a ciegas en el teclado de un teléfono es la razón de
+que la gente acabe eligiendo contraseñas cortas. **Poder mirar lo que se escribió
+protege más que esconderlo.**
+
+**JavaScript.** El panel se construyó sin nada de JavaScript y sigue siendo así:
+las once pantallas funcionan con el guion bloqueado. Lo único que hay son esas
+dos ayudas sobre los campos de contraseña —el ojo y el aviso de bloqueo de
+mayúsculas—, 1 574 bytes en un archivo aparte, porque la cabecera no permite
+scripts en línea. **Si algo del panel deja de funcionar sin el guion, se rompió
+una regla.**
+
 ## Do's and Don'ts
 
 **Hacer**
@@ -310,9 +373,13 @@ es un borde de `--accion-viva` más un anillo de 3px.
 - Un borde de color a un lado de una tarjeta o un aviso.
 - Easings con rebote. La transición es `cubic-bezier(.16,1,.3,1)`: las cosas
   frenan y se paran.
-- Caracteres Unicode o emoji haciendo de icono.
-- Traer una tipografía, un icono o una imagen de fuera: la cabecera de seguridad
-  lo bloquea, y con razón.
+- Caracteres Unicode o emoji haciendo de icono. Los mensajes llevaban un `!` y
+  un `✓` de texto hasta que se cambiaron por la máscara SVG que esta misma hoja
+  decía que usaban.
+- Traer una tipografía, un icono o una imagen **de fuera**. Lo de fuera, no lo
+  propio: la cabecera es `default-src 'self'`, así que lo que sirve el Worker
+  —las fuentes, el emblema, el guion del ojo— entra sin tocarla, y eso es
+  exactamente lo que la hace valiosa. Lo que no entra es una dirección ajena.
 - Animaciones de entrada. Esto se abre veinte veces al día; el movimiento se
   reserva a los estados de lo que se toca, y se apaga entero con
   `prefers-reduced-motion`.
@@ -321,9 +388,18 @@ es un borde de `--accion-viva` más un anillo de 3px.
 
 ---
 
-**No canonizado.** El panel no tiene emblema gráfico. El logotipo en SVG sigue
-pendiente de entrega (`PRODUCT.md`) y el PNG pesa 1,7 MB, imposible de incrustar
-en una hoja que viaja en cada respuesta; el monograma de dos letras que lo
-sustituía repetía la palabra que tenía al lado y no alcanzaba el contraste
-mínimo sobre el cian de marca, así que se quitó. **Esto es un hueco a rellenar
-cuando llegue el SVG, no una regla de diseño.**
+**El emblema, resuelto.** Este apartado decía que el panel no podía tener
+emblema porque el logotipo en SVG seguía pendiente y «el PNG pesa 1,7 MB». Lo
+segundo era falso y bastó con medirlo: el icono que el sitio ya usa,
+`favicon-96.webp`, son **7 622 bytes** con fondo transparente, y el PNG de 192
+que lo acompaña, 15 005. Ninguno de los dos se acerca al megabyte y medio que
+esta misma hoja daba por hecho.
+
+El emblema está hoy en tres sitios: la cabecera del raíl, la cabecera de la caja
+del acceso y la pestaña del navegador. El Worker lo sirve desde `/emblema.webp`,
+igual que las fuentes.
+
+**Lo que sigue pendiente** es el SVG con fondo transparente (`PRODUCT.md`), que
+es lo que haría falta para los códigos QR impresos —ahí el mapa de bits no da la
+resolución— y para que el emblema escale sin pesar. Para la pantalla, el WebP
+basta.

@@ -12,17 +12,36 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-10-06",
 
+  // La tipografía y el emblema viajan dentro del Worker.
+  //
+  // Con esta regla, `import x from './algo.woff2'` devuelve un ArrayBuffer que
+  // `src/estatico.ts` sirve por su ruta. Es lo que permite que el panel use la
+  // Montserrat del sitio sin pedirle nada a nadie de fuera: la cabecera de
+  // seguridad sigue siendo `default-src 'self'`, sin excepciones.
+  "rules": [{ "type": "Data", "globs": ["**/*.woff2", "**/*.webp", "**/*.png"], "fallthrough": false }],
+
+  // El panel se usa en admin.examlabsas.com y en ningún otro sitio.
+  //
+  // Sin estas dos líneas Cloudflare lo publica además en
+  // examlab-panel.<cuenta>.workers.dev y en una dirección de vista previa por
+  // cada despliegue. El propio panel de Cloudflare las describe como «Anyone
+  // with this URL can visit»: son la misma pantalla de acceso con otra
+  // dirección, y cada una es una puerta más que vigilar y que puede acabar
+  // indexada o reenviada por descuido.
+  "workers_dev": false,
+  "preview_urls": false,
+
   // Datos de usuarios, sesiones, invitaciones y contador de intentos.
   // El `id` lo devuelve `wrangler kv namespace create PANEL`.
   "kv_namespaces": [
     {
       "binding": "PANEL",
-      "id": "PEGAR_AQUI_EL_ID_DEL_ESPACIO_KV"
+      "id": "53b2712bcc004707aaeeec4b6da05bfd"
     }
   ],
 
   "vars": {
-    // Repositorio donde el panel escribirá. Aún no se usa: entra en la fase 2.
+    // El repositorio donde el panel escribe cada cambio, y la rama.
     "REPO": "examlabsas/ExamLab",
     "RAMA": "main"
   },

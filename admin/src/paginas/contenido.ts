@@ -111,7 +111,7 @@ export function paginaNoticia(o: {
 
         <label for="cuerpo">Artículo</label>
         <textarea id="cuerpo" name="cuerpo" rows="18" required
-          style="width:100%;margin-top:.35rem;padding:.7rem .8rem;font:inherit;font-family:ui-monospace,monospace;font-size:.85rem;border:1.5px solid var(--linea);border-radius:9px">${esc(n.cuerpo ?? '')}</textarea>
+          style="font-family:ui-monospace,monospace;font-size:.84rem">${esc(n.cuerpo ?? '')}</textarea>
         <p class="pista">
           Markdown: <code>## Un subtítulo</code>, <code>**negrita**</code>,
           <code>- lista</code>.
@@ -148,7 +148,7 @@ export function paginaAviso(o: {
     'Aviso en el sitio',
     `    ${cabecera('Aviso en el sitio', `Una franja arriba de todas las páginas. Para cosas que duran poco y no
         justifican una noticia.`)}
-      ${o.guardado ? `<p class="error" style="color:#00697f;background:#e6f5f9">Guardado. En uno o dos minutos se ve en el sitio.</p>` : ''}
+      ${o.guardado ? `<p class="error bien">Guardado. En uno o dos minutos se ve en el sitio.</p>` : ''}
       ${o.error ? `<p class="error">${esc(o.error)}</p>` : ''}
 
       <form method="post" action="/aviso" class="panel">
@@ -258,7 +258,7 @@ export function paginaEstado(o: {
       ${dias
         .map(
           ({ dia, cambios }) => `
-          <h2 style="font-size:.95rem;margin:1.75rem 0 0;color:var(--tinta-suave)">
+          <h2 style="font-size:15px;margin:1.75rem 0 0;color:var(--tinta-suave)">
             ${esc(nombreDelDia(dia, o.hoy))}
           </h2>
           <ul class="lista" style="margin-top:.4rem">

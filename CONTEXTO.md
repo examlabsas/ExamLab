@@ -36,13 +36,25 @@ Cloudflare Workers. Cada `git push` a `main` compila y publica.
 
 ## 2. Estado ahora mismo
 
-Último commit: `b4bb74b`, que ya lleva el panel dentro. **Sin subir**: 30
-archivos modificados y 3 nuevos. Las seis fases están hechas, el panel
-rediseñado, **la revisión del 13 al 16 de octubre cerrada** —once defectos,
-los once corregidos— y encima van los cambios que pidió el laboratorio: fuera
-los precios, fuera el código de verificación, altas e importación en la cartera
-de asociados, emblemas elegibles en los códigos QR y los ocho retoques de texto
-y maquetación del Dr. Silva.
+**El panel está en producción desde el 26 de octubre de 2026**, en
+`https://admin.examlabsas.com`. Entra, escribe en el repositorio y el sitio se
+reconstruye solo. Lo que falta está en `PENDIENTES.md`, sección 0.
+
+Último commit local: `4ec52e7`. **En GitHub hay uno más**, `152d37b`, que lo
+hizo el propio panel al guardar un aviso de prueba. Esto va a pasar siempre:
+cada guardado desde el panel escribe directamente en GitHub, así que el clon
+local queda por detrás y hay que traerlo antes de subir nada.
+
+**Sin subir**: diez archivos. Seis son el arreglo del despliegue —la derivación
+de contraseñas, las dos puertas del panel y las dos del sitio, el icono de
+«Guardado»— y cuatro son estos documentos.
+
+Antes de eso ya estaban hechas las seis fases, el panel rediseñado, **la
+revisión del 13 al 16 de octubre cerrada** —once defectos, los once
+corregidos— y los cambios que pidió el laboratorio: fuera los precios, fuera el
+código de verificación, altas e importación en la cartera de asociados,
+emblemas elegibles en los códigos QR y los ocho retoques de texto y maquetación
+del Dr. Silva.
 
 | | |
 |---|---|
@@ -241,20 +253,21 @@ admin/
 │   ├── sitio.ts          sitio.json, sedes.json, feriados.json
 │   ├── catalogo.ts       los 559 exámenes; derivado contra copia buena
 │   ├── importar.ts       leer una hoja de cálculo y compararla
-│   ├── asociados.ts      las 277 pruebas de asociados y su tarifario
+│   ├── asociados.ts      las 277 pruebas de asociados, sin precios
 │   ├── historial.ts      de qué sección es cada cambio del repositorio
 │   ├── qr.ts             códigos QR en SVG, sin procesar imágenes
 │   ├── emblema.ts        el logotipo recortado, lo genera un script
 │   ├── usuarios.ts       altas por invitación, roles, baja
-│   ├── auth/password.ts  PBKDF2 310 000 iteraciones, comparación constante
+│   ├── auth/password.ts  PBKDF2 100 000 iteraciones, comparación constante
 │   ├── auth/totp.ts      RFC 6238, HMAC-SHA1, ventana de ±1 paso
 │   ├── auth/sesion.ts    cookies, sesiones en KV, límite de intentos
+│   ├── estatico.ts       fuentes, emblema y guion: rutas y caché de un año
 │   └── paginas/
 │       ├── plantilla.ts  el armazón, los iconos y TODA la hoja de estilos
+│       ├── guion.ts      el único JavaScript, y es opcional
 │       └── …             una pantalla por sección, solo su contenido
 ├── scripts/
-│   ├── crear-admin.mjs   el primer administrador
-│   └── tarifario.mjs     mueve los precios entre el archivo privado y el KV
+│   └── crear-admin.mjs   el primer administrador
 └── pruebas/              solo para local: GitHub simulado, usuario, códigos,
                           y una hoja de ejemplo para la carga
 ```
@@ -294,12 +307,16 @@ admin/
 - **Los nombres se comparan sin acentos, mayúsculas ni puntuación.** Es lo que
   convierte «corregir una tilde en el Excel» en un renombrado —misma dirección,
   mismo texto— en vez de una baja y un alta que mata la URL.
-- **El tarifario de asociados vive en el KV, no en el repositorio.** El plan
-  original decía que iría al archivo privado, y no se puede: el panel solo habla
-  con GitHub y ese archivo está fuera de git a propósito. Al guardar se fuerza
-  `precio: null` en todo lo que va al repositorio — un importe que entre ahí queda
-  en el historial de git aunque luego se borre. `npm run tarifario:cargar` y
-  `tarifario:guardar` son el puente con el archivo privado.
+- **En la cartera de asociados no hay precios, y no es un olvido.** Lo pidió el
+  laboratorio y está explicado arriba, en §4. Antes existió todo un sistema para
+  guardarlos fuera del repositorio —el KV, dos comandos y una barrera que forzaba
+  `precio: null` al escribir— porque un importe que entra en git se queda en el
+  historial aunque luego se borre. Ya no existe nada de eso. Si alguien vuelve a
+  pedir precios en el panel, el problema que había que resolver era ese.
+- **`auth/totp.ts` sigue ahí y no se usa.** El laboratorio quitó el código de
+  seis cifras del acceso, pero el secreto se sigue guardando en cada usuario.
+  Está a propósito: restaurar la comprobación es volver a llamar a `verificar`
+  y reponer el campo del formulario, no rehacer el sistema.
 
 ### El rediseño, y por qué cada decisión
 
@@ -382,6 +399,12 @@ Con nueve fotos no compensa; queda decidido que no se hace.
 | `/noticias` y `/estado` respondían «No se pudo **guardar**» a un fallo de **lectura**, y debajo pintaban su estado vacío: «Todavía no hay ninguna noticia» | Apagando el GitHub simulado y pidiendo las ocho pantallas | Una lista vacía por error no es una lista vacía. **El estado vacío solo se enseña cuando se sabe que está vacío** |
 | Los recuentos de la portada (`especialidades.json`) estaban escritos a mano y se quedaron viejos: «Hematología · 128 exámenes» cuando hay 48, y las cuatro mal | Un agente los contó contra `examenes.json`; lo comprobé en `dist/index.html` | Una cifra escrita a mano al lado de un enlace que lleva a la cifra de verdad **se va a contradecir sola**. Se quitó el campo y se cuenta del catálogo |
 | Los datos estructurados publicaban `usesDevice: "Consultar"` en 495 fichas y un `codeValue: ""` en las 559 | `grep` sobre `dist/` | Es el mismo fallo de «Entrega en consultar» que ya se había corregido **en la página visible pero no en el JSON-LD**. Al arreglar un relleno, buscarlo en todas las salidas, no solo en la que se ve |
+| `DESIGN.md` del panel decía que no podía llevar emblema porque «el PNG pesa 1,7 MB» | Midiéndolo: `favicon-96.webp` son **7 622 bytes** con fondo transparente, y `logo.png` 15 005 | Ese número no salió de ninguna medición y bloqueó una decisión durante semanas. **Un dato inventado dentro de un documento de diseño se obedece igual que uno medido** |
+| El mismo documento justificaba la tipografía del sistema diciendo que una fuente propia costaría «60 KB **en cada respuesta**» | Sirviéndola desde el Worker con `immutable`: 113 868 bytes **una vez al año** | Un archivo cacheado no viaja en cada respuesta. La hoja de estilos sí, y nadie la había mirado: son 9 403 bytes comprimidos en **cada** página |
+| La CSP del panel se leyó durante meses como «aquí no cabe JavaScript» | Releyéndola: `default-src 'self'` sin `script-src` propio **permite** scripts del mismo origen; lo que bloquea es el `<script>` en línea | Una restricción mal recordada se vuelve una regla que nadie vuelve a comprobar. El ojo de ver la contraseña cabía desde el principio, en un archivo aparte |
+| La tabla de horarios de una sede pedía 697 px dentro de 375: las dos horas de la tarde quedaban **fuera de la pantalla** | Midiendo `getBoundingClientRect().right` contra el ancho del lienzo | Es el mismo fallo que ya se había arreglado en Usuarios y en Feriados. **Al corregir un desbordamiento, medir todas las tablas**, no solo la que se vio |
+| Di por bueno que `::details-content` + `interpolate-size` animaba los desplegables, y en una página el acordeón **dejó de abrirse**: contenido invisible | Midiendo el alto real en las dos páginas: 74→143 px donde el padre es una rejilla, 0 px fijos donde es un contenedor flex | Una animación que a veces esconde el contenido no se publica. Lo hace JavaScript —veinte líneas que miden y animan— con red de seguridad: pasado el tiempo, suelta el alto pase lo que pase |
+| Antes de eso saqué tres conclusiones falsas de medir animaciones en el panel de vista previa, que no pinta | `animation.currentTime` se quedaba en **0** con `document.visibilityState` diciendo «visible» | **El reloj de las animaciones no avanza en una ventana que no se pinta.** Para comprobar una curva ahí: pausar la animación, mover `currentTime` a mano y leer el alto en cada paso |
 | Pedí a Juan cargar un secreto `FIRMA_SESION` que **ningún archivo del código lee** | Buscándolo: `grep -rn FIRMA_SESION admin/src/` → vacío | Un paso de instalación que no hace nada enseña algo falso sobre cómo funciona el sistema. Las variables que el panel usa son `PANEL`, `REPO`, `RAMA`, `GITHUB_TOKEN` y `GITHUB_API` |
 
 ---
@@ -390,6 +413,22 @@ Con nueve fotos no compensa; queda decidido que no se hace.
 
 Esto costó tiempo descubrirlo y es lo primero que se olvida.
 
+- **`wrangler dev` no aplica los límites de producción.** El panel entero
+  funcionó en local durante semanas con 310 000 iteraciones de PBKDF2, y al
+  desplegarlo nadie podía entrar: `crypto.subtle` de Cloudflare rechaza por
+  encima de 100 000. Las pruebas tampoco lo vieron, porque `pruebas/usuario.mjs`
+  creaba el usuario con el mismo número y corría en Node, donde no hay tope.
+  Lección: **una prueba que fabrica su propio dato con la misma constante que
+  el código no prueba la constante.** Y el primer despliegue de cualquier cosa
+  que use `crypto.subtle` hay que ejercitarlo contra el Worker real, no contra
+  `wrangler dev`.
+- **El mensaje de error del panel no dice dónde falló.** `app.onError` usa
+  `AL_LEER` —«No se pudo leer el repositorio»— como respaldo para *cualquier*
+  excepción no capturada, no solo las de GitHub. Ese mensaje mandó a investigar
+  el token durante un rato mientras el fallo estaba en la derivación de la
+  contraseña. Lo que lo resolvió fue `npx wrangler tail examlab-panel`, que
+  imprime la excepción de verdad. Es lo primero que hay que mirar cuando el
+  panel desplegado falla, antes de tocar nada.
 - **El panel del navegador no ejecuta fotogramas de animación.** Por eso no
   funcionan ahí `IntersectionObserver`, `ResizeObserver` ni los eventos
   `resize`. Las capturas salen a medio animar. Para ver colores reales hay que
@@ -592,8 +631,11 @@ cd admin
 npm run dev                   # wrangler dev, en el 8787
 npm run check                 # tsc --noEmit
 npm run admin:crear           # primer administrador
-npm run tarifario:cargar      # archivo privado -> KV   (--remoto para producción)
-npm run tarifario:guardar     # KV -> archivo privado
+npm run deploy                # sube el panel a producción
+
+# Panel desplegado, cuando algo falla
+npx wrangler tail examlab-panel --format pretty   # la excepción de verdad
+npx wrangler kv key list --binding=PANEL --remote # qué hay en el almacén
 
 # Panel, para probarlo en local
 npm run pruebas:github        # GitHub simulado con los datos reales

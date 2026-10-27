@@ -291,13 +291,13 @@ const schema = [
       <div class="reveal-stagger mt-9 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         {
           preguntas.map((item) => (
-            <details class="group rounded-xl border border-line bg-white open:border-accent">
+            <details class="group rounded-xl border border-line bg-white">
               <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 p-6 text-base font-bold text-brand">
                 {item.pregunta}
                 <Icon
                   name="mas"
                   size={20}
-                  class="flex-none text-accent-dark transition-transform duration-200 group-open:rotate-45"
+                  class="flex-none text-accent-dark transition-transform duration-300 ease-suave group-open:rotate-45"
                 />
               </summary>
               <p class="px-6 pb-6 text-sm leading-relaxed text-neutral">{item.respuesta}</p>

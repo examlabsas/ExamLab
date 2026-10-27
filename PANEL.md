@@ -214,8 +214,14 @@ de kilobytes.
 
 ## Fase 5 · Catálogo de asociados ✅ hecha
 
+> **Los precios ya no existen en el sistema.** El laboratorio los mandó quitar
+> después de esta fase: ni el campo, ni el KV donde vivían, ni los dos comandos
+> que los movían, ni `catalogo-asociados.privado.json`. Lo que sigue se queda
+> como registro de lo que se construyó y por qué, no como descripción de lo que
+> hay hoy. El motivo y lo que se borró están en `CONTEXTO.md` §4.
+
 Las 277 pruebas que ExamLab ofrece a otros laboratorios, con su método, su
-muestra, su plazo — y su precio.
+muestra, su plazo — y, entonces, su precio.
 
 **Lo que quedó**
 
@@ -379,7 +385,7 @@ no existe no se publica por descuido.** La página pública quedó idéntica: un
 etiqueta invisible menos, 198 bytes.
 
 **El código de verificación se quitó.** Entrar es correo y contraseña. Queda
-protegiendo la puerta la contraseña con PBKDF2 y 310 000 iteraciones, el límite
+protegiendo la puerta la contraseña con PBKDF2 y 100 000 iteraciones, el límite
 de cinco intentos por correo y por IP, y que la sesión sea un testigo revocable
 en el KV. El secreto TOTP de cada usuario se sigue guardando, así que volver a
 pedirlo es restaurar una comprobación y un campo. Se ofreció alargar la sesión a
