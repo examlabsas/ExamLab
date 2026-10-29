@@ -221,7 +221,8 @@ export async function leerCabeza(cfg: Config): Promise<Cabeza> {
 export async function escribirVarios(
   cfg: Config,
   opciones: {
-    archivos: { ruta: string; texto: string }[];
+    /** Cada archivo va en texto o, si es binario, ya en base64. */
+    archivos: { ruta: string; texto?: string; base64?: string }[];
     cabeza: Cabeza;
     resumen: string;
     autor: string;
@@ -231,9 +232,17 @@ export async function escribirVarios(
   for (const archivo of opciones.archivos) {
     const blob = await pedir(cfg, `/repos/${cfg.repo}/git/blobs`, {
       method: 'POST',
-      // En texto plano, que esta API sí acepta: codificar los 288 KB del
-      // catálogo costaría 11 ms de CPU y así cuesta 1.
-      body: JSON.stringify({ content: archivo.texto, encoding: 'utf-8' }),
+      /*
+        El texto va en plano, que esta API sí acepta: codificar los 288 KB del
+        catálogo costaría 11 ms de CPU y así cuesta 1. Lo binario —las fotos que
+        sube el panel— no tiene esa suerte y viaja en base64, que es la otra
+        codificación que GitHub admite aquí.
+      */
+      body: JSON.stringify(
+        archivo.base64 !== undefined
+          ? { content: archivo.base64, encoding: 'base64' }
+          : { content: archivo.texto ?? '', encoding: 'utf-8' },
+      ),
     });
     if (!blob?.sha) throw new ErrorGitHub('No se pudo subir el contenido.', 502);
     // 100644 es un archivo normal; el modo hay que darlo siempre.

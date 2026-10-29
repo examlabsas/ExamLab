@@ -1,44 +1,37 @@
 /**
  * Fotos reales del laboratorio.
  *
- * Los originales viven en `fotos-laboratorio/usadas/` (fuera de git) y
- * `scripts/optimizar-imagenes.mjs` genera de cada uno las variantes que se
- * publican en public/images/: dos WebP para `<img>` y un JPG de 1200×630 para
- * la vista previa en WhatsApp y redes. Este archivo es el único lugar que
- * conoce esa convención de nombres.
+ * La lista vive en `src/data/fotos.json` y no aquí. Antes eran tres literales
+ * que había que mantener a mano y en orden —los nombres, los textos
+ * alternativos y el conjunto de las que tenían variante de 2000 px—, y añadir
+ * una foto significaba editar los tres. Desde que el panel puede subir fotos,
+ * eso tendría que hacerlo él: un programa editando TypeScript a ciegas, con
+ * tres sitios donde equivocarse. Escribir JSON es lo que el panel ya hace con
+ * todo lo demás.
  *
- * Al añadir una foto hay que sumarla a NOMBRES_FOTOS (así una errata en el
- * nombre falla al compilar, no en producción) y darle su texto alternativo.
+ * Lo que se gana en seguridad se pierde en tipos: `NombreFoto` era una unión
+ * cerrada y ahora es `string`. La comprobación que de verdad protegía sigue en
+ * pie —`content.config.ts` valida el campo `foto` de cada noticia contra esta
+ * lista y **la compilación falla** si el nombre no existe—, que es por donde
+ * entran los nombres de verdad.
+ *
+ * De cada foto hay dos o tres WebP en `public/images/` y un JPG en
+ * `public/images/og/`. Quién los genera depende de por dónde entre la foto:
+ * `scripts/optimizar-imagenes.mjs` con `sharp` si se procesa aquí, o el propio
+ * navegador si se sube desde el panel. Los archivos que salen son los mismos.
  */
-export const NOMBRES_FOTOS = [
-  'matriz-ficoa-fachada',
-  'laboratorio-equipo-trabajando',
-  'recepcion-de-muestras',
-  'analizador-automatizado',
-  'revision-de-muestra',
-  'microscopio',
-  'tecnologa-con-tubos',
-  'tecnologa-en-analizador',
-  'pipeteo-de-muestra',
-] as const;
+import datos from '../data/fotos.json';
 
-export type NombreFoto = (typeof NOMBRES_FOTOS)[number];
+export type Foto = { nombre: string; alt: string; anchos: number[] };
 
-/** Se describe lo que se ve, sin «imagen de»: los lectores de pantalla ya lo anuncian. */
-const ALT: Record<NombreFoto, string> = {
-  'matriz-ficoa-fachada': 'Fachada de la matriz de ExamLab en Ficoa, Ambato',
-  'laboratorio-equipo-trabajando':
-    'Personal de ExamLab procesando muestras en el área de análisis de la matriz',
-  'recepcion-de-muestras':
-    'Tecnóloga de ExamLab ordenando tubos de muestra en la gradilla del analizador',
-  'analizador-automatizado':
-    'Tecnólogo de ExamLab operando la pantalla de un analizador automatizado',
-  'revision-de-muestra': 'Bioquímica de ExamLab revisando un tubo de muestra etiquetado',
-  microscopio: 'Bioquímica de ExamLab observando una muestra al microscopio',
-  'tecnologa-con-tubos': 'Tecnóloga de ExamLab comparando dos tubos de muestra en el área de análisis',
-  'tecnologa-en-analizador': 'Tecnóloga de ExamLab registrando una orden en el analizador',
-  'pipeteo-de-muestra': 'Tecnóloga de ExamLab preparando una muestra para el microscopio',
-};
+const FOTOS: Foto[] = datos.fotos;
+
+/** Los nombres, en el orden del archivo. */
+export const NOMBRES_FOTOS = FOTOS.map((f) => f.nombre);
+
+export type NombreFoto = string;
+
+const POR_NOMBRE = new Map(FOTOS.map((f) => [f.nombre, f]));
 
 /** Foto que representa al laboratorio cuando una página no indica otra. */
 export const FOTO_POR_DEFECTO: NombreFoto = 'matriz-ficoa-fachada';
@@ -46,22 +39,6 @@ export const FOTO_POR_DEFECTO: NombreFoto = 'matriz-ficoa-fachada';
 /** Todas las variantes se generan a 4:3, así el navegador reserva el espacio exacto. */
 export const FOTO_ANCHO = 1400;
 export const FOTO_ALTO = 1050;
-
-/**
- * Fotos cuyo original da para la variante de 2000 px. Las dos que faltan son
- * de 1448 px de ancho: ampliarlas no añadiría detalle, solo peso, así que
- * `npm run imagenes` ni siquiera las genera. Si el laboratorio entrega esos
- * dos originales en mayor resolución, basta con sumarlos a esta lista.
- */
-const CON_2000: ReadonlySet<NombreFoto> = new Set([
-  'analizador-automatizado',
-  'laboratorio-equipo-trabajando',
-  'pipeteo-de-muestra',
-  'recepcion-de-muestras',
-  'revision-de-muestra',
-  'tecnologa-con-tubos',
-  'tecnologa-en-analizador',
-]);
 
 /**
  * `sizes` para una foto que ocupa media columna en escritorio y todo el ancho
@@ -72,18 +49,19 @@ export const SIZES_MEDIA_COLUMNA = '(min-width: 64rem) 50vw, 100vw';
 /**
  * Atributos listos para `<img {...foto('x')} sizes="…" />`. Solo devuelve
  * atributos válidos de `<img>`, así el spread no cuela nada raro en el HTML.
+ *
+ * El `srcset` sale de los anchos que esa foto tiene de verdad. No todas llegan
+ * a 2000: ampliar un original de 1448 px no añadiría detalle, solo peso, así
+ * que esa variante ni se genera.
  */
 export function foto(nombre: NombreFoto) {
-  const fuentes = [
-    `/images/${nombre}-800.webp 800w`,
-    `/images/${nombre}-1400.webp 1400w`,
-    ...(CON_2000.has(nombre) ? [`/images/${nombre}-2000.webp 2000w`] : []),
-  ];
+  const ficha = POR_NOMBRE.get(nombre);
+  const anchos = ficha?.anchos ?? [800, 1400];
 
   return {
     src: `/images/${nombre}-1400.webp`,
-    srcset: fuentes.join(', '),
-    alt: ALT[nombre],
+    srcset: anchos.map((a) => `/images/${nombre}-${a}.webp ${a}w`).join(', '),
+    alt: ficha?.alt ?? '',
     width: FOTO_ANCHO,
     height: FOTO_ALTO,
   };

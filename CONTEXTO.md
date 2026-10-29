@@ -262,6 +262,7 @@ admin/
 │   ├── auth/totp.ts      RFC 6238, HMAC-SHA1, ventana de ±1 paso
 │   ├── auth/sesion.ts    cookies, sesiones en KV, límite de intentos
 │   ├── estatico.ts       fuentes, emblema y guion: rutas y caché de un año
+│   ├── fotos.ts          subir una foto: comprobar y escribir en un commit
 │   └── paginas/
 │       ├── plantilla.ts  el armazón, los iconos y TODA la hoja de estilos
 │       ├── guion.ts      el único JavaScript, y es opcional
@@ -352,16 +353,22 @@ aquí van los porqués, que es lo que no se deduce del código.
   mide también el sitio público contra el sistema del panel y marca como desvíos
   decisiones que el cliente aprobó y que PRODUCT.md declara intocables.
 
-### Lo que no pudo hacerse y por qué
+### Lo que parecía imposible y cómo salió
 
-**Subir fotos desde el panel.** No es la lista: el panel ya importa
-`NOMBRES_FOTOS` del propio `src/lib/fotos.ts`, así que una foto nueva en el sitio
-aparece sola en el panel (comprobado). El problema es la imagen: los originales
-viven en `fotos-laboratorio/usadas/`, **fuera de git**, y de cada uno
-`scripts/optimizar-imagenes.mjs` genera tres WebP y un JPG con `sharp`, que no
-corre en un Worker **ni al compilar** —es un script a mano. Subir desde el panel
-exigiría meter los originales en el repositorio y mover esa generación al build.
-Con nueve fotos no compensa; queda decidido que no se hace.
+**Subir fotos desde el panel.** Aquí decía «queda decidido que no se hace», y el
+motivo era bueno: de cada original, `scripts/optimizar-imagenes.mjs` saca tres
+WebP y un JPG con `sharp`, que no corre en un Worker **ni al compilar**. Parecía
+que subir desde el panel exigía meter los originales en el repositorio y mover
+esa generación al build.
+
+Se hizo el 28 de octubre de 2026, y la pared se rodeó por el otro lado: **las
+variantes las genera el navegador de quien sube la foto**, con un lienzo, antes
+de enviarlas. El Worker no redimensiona nada —solo comprueba y escribe—, los
+originales no entran en git y el build no cambia. De regalo, pasar por un lienzo
+borra los datos EXIF del teléfono, la ubicación incluida.
+
+Es la única pantalla del panel que no funciona sin JavaScript, y lo dice ella
+misma antes de que nadie rellene nada.
 
 ---
 
@@ -406,7 +413,9 @@ Con nueve fotos no compensa; queda decidido que no se hace.
 | Di por bueno que `::details-content` + `interpolate-size` animaba los desplegables, y en una página el acordeón **dejó de abrirse**: contenido invisible | Midiendo el alto real en las dos páginas: 74→143 px donde el padre es una rejilla, 0 px fijos donde es un contenedor flex | Una animación que a veces esconde el contenido no se publica. Lo hace JavaScript —veinte líneas que miden y animan— con red de seguridad: pasado el tiempo, suelta el alto pase lo que pase |
 | Antes de eso saqué tres conclusiones falsas de medir animaciones en el panel de vista previa, que no pinta | `animation.currentTime` se quedaba en **0** con `document.visibilityState` diciendo «visible» | **El reloj de las animaciones no avanza en una ventana que no se pinta.** Para comprobar una curva ahí: pausar la animación, mover `currentTime` a mano y leer el alto en cada paso |
 | Dije que el botón del ojo «llega oculto y lo enseña el guion». Con el JavaScript bloqueado **se veía igual, y muerto** | Poniéndole `hidden` y leyendo el `display` calculado: `grid`, no `none` | `[hidden]` es la regla de menor especificidad que existe y cualquier `display` de clase la gana. Si un botón nace oculto, hace falta `.clase[hidden] { display: none }` escrito a mano — y comprobarlo, no suponerlo |
-| Escribí acentos invertidos dentro de un comentario de `ESTILOS` y de `GUION`, que son plantillas de cadena: cerraron la cadena y `tsc` sacó seis errores | `npm run check` | **Ya estaba en esta tabla**, de la vez anterior, y volví a hacerlo. Dentro de esas dos constantes, las comillas van «así» |
+| Escribí acentos invertidos dentro de un comentario de `ESTILOS` tres veces. La tercera, **`tsc` pasó limpio y el Worker no arrancó**: lo que quedaba tras cerrarse la cadena era TypeScript válido | `wrangler dev` falló al empaquetar, con `npm run check` en verde | Ya estaba apuntado dos veces y volvió a pasar, así que dejó de ser una lección y pasó a ser una comprobación: `npm run check` ahora corre también `wrangler deploy --dry-run`, que es el mismo empaquetado del despliegue. **Una regla que ya fallaste dos veces no se recuerda mejor: se automatiza** |
+| El GitHub simulado guardaba cada archivo como cadena. Al subir la primera foto, el WebP llegó al repositorio con cada byte no-UTF-8 convertido en `�` | Comprobando las imágenes subidas byte a byte: dos de cuatro tenían cabecera buena y el cuerpo destrozado | **Lo peor no fue que rompiera: fue que dos de cuatro parecían bien.** La cabecera `RIFF` sobrevive y el archivo pasa por imagen. Un banco de pruebas que no puede representar lo que hace el sistema de verdad esconde fallos en vez de enseñarlos; ahora guarda `Buffer` |
+| La lista de fotos la importaba el panel desde `src/lib/fotos.ts`, así que viajaba **dentro del Worker** | Pensando qué pasa el día después de subir una: la foto estaría en el repositorio y el desplegable de Noticias no la ofrecería hasta el siguiente despliegue del panel | Un dato que el panel escribe no puede leerlo de su propio paquete. Las pantallas de noticias leen ahora `fotos.json` del repositorio en cada visita, como hacen con todo lo demás |
 | Pedí a Juan cargar un secreto `FIRMA_SESION` que **ningún archivo del código lee** | Buscándolo: `grep -rn FIRMA_SESION admin/src/` → vacío | Un paso de instalación que no hace nada enseña algo falso sobre cómo funciona el sistema. Las variables que el panel usa son `PANEL`, `REPO`, `RAMA`, `GITHUB_TOKEN` y `GITHUB_API` |
 
 ---

@@ -28,17 +28,28 @@ const PUERTO = Number(process.argv[2] ?? 8799);
 /** La raíz del repositorio, subiendo desde admin/pruebas/. */
 const RAIZ = dirname(dirname(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'))));
 
-const blobs = new Map(); // sha -> texto
+const blobs = new Map(); // sha -> Buffer
 const arboles = new Map(); // sha -> Map(ruta -> blobSha)
 const commits = new Map(); // sha -> { arbol, padres, mensaje, fecha }
 let cabeza = null;
 
-const b64 = (t) => Buffer.from(t, 'utf8').toString('base64');
-const deB64 = (t) => Buffer.from(t, 'base64').toString('utf8');
+/*
+  Todo se guarda en Buffer, no en texto.
+
+  Como cadena parecia mas comodo —casi todo lo que escribe el panel es JSON—
+  hasta que empezo a subir fotos: pasar un WebP por toString('utf8') convierte
+  cada byte que no sea UTF-8 valido en un signo de interrogacion, y el archivo
+  llega al repositorio roto. Peor que roto: **callado**, porque las primeras
+  letras sobreviven y sigue pareciendo una imagen. El GitHub de verdad no hace
+  eso, asi que este tampoco puede.
+*/
+const aBuffer = (v) => (Buffer.isBuffer(v) ? v : Buffer.from(v, 'utf8'));
+const b64 = (b) => aBuffer(b).toString('base64');
+const deB64 = (t) => Buffer.from(t, 'base64');
 
 /** El mismo sha que da git: sobre "blob <bytes>\0<contenido>". */
-function shaBlob(texto) {
-  const cuerpo = Buffer.from(texto, 'utf8');
+function shaBlob(contenido) {
+  const cuerpo = aBuffer(contenido);
   return createHash('sha1')
     .update(Buffer.concat([Buffer.from(`blob ${cuerpo.length}\0`), cuerpo]))
     .digest('hex');
@@ -46,9 +57,10 @@ function shaBlob(texto) {
 
 const shaDe = (objeto) => createHash('sha1').update(JSON.stringify(objeto)).digest('hex');
 
-function guardarBlob(texto) {
-  const sha = shaBlob(texto);
-  blobs.set(sha, texto);
+function guardarBlob(contenido) {
+  const cuerpo = aBuffer(contenido);
+  const sha = shaBlob(cuerpo);
+  blobs.set(sha, cuerpo);
   return sha;
 }
 
@@ -95,6 +107,7 @@ for (const ruta of [
   'src/data/examenes.json',
   'src/data/catalogo-info.json',
   'src/data/catalogo-asociados.json',
+  'src/data/fotos.json',
 ]) {
   inicial.set(ruta, readFileSync(join(RAIZ, ruta), 'utf8'));
 }
@@ -155,8 +168,8 @@ http
       if (req.method === 'POST' && que === 'blobs') {
         const datos = await leerCuerpo(req);
         // Como GitHub: 'utf-8' guarda el texto tal cual, 'base64' lo descodifica.
-        const texto = datos.encoding === 'base64' ? deB64(datos.content) : datos.content;
-        return json(res, 201, { sha: guardarBlob(texto) });
+        const contenido = datos.encoding === 'base64' ? deB64(datos.content) : datos.content;
+        return json(res, 201, { sha: guardarBlob(contenido) });
       }
 
       if (req.method === 'POST' && que === 'trees') {
@@ -230,7 +243,7 @@ http
         // Tipo `raw`: el archivo tal cual, sin JSON ni base64. Es por donde lee
         // el catálogo, para no gastar 29 ms de CPU descodificando 288 KB.
         if ((req.headers.accept ?? '').includes('raw')) {
-          res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+          res.writeHead(200, { 'Content-Type': 'application/octet-stream' });
           return res.end(blobs.get(sha));
         }
         return json(res, 200, { type: 'file', path: ruta, content: b64(blobs.get(sha)), sha });

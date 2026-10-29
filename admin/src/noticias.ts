@@ -19,24 +19,20 @@ import {
 
 export const CARPETA = 'src/content/noticias';
 
-/**
- * Fotos disponibles, leídas del propio sitio.
- *
- * Es la misma lista cerrada que valida el esquema de Astro, y se importa en vez
- * de copiarse: aquí había una copia de los nueve nombres y una copia se
- * desincroniza. Si alguien añade una foto al sitio, el panel la ofrece sola; si
- * quita una, el panel deja de ofrecer un nombre que rompería el build.
- *
- * Se puede importar porque `src/lib/fotos.ts` no importa nada: es texto y
- * números, y carga igual dentro de un Worker.
- *
- * Subir fotos nuevas desde el panel sigue sin poder hacerse, y no por la lista:
- * los originales viven fuera de git y de cada uno se generan tres tamaños con
- * `sharp`, que no corre en un Worker ni al compilar.
- */
-import { NOMBRES_FOTOS, foto } from '../../src/lib/fotos';
+/*
+  Las fotos no se importan del sitio, y eso es deliberado.
 
-export { NOMBRES_FOTOS as FOTOS, foto as atributosDeFoto };
+  Aquí se importaba `src/lib/fotos.ts` para tener la lista de nombres. Funcionaba
+  —ese archivo no importa nada y carga dentro de un Worker— pero metía la lista
+  *dentro del paquete del panel*: una foto subida hoy no habría aparecido al
+  escribir una noticia hasta el siguiente despliegue, que es justo lo contrario
+  de poder subirlas desde el panel.
+
+  Desde que se pueden subir en `/fotos` (28 de octubre de 2026), la lista se lee
+  del repositorio en cada visita, con `fotosDelRepo` en `index.ts`, y
+  `revisar()` la recibe como argumento. El import se quedó sin usar y se fue, y
+  con él los 2,8 KB de `src/data/fotos.json` que viajaban en cada despliegue.
+*/
 
 export type Noticia = {
   slug: string;
@@ -169,7 +165,7 @@ export function aSlug(texto: string): string {
  * Comprueba lo mismo que el esquema de Astro, pero antes de escribir: si algo
  * está mal, es mejor decirlo en el formulario que dejar el build roto.
  */
-export function revisar(n: Partial<Noticia>): string | null {
+export function revisar(n: Partial<Noticia>, fotosValidas?: string[]): string | null {
   if (!n.titulo?.trim()) return 'Falta el título.';
   if (n.titulo.length > 120) return 'El título es demasiado largo.';
   if (!n.descripcion?.trim()) return 'Falta la descripción: es la que se ve en el listado y en Google.';
@@ -177,7 +173,12 @@ export function revisar(n: Partial<Noticia>): string | null {
   if (!n.categoria?.trim()) return 'Falta la categoría.';
   if (!n.fecha || !/^\d{4}-\d{2}-\d{2}$/.test(n.fecha)) return 'La fecha debe ser AAAA-MM-DD.';
   if (Number.isNaN(new Date(n.fecha).getTime())) return 'Esa fecha no existe.';
-  if (n.foto && !NOMBRES_FOTOS.includes(n.foto as (typeof NOMBRES_FOTOS)[number])) {
+  /*
+    Contra la lista que se acaba de leer del repositorio, no contra la que
+    viajaba dentro del Worker. Si no, una foto subida hoy no valdría hasta el
+    siguiente despliegue del panel, que es justo lo contrario de poder subirla.
+  */
+  if (n.foto && fotosValidas && !fotosValidas.includes(n.foto)) {
     return 'Esa foto no está en el sitio.';
   }
   if (!n.cuerpo?.trim()) return 'El artículo está vacío.';

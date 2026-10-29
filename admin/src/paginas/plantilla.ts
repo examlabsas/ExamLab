@@ -62,6 +62,8 @@ const ICONOS: Record<string, string> = {
   hoja: 'M5 4.5h14v15H5zM5 9.5h14M10.5 9.5v10',
   // Dos hojas, una detrás de otra. Para el botón de copiar el enlace de alta.
   copiar: 'M9 9h10.5v10.5H9zM15 9V4.5H4.5V15H9',
+  // Marco, sol y la loma que lo cruza. Para la sección de fotos.
+  fotos: 'M4 5.5h16v13H4zM4 15l4.5-4.5 4 4 3-2.5L20 16M15.5 9.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z',
   // El ojo de ver la contraseña. Tachado = ahora mismo está oculta.
   ojo: 'M2.5 12c2.4-3.6 5.6-5.5 9.5-5.5s7.1 1.9 9.5 5.5c-2.4 3.6-5.6 5.5-9.5 5.5S4.9 15.6 2.5 12zM14.5 12a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0z',
   'ojo-tachado':
@@ -99,6 +101,12 @@ export const SECCIONES: Seccion[] = [
     icono: 'noticias',
     de: 'Escribir, editar y despublicar artículos.',
     enMovil: true,
+  },
+  {
+    ruta: '/fotos',
+    etiqueta: 'Fotos',
+    icono: 'fotos',
+    de: 'Las imágenes que pueden acompañar a una noticia.',
   },
   {
     ruta: '/aviso',
@@ -539,36 +547,54 @@ const ESTILOS = `
   /*
     El campo de archivo.
 
-    El navegador lo pinta a su manera y cada uno distinto: en Chrome sale un
-    «Choose File» gris pegado al nombre, que no se parece a nada del panel. No
-    se puede estilar el botón interno directamente, pero sí con el
-    pseudoelemento file-selector-button, que es justo esa parte.
+    El navegador lo pinta a su manera, y en su idioma: en Chrome sale
+    «Choose File» junto a «No file chosen» aunque el panel entero esté en
+    español. Ese texto viene del idioma del navegador, no del lang de la
+    página, y no hay atributo, propiedad ni pseudoelemento que lo traduzca:
+    file-selector-button deja pintarlo, no escribirlo.
+
+    Así que el campo de verdad se queda donde está —invisible, pero enfocable,
+    para que el teclado siga recorriéndolo y el aviso de campo obligatorio
+    siga saliendo— y encima va una etiqueta con el aspecto del resto de
+    botones. Pulsarla abre el mismo selector de siempre: eso lo hace el
+    navegador por el for, sin JavaScript de por medio.
 
     (Sin comillas invertidas en este comentario: ESTILOS es una plantilla de
     texto y una comilla invertida la cierra. Ya pasó una vez y el Worker dejó
     de arrancar con tsc pasando limpio.)
   */
-  input[type='file'] {
-    padding: .5rem;
-    cursor: pointer;
+  .campo-archivo {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .7rem;
+    margin-top: .35rem;
   }
-  input[type='file']::file-selector-button {
-    margin-right: .8rem;
-    padding: .45rem .85rem;
-    font: inherit;
-    font-size: .84rem;
-    font-weight: 600;
-    color: var(--accion);
-    background: var(--fondo);
-    border: 1px solid var(--linea);
-    border-radius: var(--radio-chico);
-    cursor: pointer;
-    transition: background .16s var(--salida);
+  .campo-archivo input[type='file'] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    /* Los clics son para la etiqueta, que es lo que se ve. */
+    pointer-events: none;
   }
-  input[type='file']:hover::file-selector-button {
-    background: var(--superficie);
-    border-color: #aebecb;
+  .campo-archivo label { margin: 0; cursor: pointer; }
+  /* El foco del teclado cae en un campo que no se ve: se dibuja en la etiqueta. */
+  .campo-archivo input[type='file']:focus-visible + label {
+    outline: 2.5px solid var(--accion-viva);
+    outline-offset: 2px;
   }
+  /* Sin font-size: hereda el cuerpo, que es el tamaño del botón de al lado. */
+  .archivo-nombre {
+    min-width: 0;
+    color: var(--tinta-suave);
+    overflow-wrap: anywhere;
+  }
+  .archivo-nombre.hay { font-weight: 600; color: var(--tinta); }
 
   /* Para las celdas de acción de una tabla, donde un botón entero pesa mucho. */
   .boton.chico { padding: .35rem .65rem; font-size: .82rem; gap: .3rem; }
@@ -598,6 +624,83 @@ const ESTILOS = `
 
   .fila { display: flex; gap: .85rem; flex-wrap: wrap; align-items: flex-end; }
   .fila > * { flex: 1 1 11rem; }
+
+  /*
+    El interruptor de «cerrado todo el día» y las horas que manda.
+
+    Hasta aquí la casilla y las horas eran dos campos sueltos uno debajo del
+    otro: al marcar «cerrado» las horas seguían encendidas, con el mismo aspecto
+    de siempre y sin decir que ya no pintaban nada. El servidor las ignoraba,
+    pero la pantalla no lo contaba, y de ahí sale creer que el día solo puede
+    estar cerrado.
+
+    El apagado va por CSS, con la pseudoclase :has, para que no dependa del
+    guion. El guion, si corre, además las deshabilita de verdad — y así el tabulador tampoco
+    entra en un campo que no sirve.
+  */
+  .dia-especial {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    background: var(--fondo);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio-chico);
+  }
+  .interruptor { display: flex; align-items: flex-start; gap: .6rem; margin: 0; }
+  .interruptor b { display: block; font-size: 15px; }
+  .interruptor em {
+    display: block;
+    margin-top: .1rem;
+    font-size: .84rem;
+    font-style: normal;
+    font-weight: 400;
+    color: var(--tinta-suave);
+  }
+  .tramos { margin-top: .25rem; transition: opacity .18s var(--salida); }
+  .dia-especial:has(input[name="cerrado"]:checked) .tramos {
+    opacity: .4;
+    pointer-events: none;
+  }
+
+  /* La segunda pareja de horas de un día especial, plegada. */
+  .mediodia { margin-top: .9rem; }
+  .mediodia > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    width: fit-content;
+    padding: .25rem .1rem;
+    font-size: .84rem;
+    font-weight: 600;
+    color: var(--accion);
+    cursor: pointer;
+    /* Las dos, que cada navegador esconde el triángulo a su manera. */
+    list-style: none;
+  }
+  .mediodia > summary::-webkit-details-marker { display: none; }
+  .mediodia > summary:hover { color: var(--accion-viva); }
+  .mediodia > summary svg {
+    width: 16px;
+    height: 16px;
+    transition: transform .18s var(--salida);
+  }
+  .mediodia[open] > summary svg { transform: rotate(180deg); }
+
+  /*
+    El botón de enviar y la salida del formulario, en una línea.
+
+    El botón manda y ocupa lo que haga falta; lo otro se queda del tamaño de su
+    palabra, que es lo que separa una acción de la otra sin escribir «cuidado»
+    en ningún sitio. En un teléfono se parten en dos líneas.
+  */
+  .acciones-forma {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .7rem;
+    margin-top: 1.5rem;
+  }
+  .acciones-forma button { flex: 1 1 14rem; margin-top: 0; }
+  .acciones-forma .boton { flex: 0 0 auto; }
 
   .pista { margin: .4rem 0 0; max-width: 62ch; font-size: .84rem; color: var(--tinta-suave); }
 
@@ -777,6 +880,22 @@ const ESTILOS = `
   td.accion { width: 1%; text-align: right; white-space: nowrap; }
 
   /*
+    Dos acciones en la misma celda.
+
+    Sin flex-wrap a propósito: la celda mide width:1%, así que la tabla le da
+    exactamente el ancho mínimo de su contenido. Envolviendo, ese mínimo es el
+    botón más ancho y los dos se apilan **siempre**, incluso con media pantalla
+    libre al lado. Sin envolver, el mínimo es la suma, y van en fila.
+
+    Debajo de 48rem sí se apilan: ahí la tabla ya está en dos columnas y poner
+    los dos botones en fila le roba el ancho al nombre.
+  */
+  .acciones-fila { display: flex; gap: .4rem; justify-content: flex-end; }
+  @media (max-width: 48rem) {
+    .acciones-fila { flex-wrap: wrap; }
+  }
+
+  /*
     Columnas que sobran en una pantalla estrecha.
 
     La tabla de usuarios medía 511 px dentro de 375 y el contenedor no
@@ -869,6 +988,51 @@ const ESTILOS = `
      superficie. Un panel dentro de otro panel es siempre un error. */
   .recuadro { padding-top: 1.25rem; border-top: 1px solid var(--linea); }
   .recuadro > :first-child { margin-top: 0; }
+
+  /* ── Fotos ─────────────────────────────────────────────────────────────── */
+
+  /*
+    Las que ya están. Con miniatura y no en lista de nombres: «microscopio» y
+    «revision-de-muestra» no dicen cuál es cuál, y elegir la foto de una noticia
+    es exactamente mirarlas.
+  */
+  .galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: .7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .galeria li {
+    display: flex;
+    gap: .8rem;
+    padding: .7rem;
+    background: var(--superficie);
+    border: 1px solid var(--linea);
+    border-radius: var(--radio);
+  }
+  .galeria img {
+    width: 88px;
+    height: 66px;
+    flex: 0 0 auto;
+    object-fit: cover;
+    /* El hueco gris mientras la foto recién subida llega al sitio. */
+    background: var(--linea-fina);
+    border-radius: var(--radio-chico);
+  }
+  .galeria b { display: block; font-size: 15px; }
+  .galeria em {
+    display: block;
+    margin: .1rem 0 .3rem;
+    font-size: .84rem;
+    font-style: normal;
+    color: var(--tinta-suave);
+  }
+
+  /* Lo que el navegador preparó, antes de subirlo. */
+  .vista-foto { font-variant-numeric: tabular-nums; }
+  .vista-foto.mal { color: var(--alerta); background: var(--alerta-fondo); border-color: #f1c9c4; }
 
   /* ── El inicio ─────────────────────────────────────────────────────────── */
 
@@ -1040,7 +1204,8 @@ export function pagina(
       </nav>
       <div class="rail-pie">
         <p>${esc(sesion.correo)}</p>
-        <p style="margin-top:.3rem"><a href="/salir">Cerrar sesión</a></p>
+        <p style="margin-top:.3rem"><a href="/clave">Cambiar contraseña</a></p>
+        <p style="margin-top:.2rem"><a href="/salir">Cerrar sesión</a></p>
       </div>
     </div>`
     : '';

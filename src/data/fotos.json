@@ -1,0 +1,84 @@
+{
+  "nota": "Fotos reales del laboratorio. Las escribe el panel al subir una y las lee src/lib/fotos.ts. En «anchos» van las variantes WebP que existen en public/images/; cada foto lleva ademas og/<nombre>.jpg para la vista previa de WhatsApp y redes.",
+  "fotos": [
+    {
+      "nombre": "matriz-ficoa-fachada",
+      "alt": "Fachada de la matriz de ExamLab en Ficoa, Ambato",
+      "anchos": [
+        800,
+        1400
+      ]
+    },
+    {
+      "nombre": "laboratorio-equipo-trabajando",
+      "alt": "Personal de ExamLab procesando muestras en el área de análisis de la matriz",
+      "anchos": [
+        800,
+        1400,
+        2000
+      ]
+    },
+    {
+      "nombre": "recepcion-de-muestras",
+      "alt": "Tecnóloga de ExamLab ordenando tubos de muestra en la gradilla del analizador",
+      "anchos": [
+        800,
+        1400,
+        2000
+      ]
+    },
+    {
+      "nombre": "analizador-automatizado",
+      "alt": "Tecnólogo de ExamLab operando la pantalla de un analizador automatizado",
+      "anchos": [
+        800,
+        1400,
+        2000
+      ]
+    },
+    {
+      "nombre": "revision-de-muestra",
+      "alt": "Bioquímica de ExamLab revisando un tubo de muestra etiquetado",
+      "anchos": [
+        800,
+        1400,
+        2000
+      ]
+    },
+    {
+      "nombre": "microscopio",
+      "alt": "Bioquímica de ExamLab observando una muestra al microscopio",
+      "anchos": [
+        800,
+        1400
+      ]
+    },
+    {
+      "nombre": "tecnologa-con-tubos",
+      "alt": "Tecnóloga de ExamLab comparando dos tubos de muestra en el área de análisis",
+      "anchos": [
+        800,
+        1400,
+        2000
+      ]
+    },
+    {
+      "nombre": "tecnologa-en-analizador",
+      "alt": "Tecnóloga de ExamLab registrando una orden en el analizador",
+      "anchos": [
+        800,
+        1400,
+        2000
+      ]
+    },
+    {
+      "nombre": "pipeteo-de-muestra",
+      "alt": "Tecnóloga de ExamLab preparando una muestra para el microscopio",
+      "anchos": [
+        800,
+        1400,
+        2000
+      ]
+    }
+  ]
+}

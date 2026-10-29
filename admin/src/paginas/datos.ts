@@ -142,9 +142,30 @@ export function paginaSede(o: { sesion: Sesion; sede: Sede; error?: string }) {
 export function paginaFeriados(o: {
   sesion: Sesion;
   fechas: FechaEspecial[];
-  ok?: boolean;
+  /** La fecha que se está editando, si se llegó con `?editar=`. */
+  editando?: FechaEspecial;
+  /** Cuántas se acaban de guardar, y cuántas de ellas pisaron una anterior. */
+  guardadas?: number;
+  reemplazadas?: number;
   error?: string;
 }) {
+  /*
+    En la tabla las fechas van en AAAA-MM-DD, que es como se ordenan y como se
+    guardan. En un título es una matrícula: aquí se escribe como se dice.
+    `timeZone: UTC` porque la fecha se parsea a medianoche UTC y, sin eso, en
+    Ecuador saldría el día anterior.
+  */
+  const enLetra = (fecha: string) =>
+    new Date(`${fecha}T00:00:00Z`).toLocaleDateString('es-EC', {
+      timeZone: 'UTC',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+
+  const e = o.editando;
+  const tramos = e?.franja ?? [];
+  const cerrado = e ? e.franja === null : true;
   const hoy = new Date().toISOString().slice(0, 10);
   const filas = o.fechas
     .map(
@@ -163,10 +184,13 @@ export function paginaFeriados(o: {
         }<span class="solo-estrecho"><br><span class="marca">${atencion}</span></span></td>
         <td class="solo-amplio">${atencion}</td>
         <td class="accion">
-          <form method="post" action="/feriados/quitar" style="margin:0">
-            <input type="hidden" name="fecha" value="${esc(f.fecha)}">
-            <button type="submit" class="chico">Quitar</button>
-          </form>
+          <div class="acciones-fila">
+            <a class="boton chico suave" href="/feriados?editar=${esc(f.fecha)}#fecha">Editar</a>
+            <form method="post" action="/feriados/quitar" style="margin:0">
+              <input type="hidden" name="fecha" value="${esc(f.fecha)}">
+              <button type="submit" class="chico secundario">Quitar</button>
+            </form>
+          </div>
         </td>
       </tr>`;
       },
@@ -177,7 +201,20 @@ export function paginaFeriados(o: {
     'Feriados',
     `    ${cabecera('Feriados y días especiales', `El indicador de «Abierto / Cerrado» los respeta, y también los datos que
         lee Google. Sin esto, el sitio diría «Abierto» un día de cierre.`)}
-      ${guardado(o.ok)}
+      ${(() => {
+        /*
+          Decir cuántas y cuántas pisaron a otra. Guardar un rango de diez días
+          encima de tres que ya existían y que la pantalla responda «Guardado»
+          a secas deja sin saber qué pasó con esos tres.
+        */
+        const n = o.guardadas ?? 0;
+        if (n < 1) return '';
+        const r = o.reemplazadas ?? 0;
+        const cuantas = n === 1 ? 'Guardada 1 fecha' : `Guardadas ${n} fechas`;
+        const pisadas =
+          r === 0 ? '' : r === 1 ? ', 1 de ellas ya existía y se reemplazó' : `, ${r} de ellas ya existían y se reemplazaron`;
+        return `<p class="error bien">${cuantas}${pisadas}. En uno o dos minutos se ve en el sitio.</p>`;
+      })()}
       ${o.error ? `<p class="error">${esc(o.error)}</p>` : ''}
 
       <table>
@@ -187,27 +224,109 @@ export function paginaFeriados(o: {
       <p class="pista">Las fechas ya pasadas se ven atenuadas. No estorban: se pueden dejar.</p>
 
       <div class="panel" style="margin-top:2rem">
-        <h2 style="margin:0">Añadir una fecha</h2>
+        <h2 style="margin:0">${e ? `Editar el ${esc(enLetra(e.fecha))}` : 'Añadir fechas'}</h2>
         <form method="post" action="/feriados">
-          <label for="fecha">Fecha</label>
-          <input id="fecha" name="fecha" type="date" required>
+          ${e ? `<input type="hidden" name="original" value="${esc(e.fecha)}">` : ''}
+
+          <div class="fila">
+            <div style="flex:1 1 11rem">
+              <label for="fecha">${e ? 'Fecha' : 'Desde'}</label>
+              <input id="fecha" name="desde" type="date" required value="${esc(e?.fecha ?? '')}">
+            </div>
+            ${
+              /*
+                El rango es un solo campo más, y vacío no hace nada: un día
+                suelto es «desde» sin «hasta». El doctor avisa por tandas —«el 2
+                y el 3 no se abre»— y antes eso eran dos altas idénticas
+                escritas a mano, con el motivo tecleado dos veces.
+              */ ''
+            }
+            ${
+              e
+                ? ''
+                : `<div style="flex:1 1 11rem">
+                     <label for="hasta">Hasta <span class="pista">(solo si son varios días)</span></label>
+                     <input id="hasta" name="hasta" type="date">
+                   </div>`
+            }
+          </div>
+          ${
+            e
+              ? ''
+              : `<p class="pista">Déjelo vacío y la fecha vale <b>solo para ese día</b>.
+                 Con él, el mismo motivo y el mismo horario se ponen en todos los
+                 días del rango, el primero y el último incluidos.</p>`
+          }
 
           <label for="motivo">Motivo</label>
           <input id="motivo" name="motivo" type="text" required
-                 placeholder="Independencia de Guayaquil">
+                 value="${esc(e?.motivo ?? '')}" placeholder="Independencia de Guayaquil">
           <p class="pista">Se le muestra al paciente: «Cerrado por Independencia de Guayaquil».</p>
 
-          <label style="display:flex;align-items:center;gap:.5rem;margin-top:1.1rem">
-            <input type="checkbox" name="cerrado" value="si" checked style="width:auto;margin:0">
-            Cerrado todo el día
-          </label>
+          <div class="dia-especial">
+            <label class="interruptor">
+              <input type="checkbox" name="cerrado" value="si" ${cerrado ? 'checked' : ''}
+                     style="width:auto;margin:0">
+              <span><b>Cerrado todo el día</b><em>Quítelo para decir a qué hora se abre.</em></span>
+            </label>
 
-          <label for="abre">Si abre, desde</label>
-          <input id="abre" name="abre" type="time">
-          <label for="cierra">hasta</label>
-          <input id="cierra" name="cierra" type="time">
+            <div class="tramos">
+              <div class="fila">
+                <div style="flex:1 1 8rem">
+                  <label for="abre1">Abre</label>
+                  <input id="abre1" name="abre1" type="time" value="${esc(tramos[0]?.abre ?? '')}">
+                </div>
+                <div style="flex:1 1 8rem">
+                  <label for="cierra1">Cierra</label>
+                  <input id="cierra1" name="cierra1" type="time" value="${esc(tramos[0]?.cierra ?? '')}">
+                </div>
+              </div>
+              ${
+                /*
+                  La segunda pareja de horas, detrás de la pregunta que la pide.
 
-          <button type="submit">Añadir</button>
+                  Estaba siempre a la vista: cuatro campos de hora para un día
+                  que casi siempre se trabaja de corrido, y la pregunta que
+                  salía era «por qué hay dos». Sale abierta sola cuando el día
+                  que se edita ya tiene dos tramos, así que nunca esconde una
+                  hora que esté puesta.
+
+                  Es un details de verdad: esta pantalla funciona con el
+                  JavaScript bloqueado y se queda así.
+                */ ''
+              }
+              <details class="mediodia"${tramos[1] ? ' open' : ''}>
+                <summary>${icono('bajar')}Ese día se cierra al mediodía</summary>
+                <div class="fila">
+                  <div style="flex:1 1 8rem">
+                    <label for="abre2">Vuelve a abrir</label>
+                    <input id="abre2" name="abre2" type="time" value="${esc(tramos[1]?.abre ?? '')}">
+                  </div>
+                  <div style="flex:1 1 8rem">
+                    <label for="cierra2">Cierra</label>
+                    <input id="cierra2" name="cierra2" type="time" value="${esc(tramos[1]?.cierra ?? '')}">
+                  </div>
+                </div>
+                <p class="pista">
+                  Con esto el sitio dice «07:00–11:00 y 14:00–17:00». Si se trabaja
+                  de corrido no hace falta tocarlo.
+                </p>
+              </details>
+            </div>
+          </div>
+
+          ${
+            /*
+              Cancelar iba suelto debajo de un botón de ancho completo, subrayado
+              y centrado: a esa altura de la pantalla se leía como el pie de la
+              página y no como la salida del formulario. Van juntos, que es
+              donde se busca.
+            */ ''
+          }
+          <div class="acciones-forma">
+            <button type="submit">${e ? 'Guardar el cambio' : 'Añadir'}</button>
+            ${e ? `<a class="boton suave" href="/feriados">Cancelar</a>` : ''}
+          </div>
         </form>
       </div>
 `,

@@ -4,7 +4,7 @@ Lo que falta para dar el sitio por terminado. Nada de esto bloquea la
 publicación: el sitio funciona hoy y, donde falta un dato, lo dice en vez de
 inventarlo.
 
-Última revisión: 27 de octubre de 2026.
+Última revisión: 29 de octubre de 2026.
 
 ---
 
@@ -43,6 +43,22 @@ Falta:
       Cloudflare. Se invita desde Usuarios.
 - [ ] **El token de GitHub.** Uno quedó expuesto en el historial de la terminal
       durante la puesta en marcha. Confirmar que se borró y se regeneró.
+
+**El 28 de octubre el panel aprendió tres cosas más:** cambiar la propia
+contraseña y restablecer la de otro sin borrarlo, editar los feriados por rango
+de días con horario en vez de solo «cerrado», y **subir fotos nuevas**. Las
+variantes de cada foto las genera el navegador de quien la sube, porque `sharp`
+no corre en un Worker; la lista dejó de estar escrita a mano en TypeScript y
+vive en `src/data/fotos.json`.
+
+**El 29 se repasó todo eso antes de subirlo.** El botón de elegir archivo salía
+en inglés —lo pinta el navegador, no la página— y ahora es una etiqueta propia;
+la pareja de horas de la tarde de un feriado se plegó detrás de «se cierra al
+mediodía»; y apareció un fallo que no se veía en local: la subida de fotos
+descodificaba el base64 entero, **21,6 ms de CPU en el peor caso que el
+formulario admite, con el tope en 10**. Ahora mira doce bytes de cada archivo y
+calcula el resto. `wrangler dev` no mide la CPU: esto habría salido en
+producción, como el PBKDF2.
 
 Las direcciones `.workers.dev` del panel y del sitio están cerradas con
 `workers_dev` y `preview_urls` en `false`. La del panel ya responde 404; la del
@@ -86,7 +102,7 @@ la **foto de la fachada en más resolución**, que descartó.
 
 ---
 
-## 2 bis. Feriados · cerrado
+## 2 bis. Feriados · cerrado, y ahora se editan
 
 Están cargados los feriados nacionales de fecha fija de lo que queda de 2026 y
 de 2027, todos como día cerrado (`src/data/feriados.json`).
@@ -94,6 +110,11 @@ de 2027, todos como día cerrado (`src/data/feriados.json`).
 **Carnaval y Viernes Santo quedaron descartados** por el laboratorio. Son los
 dos de fecha móvil, así que esos días el indicador dirá «Abierto». Si cambian de
 idea, se añaden desde el panel en `/feriados`, sin tocar código.
+
+Desde el 28 de octubre esa pantalla también **edita** una fecha ya puesta, pone
+la misma regla en un **rango de días** y admite **dos tramos** —mañana y tarde—
+para los días de jornada partida. El interruptor de «cerrado todo el día» apaga
+las horas a la vista, que antes seguían encendidas sin servir para nada.
 
 ---
 

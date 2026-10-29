@@ -159,6 +159,7 @@ admin/
 │   │   ├── totp.ts           sin uso: el código de verificación se quitó
 │   │   └── sesion.ts         cookies, sesiones y límite de intentos
 │   ├── estatico.ts           las fuentes, el emblema y el guion, con sus rutas
+│   ├── fotos.ts              subir una foto: comprobar y escribir de una vez
 │   └── paginas/
 │       ├── plantilla.ts      el armazón, los iconos y toda la hoja de estilos
 │       └── guion.ts          el único JavaScript: el ojo de ver la contraseña
@@ -169,6 +170,14 @@ admin/
 └── pruebas/                  solo para local: GitHub simulado, usuario de
                               prueba y hoja de ejemplo
 ```
+
+### `npm run check` comprueba dos cosas
+
+Los tipos **y** el empaquetado del Worker (`wrangler deploy --dry-run`, que no
+sube nada ni habla con Cloudflare). Lo segundo está porque lo primero no basta:
+`ESTILOS` y `GUION` son plantillas de cadena de miles de líneas, y un acento
+invertido dentro de un comentario las cierra antes de tiempo. Pasó tres veces, y
+la tercera `tsc` dio verde mientras el Worker se negaba a arrancar.
 
 ### Decisiones que conviene conocer
 
@@ -216,6 +225,16 @@ Workers corta a los 10 ms. Se lee pidiendo el tipo `raw` y se escribe con
 54. Las noticias y los datos del sitio siguen por la API de contenidos, que es
 más cómoda y necesita el `sha` por archivo, porque sus archivos son de
 kilobytes.
+
+**Subir una foto tampoco descodifica el base64.** Es el mismo límite otra vez. El
+navegador manda cuatro archivos codificados —medio megabyte largo— y la ruta solo
+necesita dos cosas de cada uno: los primeros bytes, para comprobar que es de
+verdad un WebP o un JPEG, y lo que pesa. Lo primero son **veinticuatro letras de
+base64**; lo segundo sale de la aritmética, cuatro letras por cada tres bytes. El
+resto se le pasa a GitHub tal cual llegó, sin tocarlo. Descodificarlo entero
+costaba 21,6 ms medidos en Node con los cuatro archivos en el tope que admite el
+formulario, y Node es la medida optimista: `wrangler dev` no mide la CPU, así que
+esto no se habría visto hasta producción.
 
 **Los archivos que edita tienen que estar en el repositorio.** Son
 `src/data/examenes.json`, `catalogo-info.json`, `sitio.json`, `sedes.json`,

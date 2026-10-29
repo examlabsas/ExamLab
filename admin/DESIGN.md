@@ -372,6 +372,76 @@ Escribir doce caracteres a ciegas en el teclado de un teléfono es la razón de
 que la gente acabe eligiendo contraseñas cortas. **Poder mirar lo que se escribió
 protege más que esconderlo.**
 
+**Fotos (`.galeria`, `.subir-foto`).** Es **la única pantalla del panel que no
+funciona sin JavaScript**, y lo dice ella misma antes de que nadie rellene nada:
+el aviso está en el HTML y lo quita el propio guion, así que si el guion corre
+no se ve nunca. No es una excepción por comodidad. De cada foto salen tres o
+cuatro archivos —WebP de 800, 1400 y, si el original da, 2000, más un JPG de
+1200×630 para WhatsApp— y quien los genera es el navegador de quien sube la
+foto: un Worker no puede correr `sharp` y encargárselo a Cloudflare costaría
+dinero.
+
+Pasar por un lienzo tiene un efecto que viene de regalo: los datos EXIF del
+teléfono —modelo, fecha y, si lo hubiera, el GPS— no sobreviven al dibujado. Lo
+que se sube son píxeles.
+
+Antes de enviar, la pantalla dice lo que preparó: «800 px 64 KB · 1400 px 150 KB
+· 2000 px 310 KB · vista previa 180 KB. Original de 3024×4032». Subir algo al
+sitio del laboratorio sin ver qué se sube es como se cuelan fotos de 4 MB.
+
+Las que ya están van en rejilla **con miniatura**, no en lista de nombres:
+«microscopio» y «revision-de-muestra» no dicen cuál es cuál, y elegir la foto de
+una noticia es exactamente mirarlas. La miniatura se trae del sitio y se sirve
+desde el propio panel; apuntar el `<img>` a examlabsas.com habría obligado a
+abrir `img-src` a otro dominio, que es la regla que impide que esta pantalla
+cargue cualquier cosa de cualquier sitio.
+
+**Días especiales (`.dia-especial`).** El dato siempre admitió «abierto de tal a
+tal» y hasta dos tramos; lo que no se podía era decirlo desde la pantalla, y
+tampoco cambiar una fecha ya puesta. De ahí salió la idea de que un feriado solo
+podía estar cerrado.
+
+El interruptor «Cerrado todo el día» manda sobre las cuatro horas que tiene
+debajo, y **se nota**: la hoja las apaga con la pseudoclase `:has` —opacidad y
+sin puntero—, y el guion, si corre, las deshabilita de verdad para que el
+tabulador tampoco entre. Antes la casilla y las horas eran campos sueltos y las
+horas seguían encendidas al marcar «cerrado»: el servidor las ignoraba y la
+pantalla no lo contaba.
+
+El mismo formulario hace las tres cosas. Un día suelto es «desde» sin «hasta»;
+un rango los lleva los dos; editar llega por `?editar=<fecha>`, trae el campo
+`original` oculto y esconde el «hasta», porque un rango de una sola fecha no es
+un rango. Las fechas del rango que ya existían se reemplazan, y el mensaje dice
+cuántas: guardar diez días encima de tres que ya estaban y responder «Guardado»
+a secas deja sin saber qué pasó con esos tres.
+
+Tope de **60 días** por envío. No es un límite técnico: es que teclear 2027 en
+vez de 2026 escribiría cientos de fechas de un botonazo y deshacerlo sería ir
+quitándolas una a una.
+
+**Contraseñas.** Dos pantallas que no existían, y la falta de las dos tenía la
+misma consecuencia: perder una contraseña significaba **borrar al usuario y
+volver a invitarlo**, lo que le quitaba el rol y la fecha de alta. La del único
+administrador no se podía cambiar de ninguna forma.
+
+- `/clave` — cambiar la propia. Pide la actual aunque haya sesión abierta: una
+  sesión abierta en un mostrador no prueba quién está delante del teclado. Al
+  guardar se cierran las sesiones de los demás dispositivos y se abre una nueva
+  para este, así que quien la cambia no se echa a sí mismo.
+- **Restablecer** desde Usuarios — el mismo enlace de un solo uso que el alta,
+  marcado como restablecimiento. Al gastarlo cambia la contraseña y **deja
+  intacto todo lo demás**. Las sesiones de esa cuenta se cierran al usarlo, no
+  al crearlo: si se cerraran antes, pedir un restablecimiento echaría del panel
+  a quien todavía está trabajando.
+
+El fallo de la contraseña actual **no cuenta para el límite de intentos** del
+acceso. Ese límite bloquea `/entrar` quince minutos por correo y por IP:
+equivocarse tecleando en esta pantalla dejaría a la persona sin poder entrar,
+que es justo lo contrario de lo que la pantalla hace.
+
+Se llega desde el pie del raíl y, en el móvil —donde no hay raíl—, desde el
+saludo del inicio.
+
 **Copiar el enlace de alta (`.copiar`).** El enlace de invitación mide 76
 caracteres y hay que pasárselo a la persona por WhatsApp o en mano. Marcarlo a
 dedo en un teléfono, sin pasarse ni quedarse corto, es de las cosas que se hacen

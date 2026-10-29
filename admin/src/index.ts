@@ -29,6 +29,7 @@ import {
   guardar,
   listar,
   crear,
+  cambiarClave,
   invitar,
   leerInvitacion,
   gastarInvitacion,
@@ -38,11 +39,14 @@ import {
   paginaAcceso,
   paginaInvitacion,
   paginaPanel,
+  paginaClave,
   type ResumenInicio,
 } from './paginas/acceso';
 import { paginaFallo } from './paginas/plantilla';
 import { ACTIVOS, MANIFIESTO } from './estatico';
 import { paginaUsuarios } from './paginas/usuarios';
+import { paginaFotos } from './paginas/fotos';
+import * as fotos from './fotos';
 import {
   paginaNoticias,
   paginaNoticia,
@@ -307,7 +311,12 @@ app.get('/invitacion/:testigo', async (c) => {
   if (!invitacion) return c.text('Este enlace ya no sirve. Pida uno nuevo.', 410);
 
   return c.html(
-    paginaInvitacion({ testigo, correo: invitacion.correo, nombre: invitacion.nombre }),
+    paginaInvitacion({
+      testigo,
+      correo: invitacion.correo,
+      nombre: invitacion.nombre,
+      restablece: invitacion.restablece,
+    }),
   );
 });
 
@@ -335,14 +344,37 @@ app.post('/invitacion/:testigo', async (c) => {
     );
   }
 
-  const usuario = await crear(c.env.PANEL, {
-    correo: invitacion.correo,
-    nombre: invitacion.nombre,
-    rol: invitacion.rol,
-    contrasena,
-  });
+  /*
+    El mismo enlace sirve para dos cosas, y la diferencia importa: dar de alta
+    a alguien que no existe, o devolverle el acceso a alguien que ya estaba.
+
+    En el segundo caso se cambia solo la contraseña. Pasar por `crear` armaría
+    un usuario nuevo con el mismo correo y le borraría el rol, la fecha de alta
+    y el estado — que es exactamente lo que había que hacer antes, borrar a la
+    persona y volver a invitarla.
+  */
+  const usuario = invitacion.restablece
+    ? await cambiarClave(c.env.PANEL, invitacion.correo, contrasena)
+    : await crear(c.env.PANEL, {
+        correo: invitacion.correo,
+        nombre: invitacion.nombre,
+        rol: invitacion.rol,
+        contrasena,
+      });
+
+  if (!usuario) {
+    // Le dieron de baja entre que se creó el enlace y se usó.
+    return c.text('Esa cuenta ya no existe. Pida un enlace nuevo.', 410);
+  }
 
   await gastarInvitacion(c.env.PANEL, testigo);
+
+  /*
+    Las sesiones viejas se cierran al cambiar la contraseña, no al crear el
+    enlace: si se cerraran antes, pedir un restablecimiento echaría del panel a
+    quien todavía está trabajando y quizá nunca llega a usarlo.
+  */
+  if (invitacion.restablece) await cerrarSesionesDe(c.env.PANEL, usuario.correo);
 
   /*
     Antes aquí venía una pantalla más: el código QR para la aplicación de
@@ -352,6 +384,56 @@ app.post('/invitacion/:testigo', async (c) => {
   const sesion = await abrirSesion(c.env.PANEL, usuario.correo, usuario.rol);
   c.header('Set-Cookie', cookieDeSesion(sesion, !sinCifrar(c.req.url)));
   return c.redirect('/', 302);
+});
+
+/* ─── La propia contraseña ───────────────────────────────────────────────── */
+
+app.get('/clave', exigirSesion, (c) =>
+  c.html(paginaClave({ sesion: c.get('sesion'), guardado: c.req.query('ok') === '1' })),
+);
+
+app.post('/clave', exigirSesion, async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const actual = String(cuerpo.actual ?? '');
+  const nueva = String(cuerpo.nueva ?? '');
+  const repetir = String(cuerpo.repetir ?? '');
+  const sesion = c.get('sesion');
+
+  const usuario = await obtener(c.env.PANEL, sesion.correo);
+  if (!usuario) return c.redirect('/salir', 302);
+
+  /*
+    El orden de las comprobaciones es el orden en que ayudan: primero si la
+    actual es correcta —si no lo es, da igual lo demás—, luego si las dos
+    nuevas coinciden, y al final si la nueva vale.
+
+    No se apunta el fallo en el contador de intentos del acceso. Ese contador
+    bloquea `/entrar` por correo y por IP durante quince minutos: equivocarse
+    al teclear la contraseña actual en esta pantalla dejaría a la persona sin
+    poder entrar al panel, que es lo contrario de lo que esta pantalla hace.
+  */
+  let problema: string | null = null;
+  if (!(await verificar(actual, usuario.clave))) problema = 'La contraseña actual no es correcta.';
+  else if (nueva !== repetir) problema = 'Las dos contraseñas nuevas no coinciden.';
+  else if (nueva === actual) problema = 'La nueva es igual a la de ahora.';
+  else problema = revisarContrasena(nueva);
+
+  if (problema) {
+    return c.html(paginaClave({ sesion, error: problema }), 400);
+  }
+
+  await cambiarClave(c.env.PANEL, usuario.correo, nueva);
+
+  /*
+    Se cierran todas las sesiones y se abre una nueva para este navegador. Si
+    alguien cambia la contraseña es, muchas veces, porque sospecha que otro la
+    tiene: dejar viva la sesión que ese otro abrió no serviría de nada.
+  */
+  await cerrarSesionesDe(c.env.PANEL, usuario.correo);
+  const testigo = await abrirSesion(c.env.PANEL, usuario.correo, usuario.rol);
+  c.header('Set-Cookie', cookieDeSesion(testigo, !sinCifrar(c.req.url)));
+
+  return c.redirect('/clave?ok=1', 302);
 });
 
 /* ─── Usuarios ───────────────────────────────────────────────────────────── */
@@ -406,6 +488,54 @@ app.post('/usuarios/invitar', exigirSesion, exigirAdministrador, async (c) => {
   );
 });
 
+/*
+  Devolverle el acceso a alguien que perdió su contraseña.
+
+  Antes esto no existía y la única salida era **borrar a la persona y volver a
+  invitarla**, lo que le quitaba el rol y la fecha de alta. Ahora sale el mismo
+  enlace de un solo uso, marcado como restablecimiento: al gastarlo cambia la
+  contraseña y deja todo lo demás como estaba.
+
+  El panel no manda correos, así que el enlace se entrega en mano, igual que el
+  de alta. Eso tiene una consecuencia que conviene tener presente: **quien pueda
+  pulsar este botón puede entrar como esa persona.** Por eso es solo para
+  administradores, y por eso al gastarse se cierran las sesiones de esa cuenta:
+  un restablecimiento que no echa a nadie no sirve para recuperar nada.
+*/
+app.post('/usuarios/restablecer', exigirSesion, exigirAdministrador, async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const correo = String(cuerpo.correo ?? '').toLowerCase().trim();
+  const usuario = await obtener(c.env.PANEL, correo);
+
+  if (!usuario) {
+    return c.html(
+      paginaUsuarios({
+        sesion: c.get('sesion'),
+        usuarios: await listar(c.env.PANEL),
+        error: 'Ese usuario ya no existe.',
+      }),
+      400,
+    );
+  }
+
+  const testigo = await invitar(c.env.PANEL, {
+    correo: usuario.correo,
+    nombre: usuario.nombre,
+    rol: usuario.rol,
+    invitadoPor: c.get('sesion').correo,
+    restablece: true,
+  });
+
+  return c.html(
+    paginaUsuarios({
+      sesion: c.get('sesion'),
+      usuarios: await listar(c.env.PANEL),
+      enlaceNuevo: new URL(`/invitacion/${testigo}`, c.req.url).toString(),
+      enlaceEsReset: usuario.nombre,
+    }),
+  );
+});
+
 app.post('/usuarios/estado', exigirSesion, exigirAdministrador, async (c) => {
   const cuerpo = await c.req.parseBody();
   const correo = String(cuerpo.correo ?? '').toLowerCase().trim();
@@ -453,11 +583,21 @@ app.get('/noticias', exigirSesion, async (c) => {
   }
 });
 
-app.get('/noticias/nueva', exigirSesion, (c) =>
+/** La lista de fotos, o vacía: no poder ofrecerlas no debe tumbar el editor. */
+const fotosDelRepo = async (c: any) => {
+  try {
+    return (await fotos.leerFotos(github(c.env))).datos.fotos;
+  } catch {
+    return [];
+  }
+};
+
+app.get('/noticias/nueva', exigirSesion, async (c) =>
   c.html(
     paginaNoticia({
       sesion: c.get('sesion'),
       esNueva: true,
+      fotos: await fotosDelRepo(c),
       noticia: {
         fecha: new Date().toISOString().slice(0, 10),
         autor: 'Equipo ExamLab',
@@ -488,11 +628,19 @@ async function noticiaDelFormulario(c: any, slug?: string): Promise<noticias.Not
 
 app.post('/noticias/nueva', exigirSesion, async (c) => {
   const noticia = await noticiaDelFormulario(c);
-  const error = !noticia.slug ? 'El título no da un nombre de archivo válido.' : noticias.revisar(noticia);
+  const error = !noticia.slug
+    ? 'El título no da un nombre de archivo válido.'
+    : noticias.revisar(noticia, (await fotosDelRepo(c)).map((f) => f.nombre));
 
   if (error) {
     return c.html(
-      paginaNoticia({ sesion: c.get('sesion'), noticia, esNueva: true, error }),
+      paginaNoticia({
+        sesion: c.get('sesion'),
+        noticia,
+        esNueva: true,
+        fotos: await fotosDelRepo(c),
+        error,
+      }),
       400,
     );
   }
@@ -506,6 +654,7 @@ app.post('/noticias/nueva', exigirSesion, async (c) => {
         sesion: c.get('sesion'),
         noticia,
         esNueva: true,
+        fotos: await fotosDelRepo(c),
         error: motivo(e),
       }),
       502,
@@ -518,16 +667,29 @@ app.post('/noticias/nueva', exigirSesion, async (c) => {
 app.get('/noticias/:slug', exigirSesion, async (c) => {
   const noticia = await noticias.obtener(github(c.env), c.req.param('slug'));
   if (!noticia) return c.text('Esa noticia no existe.', 404);
-  return c.html(paginaNoticia({ sesion: c.get('sesion'), noticia, esNueva: false }));
+  return c.html(
+    paginaNoticia({
+      sesion: c.get('sesion'),
+      noticia,
+      esNueva: false,
+      fotos: await fotosDelRepo(c),
+    }),
+  );
 });
 
 app.post('/noticias/:slug', exigirSesion, async (c) => {
   const noticia = await noticiaDelFormulario(c, c.req.param('slug'));
-  const error = noticias.revisar(noticia);
+  const error = noticias.revisar(noticia, (await fotosDelRepo(c)).map((f) => f.nombre));
 
   if (error) {
     return c.html(
-      paginaNoticia({ sesion: c.get('sesion'), noticia, esNueva: false, error }),
+      paginaNoticia({
+        sesion: c.get('sesion'),
+        noticia,
+        esNueva: false,
+        fotos: await fotosDelRepo(c),
+        error,
+      }),
       400,
     );
   }
@@ -540,6 +702,7 @@ app.post('/noticias/:slug', exigirSesion, async (c) => {
         sesion: c.get('sesion'),
         noticia,
         esNueva: false,
+        fotos: await fotosDelRepo(c),
         error: motivo(e),
       }),
       502,
@@ -753,60 +916,120 @@ app.post('/sedes/:slug', exigirSesion, async (c) => {
 
 app.get('/feriados', exigirSesion, async (c) => {
   const { datos } = await sitio.leerFeriados(github(c.env));
+  const editar = c.req.query('editar') ?? '';
+
   return c.html(
     paginaFeriados({
       sesion: c.get('sesion'),
       fechas: datos.fechas,
-      ok: c.req.query('ok') === '1',
+      editando: datos.fechas.find((f) => f.fecha === editar),
+      guardadas: Number(c.req.query('ok') ?? 0),
+      reemplazadas: Number(c.req.query('cambiadas') ?? 0),
     }),
   );
 });
 
+/** Los días, de uno a otro inclusive. En UTC: así no hay días de 23 ni de 25 horas. */
+function diasEntre(desde: string, hasta: string): string[] {
+  const salida: string[] = [];
+  const fin = Date.parse(`${hasta}T00:00:00Z`);
+  for (let t = Date.parse(`${desde}T00:00:00Z`); t <= fin; t += 86_400_000) {
+    salida.push(new Date(t).toISOString().slice(0, 10));
+  }
+  return salida;
+}
+
+/**
+ * Cuántos días seguidos se pueden poner de una vez.
+ *
+ * No es un límite técnico: es que un error de tecleo en «hasta» —2027 en vez de
+ * 2026— escribiría cientos de fechas en el repositorio de un botonazo, y
+ * deshacerlo sería ir quitándolas una a una.
+ */
+const TOPE_DIAS = 60;
+
+/*
+  Un solo formulario para las tres cosas: añadir un día, cambiar uno que ya
+  está y poner la misma regla en un rango.
+
+  Lo que se guarda no cambió: `franja: null` es cerrado y una lista de tramos es
+  el horario de ese día. El dato siempre lo admitió —y hasta dos tramos—; lo que
+  faltaba era poder decirlo desde la pantalla.
+*/
 app.post('/feriados', exigirSesion, async (c) => {
   const cuerpo = await c.req.parseBody();
   const t = (k: string) => String(cuerpo[k] ?? '').trim();
+  const fallo = (error: string, fechas: sitio.FechaEspecial[], codigo: 400 | 502) =>
+    c.html(paginaFeriados({ sesion: c.get('sesion'), fechas, error }), codigo);
 
   const { datos, sha } = await sitio.leerFeriados(github(c.env));
-  const cerrado = cuerpo.cerrado === 'si';
-  const abre = t('abre');
-  const cierra = t('cierra');
 
-  const nueva: sitio.FechaEspecial = {
-    fecha: t('fecha'),
-    motivo: t('motivo'),
-    franja: cerrado || !abre || !cierra ? null : [{ abre, cierra }],
-  };
+  const desde = t('desde');
+  const hasta = t('hasta') || desde;
+  /** La fecha que se estaba editando. Vacío cuando se está añadiendo. */
+  const original = t('original');
+  // `motivo` a secas es, en este archivo, el helper que traduce un fallo a texto.
+  const razon = t('motivo');
 
-  const error =
-    sitio.revisarFechaEspecial(nueva) ??
-    (datos.fechas.some((f) => f.fecha === nueva.fecha)
-      ? 'Ya hay una fecha especial ese día.'
-      : undefined);
+  /*
+    Los dos tramos. Un tramo a medias —hora de abrir sin hora de cerrar— no se
+    descarta en silencio: se deja pasar para que `revisarFranja` lo explique.
+  */
+  const tramos = [
+    { abre: t('abre1'), cierra: t('cierra1') },
+    { abre: t('abre2'), cierra: t('cierra2') },
+  ].filter((x) => x.abre || x.cierra);
 
-  if (error) {
-    return c.html(
-      paginaFeriados({ sesion: c.get('sesion'), fechas: datos.fechas, error }),
+  const franja: sitio.Franja = cuerpo.cerrado === 'si' ? null : tramos;
+
+  for (const [etiqueta, valor] of [['desde', desde], ['hasta', hasta]] as const) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+      return fallo(`La fecha de «${etiqueta}» va como AAAA-MM-DD.`, datos.fechas, 400);
+    }
+  }
+  if (hasta < desde) return fallo('La fecha final es anterior a la inicial.', datos.fechas, 400);
+
+  const dias = diasEntre(desde, hasta);
+  if (dias.length > TOPE_DIAS) {
+    return fallo(
+      `Son ${dias.length} días de una vez; el tope es ${TOPE_DIAS}. Revise la fecha final.`,
+      datos.fechas,
       400,
     );
   }
 
-  datos.fechas = [...datos.fechas, nueva].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  const problema = sitio.revisarFechaEspecial({ fecha: desde, motivo: razon, franja });
+  if (problema) return fallo(problema, datos.fechas, 400);
+
+  const nuevas = dias.map((fecha) => ({ fecha, motivo: razon, franja }));
+
+  /*
+    Las fechas del rango que ya existían se reemplazan, y la pantalla dice
+    cuántas. Es lo que se quiere decir al escribir «del 2 al 4 cerramos»: la
+    regla de esos días es esta, diga lo que diga la que había. Quedarse a medias
+    —unas escritas y otras no— sería peor que cualquiera de las dos opciones.
+  */
+  const reemplazadas = dias.filter(
+    (d) => d !== original && datos.fechas.some((f) => f.fecha === d),
+  ).length;
+
+  const fuera = new Set(original ? [...dias, original] : dias);
+  datos.fechas = [...datos.fechas.filter((f) => !fuera.has(f.fecha)), ...nuevas].sort((a, b) =>
+    a.fecha.localeCompare(b.fecha),
+  );
+
+  const resumen =
+    dias.length === 1
+      ? `${original ? 'Cambia' : 'Añade'} ${razon} (${desde})`
+      : `Pone ${razon} en ${dias.length} días (${desde} a ${hasta})`;
 
   try {
-    await sitio.guardarFeriados(
-      github(c.env),
-      datos,
-      sha,
-      c.get('sesion').correo,
-      `Añade ${nueva.motivo} (${nueva.fecha})`,
-    );
+    await sitio.guardarFeriados(github(c.env), datos, sha, c.get('sesion').correo, resumen);
   } catch (e) {
-    return c.html(
-      paginaFeriados({ sesion: c.get('sesion'), fechas: datos.fechas, error: motivo(e) }),
-      502,
-    );
+    return fallo(motivo(e), datos.fechas, 502);
   }
-  return c.redirect('/feriados?ok=1', 302);
+
+  return c.redirect(`/feriados?ok=${dias.length}&cambiadas=${reemplazadas}`, 302);
 });
 
 app.post('/feriados/quitar', exigirSesion, async (c) => {
@@ -832,6 +1055,162 @@ app.post('/feriados/quitar', exigirSesion, async (c) => {
     );
   }
   return c.redirect('/feriados?ok=1', 302);
+});
+
+/* ─── Fotos ──────────────────────────────────────────────────────────────── */
+
+app.get('/fotos', exigirSesion, async (c) => {
+  const { datos } = await fotos.leerFotos(github(c.env));
+  return c.html(
+    paginaFotos({
+      sesion: c.get('sesion'),
+      fotos: datos.fotos,
+      guardada: c.req.query('ok') ?? undefined,
+    }),
+  );
+});
+
+/*
+  La miniatura de una foto que ya está publicada.
+
+  Se trae del sitio y se sirve desde aquí en vez de apuntar el `<img>` a
+  examlabsas.com, que es lo que parecería más simple. La cabecera de seguridad
+  del panel es `img-src 'self' data:`, y abrirla a otro dominio para enseñar
+  nueve miniaturas sería pagar con la única regla que impide que esta pantalla
+  cargue cualquier cosa de cualquier sitio.
+
+  Una foto recién subida tarda un par de minutos en existir ahí. Mientras, esta
+  ruta devuelve 404 y el hueco se queda gris, que es lo que la pantalla ya
+  anuncia al guardar.
+*/
+/*
+  Un marco gris en lugar del icono de imagen rota.
+
+  La lista y los archivos de una foto viajan en el mismo commit, pero el sitio
+  tarda uno o dos minutos en reconstruirse. En esa ventana la foto ya está en la
+  lista y todavía no en examlabsas.com, y lo que salía era el icono de imagen
+  rota del navegador: el mismo que sale cuando algo se ha perdido de verdad.
+  Aquí no se ha perdido nada, solo no ha llegado.
+*/
+const ESPERANDO =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" width="160" height="120">' +
+  '<rect width="160" height="120" fill="#eef2f5"/>' +
+  '<g transform="translate(68 42)" fill="none" stroke="#9aa8b4" stroke-width="1.75" ' +
+  'stroke-linecap="round" stroke-linejoin="round">' +
+  '<path d="M4 5.5h16v13H4zM4 15l4.5-4.5 4 4 3-2.5L20 16M15.5 9.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z"/>' +
+  '</g>' +
+  '<text x="80" y="84" text-anchor="middle" font-family="system-ui, sans-serif" ' +
+  'font-size="10" fill="#6d7b86">aún no publicada</text>' +
+  '</svg>';
+
+app.get('/vista/:nombre', exigirSesion, async (c) => {
+  const nombre = c.req.param('nombre');
+  if (!/^[a-z0-9-]{1,60}$/.test(nombre)) return c.notFound();
+
+  const respuesta = await fetch(`https://examlabsas.com/images/${nombre}-800.webp`);
+  /* Medio minuto de caché y no una hora: lo que se espera es que deje de hacer
+     falta, y con la hora del caso bueno no se vería hasta mañana. */
+  if (!respuesta.ok) {
+    return c.body(ESPERANDO, 200, {
+      'Content-Type': 'image/svg+xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=30',
+    });
+  }
+
+  return c.body(await respuesta.arrayBuffer(), 200, {
+    'Content-Type': 'image/webp',
+    'Cache-Control': 'public, max-age=3600',
+  });
+});
+
+app.post('/fotos', exigirSesion, async (c) => {
+  const cuerpo = await c.req.parseBody();
+  const t = (k: string) => String(cuerpo[k] ?? '').trim();
+
+  const { datos } = await fotos.leerFotos(github(c.env));
+  const fallo = (error: string, codigo: 400 | 502) =>
+    c.html(paginaFotos({ sesion: c.get('sesion'), fotos: datos.fotos, error }), codigo);
+
+  const nombre = fotos.aNombre(t('nombre'));
+  const alt = t('alt');
+
+  /*
+    Lo que manda el navegador: una variante por ancho más la vista previa. Se
+    mira aquí para no fiarse de que el navegador mandó lo que dijo: por este
+    formulario se publica en el sitio del laboratorio.
+
+    **Se descodifican doce bytes de cada archivo, no el archivo.** Esa es la
+    diferencia entre funcionar y no. El plan gratuito de Workers corta a los
+    10 ms de CPU por petición, y es el mismo motivo por el que el catálogo
+    dejó de pasar por base64. Descodificar entero lo que admite este
+    formulario —cuatro archivos de 1,5 MB— cuesta 21,6 ms medidos en Node, y
+    Node es la medida optimista: `wrangler dev` no mide la CPU, así que esto
+    no se veía hasta producción. El base64 se manda a GitHub tal cual llega,
+    así que no había nada más que descodificar.
+  */
+  const cabezaDe = (base64: string): Uint8Array => {
+    const binario = atob(base64.slice(0, 24));
+    const bytes = new Uint8Array(binario.length);
+    for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
+    return bytes;
+  };
+
+  /** Lo que pesa, de la aritmética del propio base64: cuatro letras, tres bytes. */
+  const pesaDe = (base64: string): number => {
+    const relleno = base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0;
+    return (base64.length / 4) * 3 - relleno;
+  };
+
+  let archivos: { ancho: number | 'og'; cabeza: Uint8Array; pesa: number; base64: string }[];
+  try {
+    archivos = [...fotos.ANCHOS.map((a) => ({ ancho: a as number | 'og', campo: `v${a}` })), { ancho: 'og' as const, campo: 'og' }]
+      .map((x) => ({ ...x, base64: t(x.campo) }))
+      .filter((x) => x.base64 !== '')
+      .map((x) => ({
+        ancho: x.ancho,
+        base64: x.base64,
+        cabeza: cabezaDe(x.base64),
+        pesa: pesaDe(x.base64),
+      }));
+  } catch {
+    return fallo('La foto llegó dañada. Vuelva a elegirla.', 400);
+  }
+
+  const problema = fotos.revisarFoto({
+    nombre,
+    alt,
+    ocupados: datos.fotos.map((f) => f.nombre),
+    archivos,
+  });
+  if (problema) return fallo(problema, 400);
+
+  const anchos = archivos
+    .map((a) => a.ancho)
+    .filter((a): a is number => a !== 'og')
+    .sort((a, b) => a - b);
+
+  /*
+    La lista de antes se guarda aparte. Si GitHub falla, la pantalla de error
+    enseña la galería, y con la foto ya metida en `datos` enseñaría una foto que
+    no se guardó —con su miniatura rota— justo debajo del aviso de que no se
+    pudo guardar.
+  */
+  const antes = datos.fotos;
+  datos.fotos = [...antes, { nombre, alt, anchos }];
+
+  try {
+    await fotos.guardarFoto(github(c.env), {
+      datos,
+      nombre,
+      archivos: archivos.map((a) => ({ ancho: a.ancho, base64: a.base64 })),
+      autor: c.get('sesion').correo,
+    });
+  } catch (e) {
+    datos.fotos = antes;
+    return fallo(motivo(e), 502);
+  }
+
+  return c.redirect(`/fotos?ok=${encodeURIComponent(nombre)}`, 302);
 });
 
 /* ─── Catálogo público ───────────────────────────────────────────────────── */

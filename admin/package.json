@@ -9,7 +9,7 @@
     "deploy": "wrangler deploy",
     "tipos": "wrangler types",
     "admin:crear": "node scripts/crear-admin.mjs",
-    "check": "tsc --noEmit",
+    "check": "node scripts/comprobar.mjs",
     "pruebas:github": "node pruebas/github-falso.mjs",
     "pruebas:usuario": "node pruebas/usuario.mjs",
     "pruebas:codigo": "node pruebas/codigo.mjs",

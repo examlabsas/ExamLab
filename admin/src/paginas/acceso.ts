@@ -77,16 +77,23 @@ export function paginaInvitacion(opciones: {
   correo: string;
   nombre: string;
   error?: string;
+  /** El mismo enlace, usado para recuperar un acceso en vez de crearlo. */
+  restablece?: boolean;
 }) {
   return pagina(
-    'Crear su acceso',
+    opciones.restablece ? 'Nueva contraseña' : 'Crear su acceso',
     `<form class="caja" method="post" action="/invitacion/${esc(opciones.testigo)}">
       ${marca}
       <div class="caja-cuerpo">
-        <h1>Hola, ${esc(opciones.nombre)}</h1>
+        <h1>${opciones.restablece ? 'Nueva contraseña' : `Hola, ${esc(opciones.nombre)}`}</h1>
         <p class="sub">
-          Elija su contraseña para <strong>${esc(opciones.correo)}</strong>.
-          Nadie más la verá, ni siquiera quien le invitó.
+          ${
+            opciones.restablece
+              ? `Elija una nueva para <strong>${esc(opciones.correo)}</strong>. La anterior deja de
+                 servir y se cierran las sesiones que hubiera abiertas en otros dispositivos.`
+              : `Elija su contraseña para <strong>${esc(opciones.correo)}</strong>.
+                 Nadie más la verá, ni siquiera quien le invitó.`
+          }
         </p>
 
         <label for="contrasena">Contraseña</label>
@@ -116,6 +123,54 @@ export function paginaInvitacion(opciones: {
   );
 }
 
+
+/**
+ * Cambiar la propia contraseña.
+ *
+ * No existía. La única forma de cambiar una contraseña era que un
+ * administrador borrase al usuario y lo volviera a invitar, y la del único
+ * administrador no se podía cambiar de ninguna forma: tocaba repetir
+ * `npm run admin:crear` con acceso a Cloudflare.
+ *
+ * Pide la actual aunque haya sesión abierta. Una sesión abierta en un mostrador
+ * no prueba quién está delante del teclado, y esto es lo que protege la puerta.
+ */
+export function paginaClave(opciones: { sesion: Sesion; error?: string; guardado?: boolean }) {
+  return pagina(
+    'Su contraseña',
+    `${cabecera(
+      'Cambiar su contraseña',
+      `La de <strong>${esc(opciones.sesion.correo)}</strong>. Al cambiarla se cierran las
+       sesiones abiertas en otros dispositivos; esta se queda.`,
+    )}
+
+    ${opciones.guardado ? `<p class="error bien">Cambiada. La siguiente vez entre con la nueva.</p>` : ''}
+
+    <div class="panel" style="max-width:34rem">
+      <form method="post" action="/clave">
+        <label for="actual">Contraseña actual</label>
+        ${campoClave({ id: 'actual', nombre: 'actual', completar: 'current-password', foco: true })}
+
+        <label for="nueva">Contraseña nueva</label>
+        ${campoClave({ id: 'nueva', nombre: 'nueva', completar: 'new-password', minimo: 12 })}
+
+        <label for="repetir">Repítala</label>
+        ${campoClave({ id: 'repetir', nombre: 'repetir', completar: 'new-password' })}
+        <p class="pista mayusculas" hidden>Está activado el bloqueo de mayúsculas.</p>
+
+        <p class="pista">
+          Al menos 12 caracteres. Una frase que recuerde resiste más que ocho
+          caracteres con símbolos — y no acaba escrita en un papel.
+        </p>
+
+        ${opciones.error ? `<p class="error">${esc(opciones.error)}</p>` : ''}
+
+        <button type="submit">Cambiarla</button>
+      </form>
+    </div>`,
+    { sesion: opciones.sesion },
+  );
+}
 
 /** Lo que el inicio sabe del sitio. Vacío si GitHub no contestó. */
 export type ResumenInicio = {
@@ -189,7 +244,9 @@ export function paginaPanel(opciones: {
     `${cabecera(
       `Hola, ${esc(opciones.nombre)}`,
       `Entró como <strong>${esc(opciones.sesion.rol)}</strong>. Lo que guarde aquí tarda
-       uno o dos minutos en verse en el sitio y queda anotado con su nombre.`,
+       uno o dos minutos en verse en el sitio y queda anotado con su nombre.
+       ${/* En el móvil no hay raíl, así que este es el único camino a /clave. */ ''}
+       <a href="/clave">Cambiar su contraseña</a>.`,
     )}
 
     ${bloqueAviso}

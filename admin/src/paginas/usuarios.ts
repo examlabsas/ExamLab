@@ -18,6 +18,8 @@ export function paginaUsuarios(opciones: {
   sesion: Sesion;
   usuarios: UsuarioPublico[];
   enlaceNuevo?: string;
+  /** El nombre de quien lo recupera, cuando el enlace es de restablecimiento. */
+  enlaceEsReset?: string;
   error?: string;
 }) {
   const filas = opciones.usuarios
@@ -41,13 +43,27 @@ export function paginaUsuarios(opciones: {
         <td class="accion">${
           u.correo === opciones.sesion.correo
             ? '<span class="pista">Es usted</span>'
-            : `<form method="post" action="/usuarios/estado" style="margin:0">
-                 <input type="hidden" name="correo" value="${esc(u.correo)}">
-                 <input type="hidden" name="activo" value="${u.activo ? 'no' : 'si'}">
-                 <button type="submit" class="chico ${u.activo ? 'secundario' : ''}">
-                   ${u.activo ? 'Desactivar' : 'Reactivar'}
-                 </button>
-               </form>`
+            : `<div class="acciones-fila">
+                 ${
+                   /*
+                     Restablecer va primero porque es lo que se viene a hacer:
+                     alguien llama diciendo que no puede entrar. Desactivar es
+                     para cuando alguien se va del laboratorio, y pasa una vez
+                     al año.
+                   */ ''
+                 }
+                 <form method="post" action="/usuarios/restablecer" style="margin:0">
+                   <input type="hidden" name="correo" value="${esc(u.correo)}">
+                   <button type="submit" class="chico secundario">Restablecer</button>
+                 </form>
+                 <form method="post" action="/usuarios/estado" style="margin:0">
+                   <input type="hidden" name="correo" value="${esc(u.correo)}">
+                   <input type="hidden" name="activo" value="${u.activo ? 'no' : 'si'}">
+                   <button type="submit" class="chico ${u.activo ? 'secundario' : ''}">
+                     ${u.activo ? 'Desactivar' : 'Reactivar'}
+                   </button>
+                 </form>
+               </div>`
         }</td>
       </tr>`,
     )
@@ -63,10 +79,20 @@ export function paginaUsuarios(opciones: {
       ${
         opciones.enlaceNuevo
           ? `<div class="panel" style="margin:1.5rem 0;max-width:none">
-               <strong>Enlace de alta creado</strong>
+               <strong>${
+                 opciones.enlaceEsReset
+                   ? `Enlace para que ${esc(opciones.enlaceEsReset)} recupere su acceso`
+                   : 'Enlace de alta creado'
+               }</strong>
                <p class="pista">
                  Páseselo a esa persona por un medio directo. Caduca en 24 horas
                  y sirve una sola vez. Ella elige su contraseña: usted no la verá.
+                 ${
+                   opciones.enlaceEsReset
+                     ? `Su contraseña de ahora sigue sirviendo hasta que lo use; al usarlo,
+                        se cierran las sesiones que tuviera abiertas.`
+                     : ''
+                 }
                </p>
                <div class="enlace-fila">
                  <code class="enlace-alta" id="enlace-alta">${esc(opciones.enlaceNuevo)}</code>

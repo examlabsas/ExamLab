@@ -1,6 +1,7 @@
 /** Pantallas de noticias, aviso temporal y estado del último cambio. */
 import { pagina, cabecera, esc, icono, type Sesion } from './plantilla';
-import { FOTOS, atributosDeFoto, type Noticia } from '../noticias';
+import { type Noticia } from '../noticias';
+import type { Foto } from '../fotos';
 import type { Commit } from '../github';
 import { diaDe, nombreDelDia, SECCIONES, seccionDe, type Seccion } from '../historial';
 
@@ -58,6 +59,8 @@ export function paginaNoticia(o: {
   sesion: Sesion;
   noticia: Partial<Noticia>;
   esNueva: boolean;
+  /** Las que hay ahora mismo en el repositorio, no las del despliegue. */
+  fotos?: Foto[];
   error?: string;
 }) {
   const n = o.noticia;
@@ -65,9 +68,9 @@ export function paginaNoticia(o: {
     .concat(
       // Se ofrece la descripción de la foto y no su nombre de archivo:
       // «tecnologa con tubos» no dice qué se ve, y el texto alternativo sí.
-      FOTOS.map(
+      (o.fotos ?? []).map(
         (f) =>
-          `<option value="${f}"${n.foto === f ? ' selected' : ''}>${esc(atributosDeFoto(f).alt)}</option>`,
+          `<option value="${f.nombre}"${n.foto === f.nombre ? ' selected' : ''}>${esc(f.alt)}</option>`,
       ),
     )
     .join('');
@@ -105,8 +108,8 @@ export function paginaNoticia(o: {
         <label for="foto">Foto</label>
         <select id="foto" name="foto">${opcionesFoto}</select>
         <p class="pista">
-          Las nueve fotos reales del laboratorio. Subir una nueva exige tocar el
-          código del sitio y queda para una fase posterior.
+          Las fotos reales del laboratorio. Si falta la que quiere,
+          <a href="/fotos">súbala en Fotos</a> y vuelva aquí.
         </p>
 
         <label for="cuerpo">Artículo</label>

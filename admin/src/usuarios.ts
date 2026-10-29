@@ -95,9 +95,44 @@ export async function crear(
   return usuario;
 }
 
+/**
+ * Cambia la contraseña de alguien que ya existe, y nada más.
+ *
+ * No se reutiliza `crear` para esto: `crear` arma un usuario nuevo entero, así
+ * que le borraría la fecha de alta, el rol y el estado a quien ya estaba. Un
+ * restablecimiento cambia la contraseña; todo lo demás es la misma persona.
+ */
+export async function cambiarClave(
+  kv: KVNamespace,
+  correo: string,
+  contrasena: string,
+): Promise<Usuario | null> {
+  const usuario = await obtener(kv, correo);
+  if (!usuario) return null;
+
+  const actualizado: Usuario = { ...usuario, clave: await cifrar(contrasena) };
+  await guardar(kv, actualizado);
+  return actualizado;
+}
+
 /* ─── Invitaciones ───────────────────────────────────────────────────────── */
 
-export type Invitacion = { correo: string; nombre: string; rol: Rol; invitadoPor: string };
+export type Invitacion = {
+  correo: string;
+  nombre: string;
+  rol: Rol;
+  invitadoPor: string;
+  /**
+   * Un enlace de restablecimiento en vez de uno de alta.
+   *
+   * Es el mismo mecanismo —un testigo de un solo uso que caduca en 24 horas—
+   * pero al gastarlo cambia la contraseña de quien ya existe en vez de crear a
+   * nadie. Así se recupera un acceso perdido **sin borrar al usuario**, que era
+   * lo único que se podía hacer antes y se llevaba por delante su rol y su
+   * fecha de alta.
+   */
+  restablece?: boolean;
+};
 
 const HORAS_DE_INVITACION = 24;
 
